@@ -66,11 +66,15 @@ class App extends Component {
         <Map
           google={this.props.google}
           style={style}
+          mapTypeControl={false}      // Turn off the map type control
+          streetViewControl={false} 
           initialCenter={{
             lat: 41.977226,
             lng: -87.836723,
-          }}
-          zoom={14}
+          }
+        }
+          zoom={12}
+          fullscreenControl={false} 
         >
           {markers.map((marker, index) => (
             <Marker
