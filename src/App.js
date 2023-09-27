@@ -18,6 +18,7 @@ class App extends Component {
 
   handleFileUpload = (e) => {
     const file = e.target.files[0];
+    
     if (file) {
       const reader = new FileReader();
 
@@ -26,9 +27,15 @@ class App extends Component {
         Papa.parse(csvData, {
           header: true,
           dynamicTyping: true,
+          // Specify the columns for Street Address, City, and Zip Code
+          columns: ["Street Address", "City", "Zip Code"],
           complete: (result) => {
             if (result && result.data) {
-              const addresses = result.data.map((row) => row["Street Address"]);
+              const addresses = result.data.map((row) => ({
+                streetAddress: row["Street Address"],
+                city: row["City"],
+                zipCode: row["Zip Code"],
+              }));
               this.createPinsFromAddresses(addresses);
             }
           },
@@ -44,8 +51,11 @@ class App extends Component {
     const geocoder = new google.maps.Geocoder();
     const markers = [];
 
-    addresses.forEach((address) => {
-      geocoder.geocode({ address }, (results, status) => {
+    addresses.forEach((addressData) => {
+      // Construct the full address from components
+      const fullAddress = `${addressData.streetAddress}, ${addressData.city}, ${addressData.zipCode}`;
+
+      geocoder.geocode({ address: fullAddress }, (results, status) => {
         if (status === google.maps.GeocoderStatus.OK && results[0]) {
           const location = results[0].geometry.location;
           markers.push({
@@ -66,15 +76,15 @@ class App extends Component {
         <Map
           google={this.props.google}
           style={style}
-          mapTypeControl={false}      // Turn off the map type control
-          streetViewControl={false} 
+          mapTypeControl={false}
+          streetViewControl={false}
+          zoomControl={false}
           initialCenter={{
             lat: 41.977226,
             lng: -87.836723,
-          }
-        }
+          }}
           zoom={12}
-          fullscreenControl={false} 
+          fullscreenControl={false}
         >
           {markers.map((marker, index) => (
             <Marker
@@ -88,7 +98,6 @@ class App extends Component {
     );
   }
 }
-
 
 
 export default GoogleApiWrapper({
