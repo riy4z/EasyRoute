@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 import { Map, GoogleApiWrapper, Marker } from "google-maps-react";
 import Papa from "papaparse";
+import "../src/ImportButton.css";
 
 const style = {
+  left:270,
+  top:5,
   width: "100%",
   height: "100%",
 };
@@ -12,12 +15,15 @@ class App extends Component {
     super(props);
     this.state = {
       map: null,
-      markers: [],
+      markers: []
     };
   }
 
+
   handleFileUpload = (e) => {
+
     const file = e.target.files[0];
+    
     
     if (file) {
       const reader = new FileReader();
@@ -68,11 +74,35 @@ class App extends Component {
   };
 
   render() {
-    const { markers } = this.state;
+    const { markers} = this.state;
 
     return (
       <>
-        <input type="file" accept=".csv" onChange={this.handleFileUpload} />
+      
+      <input
+    type="file"
+    accept=".csv"
+    onChange={this.handleFileUpload}
+    
+  />
+    <div  style={{width: '250px',
+    height: '100%',
+    backgroundColor: '#000000',
+    color: 'white',
+    position: 'fixed',
+    top: 28.5,
+    left: 0,
+    padding: '20px'}}>
+          <h2 style={{fontSize:40}}>EasyRoute</h2>
+          <ul>
+            <li style={{padding:20}}>Team</li>
+            <li style={{padding:20}}>Support</li>
+            <li style={{padding:20}}>Settings</li>
+            <li style={{padding:20}}>About</li>
+          </ul>
+         </div>
+        
+          
         <Map
           google={this.props.google}
           style={style}
@@ -84,7 +114,7 @@ class App extends Component {
             lng: -87.836723,
           }}
           zoom={12}
-          fullscreenControl={false}
+          fullscreenControl={false} 
         >
           {markers.map((marker, index) => (
             <Marker
@@ -94,6 +124,7 @@ class App extends Component {
             />
           ))}
         </Map>
+          
       </>
     );
   }
