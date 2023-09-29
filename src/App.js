@@ -95,8 +95,8 @@ class App extends Component {
     padding: '20px'}}>
           <h2 style={{fontSize:40}}>EasyRoute</h2>
           <ul>
-            <li style={{padding:20}}>Team</li>
-            <li style={{padding:20}}>Support</li>
+            <li style={{padding:20}}>Follow Up</li>
+            <li style={{padding:20}}>Route</li>
             <li style={{padding:20}}>Settings</li>
             <li style={{padding:20}}>About</li>
           </ul>
