@@ -1,14 +1,8 @@
 import React, { Component } from "react";
 import { Map, GoogleApiWrapper, Marker } from "google-maps-react";
 import Papa from "papaparse";
-import "../src/ImportButton.css";
+import Sidebar from "./Sidebar";
 
-const style = {
-  left:270,
-  top:5,
-  width: "100%",
-  height: "100%",
-};
 
 class App extends Component {
   constructor(props) {
@@ -74,38 +68,22 @@ class App extends Component {
   };
 
   render() {
-    const { markers} = this.state;
+    const {markers} = this.state;
 
     return (
+  
       <>
       
       <input
-    type="file"
-    accept=".csv"
-    onChange={this.handleFileUpload}
-    
-  />
-    <div  style={{width: '250px',
-    height: '100%',
-    backgroundColor: '#000000',
-    color: 'white',
-    position: 'fixed',
-    top: 28.5,
-    left: 0,
-    padding: '20px'}}>
-          <h2 style={{fontSize:40}}>EasyRoute</h2>
-          <ul>
-            <li style={{padding:20}}>Follow Up</li>
-            <li style={{padding:20}}>Route</li>
-            <li style={{padding:20}}>Settings</li>
-            <li style={{padding:20}}>About</li>
-          </ul>
-         </div>
-        
-          
-        <Map
+         type="file"
+         accept=".csv"
+         onChange={this.handleFileUpload}/>   
+      
+      <Map
           google={this.props.google}
-          style={style}
+          style={{width: "100%",
+          height: "100%",
+          z: -1,}}
           mapTypeControl={false}
           streetViewControl={false}
           zoomControl={false}
@@ -123,12 +101,14 @@ class App extends Component {
               name={`Marker ${index}`}
             />
           ))}
-        </Map>
+      </Map>
+        <Sidebar/>
           
       </>
     );
   }
 }
+
 
 
 export default GoogleApiWrapper({
