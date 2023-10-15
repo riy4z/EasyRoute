@@ -11,7 +11,7 @@ const ExtendedScreen = ({ children, isExpanded, onToggleExpand }) => {
         color: 'black',
         position: 'fixed',
         top: 28.5,
-        left: 250,
+        left: 300,
         padding: '20px',
         zIndex: 0,
         transition: 'width 0.3s ease-in-out',
