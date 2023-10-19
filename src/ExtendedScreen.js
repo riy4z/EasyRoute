@@ -7,23 +7,20 @@ const ExtendedScreen = ({ children, isExpanded, onToggleExpand }) => {
       style={{
         width: isExpanded ? '300px' : '0px',
         height: '100%',
-        backgroundColor: isExpanded ? 'white' : '#282c34',
+        backgroundColor: 'white',
         color: 'black',
         position: 'fixed',
-        top: 28.5,
-        left: 300,
+        top: 0,
+        left: isExpanded ? '300px' : '-300px', // Adjusted the left property to completely hide the component
         padding: '20px',
         zIndex: 0,
-        transition: 'width 0.3s ease-in-out',
+        transition: 'left 0.3s ease-in-out, width 0.3s ease-in-out',
       }}
     >
       {isExpanded ? (
         <div>
-          <div style={{ marginBottom: '10px' }}>
-            <RxCrossCircled
-              onClick={onToggleExpand}
-              style={{ cursor: 'pointer' }}
-            />
+          <div style={{ marginBottom: '10px', marginLeft: '280px' }}>
+            <RxCrossCircled onClick={onToggleExpand} style={{ cursor: 'pointer' }} />
           </div>
           {children}
         </div>

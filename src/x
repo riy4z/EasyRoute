@@ -1,0 +1,52 @@
+ // handleFileUpload = (e) => {
+
+  //   const file = e.target.files[0];
+    
+    
+  //   if (file) {
+  //     const reader = new FileReader();
+
+  //     reader.onload = (event) => {
+  //       const csvData = event.target.result;
+  //       Papa.parse(csvData, {
+  //         header: true,
+  //         dynamicTyping: true,
+  //         columns: ["Street Address", "City", "Zip Code"],
+  //         complete: (result) => {
+  //           if (result && result.data) {
+  //             const addresses = result.data.map((row) => ({
+  //               streetAddress: row["Street Address"],
+  //               city: row["City"],
+  //               zipCode: row["Zip Code"],
+  //             }));
+  //             this.createPinsFromAddresses(addresses);
+  //           }
+  //         },
+  //       });
+  //     };
+
+  //     reader.readAsText(file);
+  //   }
+  // };
+
+  // createPinsFromAddresses = (addresses) => {
+  //   const { google } = this.props;
+  //   const geocoder = new google.maps.Geocoder();
+  //   const markers = [];
+
+  //   addresses.forEach((addressData) => {
+  //     const fullAddress = `${addressData.streetAddress}, ${addressData.city}, ${addressData.zipCode}`;
+
+  //     geocoder.geocode({ address: fullAddress }, (results, status) => {
+  //       if (status === google.maps.GeocoderStatus.OK && results[0]) {
+  //         const location = results[0].geometry.location;
+  //         markers.push({
+  //           position: { lat: location.lat(), lng: location.lng() },
+  //         });
+  //         this.setState({ markers });
+  //       }
+  //     });
+  //   });
+  // };
+
+  
