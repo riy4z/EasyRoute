@@ -61,7 +61,7 @@ class GMap extends Component {
         {initialCenter && (
           <Map
             google={this.props.google}
-            style={{ width: "100%", height: "100%", position: "fixed" }}
+            style={{ width: "100%", height: "100%", position: "fixed", }}
             containerElement={<div style={{ height: "100%" }} />}
             mapElement={<div style={{ height: "100%" }} />}
             mapTypeControl={false}
