@@ -11,7 +11,7 @@ const ExtendedScreen = ({ children, isExpanded, onToggleExpand }) => {
         color: 'black',
         position: 'fixed',
         top: 0,
-        left: isExpanded ? '300px' : '-300px', // Adjusted the left property to completely hide the component
+        left: isExpanded ? '290px' : '-300px', // Adjusted the left property to completely hide the component
         padding: '20px',
         zIndex: -1,
         transition: 'left 0.3s ease-in-out, width 0.3s ease-in-out',

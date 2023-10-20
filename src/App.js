@@ -16,7 +16,7 @@ class App extends Component {
 
   render() {
     const { addresses } = this.state;
-
+    // console.log(addresses);
     return (
       <div>
         <Sidebar setAddresses={this.setAddresses} />

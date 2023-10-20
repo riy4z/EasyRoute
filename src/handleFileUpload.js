@@ -16,7 +16,6 @@ const handleFileUpload = (file, callback) => {
         },
       });
     };
-    console.log(reader);
     reader.readAsText(file);
   }
 };

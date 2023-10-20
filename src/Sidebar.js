@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ExtendedScreen from './ExtendedScreen';
-import Account from './Screens/Account';
+import Account from './Screens/Account'; // Import the Account component
 import RoutesS from './Screens/RoutesS';
 import Tools from './Screens/Tools';
 import HelpSupport from './Screens/HelpSupport';
@@ -40,10 +40,24 @@ function Sidebar(props) {
     }
   };
 
+  const optionStyle = {
+    padding: 10,
+    cursor: 'pointer',
+    
+  };
+
+  const selectedOptionStyle = {
+    padding: '10px 18px',
+    cursor: 'pointer',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius : 10,
+    
+  };
+
   return (
     <div
       style={{
-        width: '300px',
+        width: '250px',
         height: '100%',
         backgroundColor: '#282c34',
         fontFamily: 'dubai',
@@ -58,43 +72,44 @@ function Sidebar(props) {
     >
       <h2 style={{ fontSize: 40, color: 'white' }}>EasyRoute</h2>
 
+
       <p
-        style={{ padding: 5, cursor: 'pointer' }}
+        style={selectedOption === 'Account' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Account')}
       >
         <i className="fas fa-user-circle" style={{ marginRight: '25px' }} />
         Account
       </p>
       <p
-        style={{ padding: 5, cursor: 'pointer' }}
+        style={selectedOption === 'Route' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Route')}
       >
         <i className="fas fa-map-marked-alt" style={{ marginRight: '25px' }} />
         Route
       </p>
       <p
-        style={{ padding: 5, cursor: 'pointer' }}
+        style={selectedOption === 'Tools' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Tools')}
       >
         <i className="fas fa-tools" style={{ marginRight: '25px' }} />
         Tools
       </p>
       <p
-        style={{ padding: 5, cursor: 'pointer' }}
+        style={selectedOption === 'HelpSupport' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('HelpSupport')}
       >
         <i className="fas fa-question-circle" style={{ marginRight: '25px' }} />
         Help & Support
       </p>
       <p
-        style={{ padding: 5, cursor: 'pointer' }}
+        style={selectedOption === 'Settings' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Settings')}
       >
         <i className="fas fa-cog" style={{ marginRight: '25px' }} />
         Settings
       </p>
       <p
-        style={{ padding: 5, cursor: 'pointer' }}
+        style={selectedOption === 'About' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('About')}
       >
         <i className="fas fa-info-circle" style={{ marginRight: '25px' }} />

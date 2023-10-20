@@ -1,22 +1,53 @@
 import React from "react";
 import handleFileUpload from "../handleFileUpload";
 
+
 class Account extends React.Component {
+  handleFileSelect = () => {
+    this.fileInput.click();
+  };
+
   handleFileChange = (e) => {
     const file = e.target.files[0];
     handleFileUpload(file, (data) => {
-      this.props.setAddresses(data);
+      this.props.setAddresses(data); // Pass the parsed data to the parent component
     });
   };
 
   render() {
+    const buttonStyle = {
+      backgroundColor: "#0066ff",
+      border: "none",
+      borderRadius: 10,
+      color: "white",
+      padding: "10px 80px",
+      textAlign: "center",
+      textDecoration: "none",
+      display: "inline-block",
+      fontWeight: 600,
+      position: "absolute",
+      fontSize: "16px",
+      cursor: "pointer",
+    };
+
     return (
       <div>
-        <input type="file" accept=".csv" onChange={this.handleFileChange} />
-        {/* Any other content you want to show in Account component */}
+        <h1>Accounts</h1>
+        <button style={buttonStyle} onClick={this.handleFileSelect}>
+          Import Accounts
+        </button>
+        <input
+          type="file"
+          accept=".csv"
+          onChange={this.handleFileChange}
+          ref={(fileInput) => (this.fileInput = fileInput)}
+          style={{ display: "none" }}
+        />
+
+        {/* Any other content you want to show in the Account component */}
       </div>
     );
   }
-}     
+}
 
 export default Account;
