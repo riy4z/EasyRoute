@@ -6,22 +6,55 @@ class GMap extends Component {
     super(props);
     this.state = {
       markers: [],
-      initialCenter: {
-        lat: 41.977226,
-        lng: -87.836723,
-      },
+      initialCenter: null, // Initial center is initially set to null
     };
   }
 
-  createPinsFromAddresses = async (addresses) => {
+  // Add a new method to get the user's current location
+  getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { coords } = position;
+        this.setState({
+          initialCenter: {
+            lat: coords.latitude,
+            lng: coords.longitude,
+          },
+        });
+      }, () => {
+        // Error handling when the user's location is not available
+        this.setState({
+          initialCenter: {
+            lat: 41.977226,
+            lng: -87.836723,
+          },
+        });
+      });
+    } else {
+      // If geolocation is not supported, set the default coordinates
+      this.setState({
+        initialCenter: {
+          lat: 41.977226,
+          lng: -87.836723,
+        },
+      });
+    }
+  }
+
+  componentDidMount() {
+    // Get the user's location when the component mounts
+    this.getUserLocation();
+  }
+
+  createPinsFromAddresses = (addresses) => {
     if (!addresses || addresses.length === 0) {
       return;
     }
-  
+
     const { google } = this.props;
     const geocoder = new google.maps.Geocoder();
     const markers = [];
-  
+
     const logGeocodingError = (status, address) => {
       if (status === 'ZERO_RESULTS') {
         console.error('No results found for the address:', address);
@@ -29,21 +62,21 @@ class GMap extends Component {
         console.error('Geocode was not successful for the following reason: ' + status);
       }
     };
-  
-    for (let i = 0; i < addresses.length; i++) {
-      const addressData = addresses[i];
+
+    const geocodeAddress = async (addressData) => {
       if (!addressData["Street Address"] || !addressData["City"] || !addressData["ZIP Code"]) {
         console.error('Invalid address data:', addressData);
-        continue;
+        return;
       }
       const fullAddress = `${addressData["Street Address"]}, ${addressData["City"]}, ${addressData["ZIP Code"]}`;
-      console.log('Full address:', fullAddress);
+      // console.log('Full address:', fullAddress);
+
       try {
         const response = await new Promise((resolve) =>
           geocoder.geocode({ address: fullAddress }, (results, status) => {
             if (status === 'OK' && results[0]) {
               const location = results[0].geometry.location;
-              console.log('Geolocation data:', location.lat(), location.lng());
+              // console.log('Geolocation data:', location.lat(), location.lng());
               markers.push({ position: { lat: location.lat(), lng: location.lng() } });
             } else {
               logGeocodingError(status, fullAddress);
@@ -54,22 +87,27 @@ class GMap extends Component {
       } catch (error) {
         console.error('Geocoding error:', error);
       }
-    }
-  
-    console.log('Markers:', markers);
-    this.setState({ markers });
-  };
-  
-  
-  
-  
+    };
 
+    // Iterate through the addresses and geocode them sequentially
+    const geocodePromises = addresses.map((addressData) => geocodeAddress(addressData));
+
+    // Wait for all geocoding promises to complete
+    Promise.all(geocodePromises).then(() => {
+      // console.log('Markers:', markers);
+      this.setState({ markers });
+    });
+  };
+
+
+  
   componentDidUpdate(prevProps) {
     if (prevProps.addresses !== this.props.addresses) {
-      console.log('Updated Addresses:', this.props.addresses);
+      // console.log('Updated Addresses:', this.props.addresses);
       this.createPinsFromAddresses(this.props.addresses);
     }
   }
+  
 
   render() {
     const { markers, initialCenter } = this.state;
