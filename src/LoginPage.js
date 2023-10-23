@@ -18,7 +18,7 @@ const LoginPage = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // Check if the login is successful
-    if (username === 'yourUsername' && password === 'yourPassword') {
+    if (username === 'fm' && password === 'sr') {
       // Navigate to the App component
       navigate('/app');
     } else {

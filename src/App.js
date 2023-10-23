@@ -1,3 +1,4 @@
+//App.js
 import React, { Component } from "react";
 import GMap from "./GMap";
 import Sidebar from "./Sidebar";
