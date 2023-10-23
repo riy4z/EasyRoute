@@ -15,8 +15,8 @@ const ExtendedScreen = ({ children, isExpanded, onToggleExpand }) => {
         left: isExpanded ? 290 : -300,
         padding: 20,
         zIndex: 0,
-        transition: 'transform 0.3s ease', // Using transform for transition effect
-        transform: isExpanded ? 'scale(1)' : 'scale(0)', // Adjusting the scale based on the expansion state
+        transition : 'opacity 0.6s ease',
+        opacity : isExpanded ? 1:0, 
       }}
     >
       {isExpanded ? (
