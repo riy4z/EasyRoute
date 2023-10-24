@@ -1,0 +1,61 @@
+/* SignupPage.css */
+.signup-page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid #ccc;
+    padding: 50px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    width: 700px;
+  }
+  
+  .signup-page-container form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .signup-page-container .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .signup-page-container .half-width {
+    width: 45%;
+  }
+  
+  .signup-page-container label {
+    margin-bottom: 10px;
+    width: 10%;
+  }
+  
+  .signup-page-container input
+ {
+  width: 100%; /* Set the width of the input fields and select elements to 100% */
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+.signup-page-container select {
+    width: 100%; /* Set the width of the input fields and select elements to 100% */
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .signup-page-container button {
+    margin-top: 30px;
+    margin-left: 26%;
+    width: 50%;
+    padding: 8px 20px; /* Adjust the padding to change the button size */
+    font-size: 14px; /* Adjust the font size of the button */
+  }
+  

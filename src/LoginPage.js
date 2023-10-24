@@ -1,6 +1,7 @@
 // LoginPage.js
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import './LoginPage.css'; // Import the CSS file for styling
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -27,24 +28,26 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Username:</label>
-          <input type="text" value={username} onChange={handleUsernameChange} />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input type="password" value={password} onChange={handlePasswordChange} />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-      <Link to="/signup">
-        <button>Sign Up</button>
-      </Link>
-    </div>
-  );
+    <div className="login-page-container">
+    <h2>Login</h2>
+    <form onSubmit={handleSubmit}>
+      <div className="form-group">
+        <label>Username:</label>
+        <input type="text" value={username} onChange={handleUsernameChange} />
+      </div>
+      <div className="form-group">
+        <label>Password:</label>
+        <input type="password" value={password} onChange={handlePasswordChange} />
+      </div>
+      <div className="action-buttons">
+        <button type="submit" className="login-button">Login</button>
+        <Link to="/signup">
+          <button className="signup-button">Sign Up</button>
+        </Link>
+      </div>
+    </form>
+  </div>
+);
 };
 
 export default LoginPage;
