@@ -26,10 +26,11 @@ const LoginPage = () => {
       alert('Invalid credentials. Please try again.');
     }
   };
+ 
 
   return (
     <div className="login-page-container">
-    <h2>Login</h2>
+    <h2>LOGIN</h2>
     <form onSubmit={handleSubmit}>
       <div className="form-group">
         <label>Username:</label>

@@ -31,7 +31,7 @@ class Account extends React.Component {
 
   render() {
     const buttonStyle = {
-      backgroundColor: "#0066ff",
+      backgroundColor: '#394359',
       border: "none",
       borderRadius: 10,
       color: "white",
@@ -43,14 +43,15 @@ class Account extends React.Component {
       position: "absolute",
       fontSize: "16px",
       cursor: "pointer",
+      left:"25px"
     };
     const buttonStyle1 = {
-      top:50,
-      backgroundColor: "black",
+      top:20,
+      backgroundColor: '#394359',
       border: "none",
       borderRadius: 10,
       color: "white",
-      padding: "10px 80px",
+      padding: "10px 10px",
       textAlign: "center",
       textDecoration: "none",
       display: "inline-block",
@@ -58,11 +59,18 @@ class Account extends React.Component {
       position: "absolute",
       fontSize: "16px",
       cursor: "pointer",
+      justifyContent:"center",
+      left:"95px",
     };
+
+    const style= {
+      color: "#282c34",
+      textAlign:"center"
+    }
 
     return (
       <div>
-        <h1>Accounts</h1>
+        <h1 style={style}>Accounts</h1>
 
         <button style={buttonStyle} onClick={this.handleFileSelect}>
           Import Accounts
@@ -76,6 +84,7 @@ class Account extends React.Component {
         />
 
         <button style={buttonStyle1} onClick={this.openPopup}>
+        <i className="fas fa-plus-circle" style={{ marginRight: 10}}></i>
           Add Account
         </button>
 

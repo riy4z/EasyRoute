@@ -75,9 +75,10 @@ const SignupPage = () => {
     navigate('/');
   };
 
+ 
   return (
     <div className="signup-page-container">
-      <h2>Sign Up</h2>
+      <h2>SIGN UP</h2>
       <form onSubmit={handleSubmit}>
         <div className="row">
           <div className="half-width">

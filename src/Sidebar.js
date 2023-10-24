@@ -64,7 +64,7 @@ function Sidebar(props) {
         width: 250,
         height: '100%',
         backgroundColor: '#282c34',
-        fontFamily: 'dubai',
+        fontFamily: '',
         fontSize: 25,
         color: 'lightblue',
         position: 'fixed',
