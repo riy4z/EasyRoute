@@ -1,15 +1,27 @@
 import React, { Component } from "react";
 import { Map, GoogleApiWrapper, Marker } from "google-maps-react";
+import axios from 'axios';
 
 class GMap extends Component {
   constructor(props) {
     super(props);
     this.state = {
       markers: [],
-      initialCenter: null, // Initial center is initially set to null
+      initialCenter: null, 
     };
   }
-
+       
+  sendAddressDataToBackend = async (addressData) => {
+  
+    try {
+      const response = await axios.post('http://localhost:4000/api/store-address-data', addressData, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (error) {
+      // console.error('Errror saving address data:', error);
+      console.log("error")
+    }
+  }
   // Add a new method to get the user's current location
   getUserLocation = () => {
     if (navigator.geolocation) {
@@ -69,15 +81,20 @@ class GMap extends Component {
         return;
       }
       const fullAddress = `${addressData["Street Address"]}, ${addressData["City"]}, ${addressData["ZIP Code"]}`;
-      // console.log('Full address:', fullAddress);
-
+    
       try {
-        const response = await new Promise((resolve) =>
+        const geo = await new Promise((resolve) =>
           geocoder.geocode({ address: fullAddress }, (results, status) => {
             if (status === 'OK' && results[0]) {
               const location = results[0].geometry.location;
-              // console.log('Geolocation data:', location.lat(), location.lng());
-              markers.push({ position: { lat: location.lat(), lng: location.lng() } });
+              const longitude = location.lng();
+              const latitude = location.lat();
+              
+              // Include longitude and latitude in the addressData object
+              addressData.longitude = longitude;
+              addressData.latitude = latitude;
+    
+              markers.push({ position: { lat: latitude, lng: longitude } });
             } else {
               logGeocodingError(status, fullAddress);
             }
@@ -87,6 +104,11 @@ class GMap extends Component {
       } catch (error) {
         console.error('Geocoding error:', error);
       }
+
+    
+      // Send addressData to the backend
+      this.sendAddressDataToBackend(addressData);
+    
     };
 
     // Iterate through the addresses and geocode them sequentially
@@ -94,7 +116,6 @@ class GMap extends Component {
 
     // Wait for all geocoding promises to complete
     Promise.all(geocodePromises).then(() => {
-      // console.log('Markers:', markers);
       this.setState({ markers });
     });
   };
@@ -103,7 +124,6 @@ class GMap extends Component {
   
   componentDidUpdate(prevProps) {
     if (prevProps.addresses !== this.props.addresses) {
-      // console.log('Updated Addresses:', this.props.addresses);
       this.createPinsFromAddresses(this.props.addresses);
     }
   }
