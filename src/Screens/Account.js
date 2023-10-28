@@ -10,6 +10,37 @@ class Account extends React.Component {
     };
   }
 
+
+  fetchAddressData = () => {
+    fetch('http://localhost:4000/api/get-address-data')
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (typeof data !== 'object') {
+          console.error('Client: Error - Response is not an object:', data);
+          throw new Error('Response is not a valid JSON object');
+        }
+        this.setSavedAddresses(data); // Pass the retrieved data to the parent component
+      })
+      .catch((error) => {
+        console.error('Client: Error fetching address data:', error);
+        throw error; // Rethrow the error for further handling if necessary
+      });
+  };
+  
+  setSavedAddresses = (savedaddress) => {
+    this.setState({ savedaddress });
+  };
+
+  // Automatically fetch address data when the component mounts
+  componentDidMount() {
+    this.fetchAddressData();
+  }
+
   handleFileSelect = () => {
     this.fileInput.click();
   };
@@ -30,6 +61,8 @@ class Account extends React.Component {
   };
 
   render() {
+    const {savedaddress} = this.state;
+    // console.log(savedaddress)
     const buttonStyle = {
       backgroundColor: '#394359',
       border: "none",
@@ -87,6 +120,10 @@ class Account extends React.Component {
         <i className="fas fa-plus-circle" style={{ marginRight: 10}}></i>
           Add Account
         </button>
+        {/* <div>
+        <text>{savedaddress}</text>
+        </div> */}
+      
 
         {this.state.isPopupOpen && (
           <Popup onClose={this.closePopup} />
