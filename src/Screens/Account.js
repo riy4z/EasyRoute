@@ -1,17 +1,31 @@
 import React from "react";
 import handleFileUpload from "../handleFileUpload";
 import Popup from "../Popup";
+import AccountDetails from "../AccountDetails";
+
 
 class Account extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       isPopupOpen: false,
+      savedaddress: [{}],
+      searchInput: "", // State variable to store the search input
+      selectedAddress: null, 
+      isAccountDetailsExpanded: false,
     };
   }
 
-
   fetchAddressData = () => {
+    // Fetch address data and update state every 10 seconds (for example)
+    this.fetchAndUpdateAddressData(); // Fetch immediately when the component mounts
+    this.fetchInterval = setInterval(() => {
+      if (!this.state.searchInput) { // Only fetch if search input is empty
+        this.fetchAndUpdateAddressData(); // Fetch every 10 seconds only if no search is active
+      }
+    }, 1000); // Fetch every 10 seconds
+  };
+  fetchAndUpdateAddressData = () => {
     fetch('http://localhost:4000/api/get-address-data')
       .then((res) => {
         if (!res.ok) {
@@ -24,13 +38,19 @@ class Account extends React.Component {
           console.error('Client: Error - Response is not an object:', data);
           throw new Error('Response is not a valid JSON object');
         }
-        this.setSavedAddresses(data); // Pass the retrieved data to the parent component
+        this.setSavedAddresses(data); // Update the address data in the component state
       })
       .catch((error) => {
         console.error('Client: Error fetching address data:', error);
-        throw error; // Rethrow the error for further handling if necessary
+        // Handle errors if needed
       });
   };
+
+  
+  
+  componentWillUnmount() {
+    clearInterval(this.fetchInterval); // Clear the interval when the component unmounts
+  }
   
   setSavedAddresses = (savedaddress) => {
     this.setState({ savedaddress });
@@ -60,11 +80,75 @@ class Account extends React.Component {
     this.setState({ isPopupOpen: false });
   };
 
+handleListItemHover = (index) => {
+  const updatedSavedAddresses = [...this.state.savedaddress];
+  updatedSavedAddresses[index].backgroundColor = '#f0f0f0'; // Change the background color on hover
+  this.setState({ savedaddress: updatedSavedAddresses });
+};
+
+handleListItemLeave = (index) => {
+  const updatedSavedAddresses = [...this.state.savedaddress];
+  delete updatedSavedAddresses[index].backgroundColor; // Remove the background color on hover leave
+  this.setState({ savedaddress: updatedSavedAddresses });
+};
+
+searchTimeout;
+
+handleSearchInputChange = (e) => {
+  const value = e.target.value;
+
+  this.setState({ searchInput: value }, () => {
+    clearTimeout(this.searchTimeout);
+
+    if (value === '') {
+      // If search is cleared, resume fetching data
+      this.fetchAddressData();
+    } else {
+      // If search is active, stop the interval
+      clearInterval(this.fetchInterval);
+    }
+
+    this.searchTimeout = setTimeout(this.searchAddresses, 300);
+  });
+};
+
+searchAddresses = () => {
+  const { savedaddress, searchInput } = this.state;
+  const filteredAddresses = savedaddress.filter((address) => {
+    const fullName = `${address['First Name']} ${address['Last Name']}`;
+    const addressFields = [
+      address['Street Address'],
+      address['City'],
+      address['State'],
+      address['ZIP Code']
+    ];
+
+    // Check if any field contains the search input
+    const matchesSearch = addressFields.some(field => field.toLowerCase().includes(searchInput.toLowerCase()));
+
+    // Check if the full name contains the search input
+    const fullNameMatches = fullName.toLowerCase().includes(searchInput.toLowerCase());
+
+    return matchesSearch || fullNameMatches;
+  });
+  this.setSavedAddresses(filteredAddresses);
+};
+
+handleListItemClick = (index) => {
+  const selectedAddress = this.state.savedaddress[index];
+  this.setState({
+    selectedAddress,
+    isAccountDetailsExpanded: true,
+  });
+};
+
+
   render() {
-    const {savedaddress} = this.state;
+    const { savedaddress, searchInput, selectedAddress, isAccountDetailsExpanded } = this.state;
+   
     // console.log(savedaddress)
     const buttonStyle = {
-      backgroundColor: '#394359',
+      backgroundColor: '#0066ff',
       border: "none",
       borderRadius: 10,
       color: "white",
@@ -76,10 +160,11 @@ class Account extends React.Component {
       position: "absolute",
       fontSize: "16px",
       cursor: "pointer",
-      left:"25px"
+      top:"160px"
     };
+
     const buttonStyle1 = {
-      top:20,
+      bottom:70,
       backgroundColor: '#394359',
       border: "none",
       borderRadius: 10,
@@ -93,16 +178,24 @@ class Account extends React.Component {
       fontSize: "16px",
       cursor: "pointer",
       justifyContent:"center",
-      left:"95px",
+      left:"85px",
     };
 
     const style= {
       color: "#282c34",
-      textAlign:"center"
+      textAlign:"left",
     }
+    
+    const listContainerStyle = {
+      position:"absolute",
+      height: "600px", // Set a fixed height for the container
+      overflow: "auto", // Enable vertical scrolling
+      marginTop:"110px",
+      marginRight:"10px"
+    };
 
     return (
-      <div>
+      <div >
         <h1 style={style}>Accounts</h1>
 
         <button style={buttonStyle} onClick={this.handleFileSelect}>
@@ -116,23 +209,65 @@ class Account extends React.Component {
           style={{ display: "none" }}
         />
 
+<input
+          type="text"
+          placeholder="Search Accounts"
+          value={searchInput}
+          onChange={this.handleSearchInputChange}
+          style={{
+          
+            padding: "10px",
+            width: "85%",
+            border: "1px solid #ccc",
+            borderRadius: "15px",
+            marginTop:"50px",
+            position:"absolute"
+          }}
+        />       
+
         <button style={buttonStyle1} onClick={this.openPopup}>
         <i className="fas fa-plus-circle" style={{ marginRight: 10}}></i>
           Add Account
         </button>
-        {/* <div>
-        <text>{savedaddress}</text>
-        </div> */}
+        <div style={{...listContainerStyle}}> 
       
+      <ul  style={{ listStyleType: "none", padding: 0 }}>
+      {this.state.savedaddress.map((address, index) => (
+          <li 
+          key={address._id}
+          onClick={() => this.handleListItemClick(index)}
+          onMouseEnter={() => this.handleListItemHover(index)}
+          onMouseLeave={() => this.handleListItemLeave(index)}
+          style={{
+            backgroundColor: address.backgroundColor, // Use the background color from state
+            cursor: 'pointer', // Change the cursor to a pointer on hover for better UX
+            borderBottom: '1px solid #ccc',  
+          }}
+        >
+            <p style={{fontSize:"14px"}}><strong>{address['First Name']} {address['Last Name']}</strong><br></br>         
+            {address['Street Address']},{address['City']},{address['State']},{address['ZIP Code']}</p>   
+            
+          </li>
+        ))}
+      </ul>
+    </div>
+     
+    {isAccountDetailsExpanded && (
+          <AccountDetails
+  
+            addressData={selectedAddress}
+            isExpanded={isAccountDetailsExpanded}
+            onToggleExpand={() => this.setState({ isAccountDetailsExpanded: !isAccountDetailsExpanded })
+            }
+            />
+            )}
 
-        {this.state.isPopupOpen && (
-          <Popup onClose={this.closePopup} />
-        )}
-
-        {/* Any other content you want to show in the Account component */}
+{this.state.isPopupOpen && <Popup onClose={this.closePopup} />
+  }
+    
       </div>
     );
   }
 }
 
-export default Account;
+export default Account;

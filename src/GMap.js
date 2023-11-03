@@ -18,8 +18,7 @@ class GMap extends Component {
         headers: { 'Content-Type': 'application/json' },
       });
     } catch (error) {
-      // console.error('Errror saving address data:', error);
-      console.log("error")
+      console.error('Errror saving address data:', error);
     }
   }
   // Add a new method to get the user's current location

@@ -14,6 +14,7 @@ const Root = () => (
       <Route path="/" element={<LoginPage />} />
       <Route path="/app" element={<App />} />
       <Route path="/signup" element={<SignupPage />} />
+
     </Routes>
   </BrowserRouter>
 );
