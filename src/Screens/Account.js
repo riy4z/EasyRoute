@@ -9,7 +9,7 @@ class Account extends React.Component {
     super(props);
     this.state = {
       isPopupOpen: false,
-      savedaddress: [{}],
+      savedaddress: [],
       searchInput: "", // State variable to store the search input
       selectedAddress: null, 
       isAccountDetailsExpanded: false,
@@ -134,18 +134,29 @@ searchAddresses = () => {
   this.setSavedAddresses(filteredAddresses);
 };
 
-handleListItemClick = (index) => {
-  const selectedAddress = this.state.savedaddress[index];
+handleListItemClick = (selectedAddress) => {
   this.setState({
     selectedAddress,
     isAccountDetailsExpanded: true,
   });
 };
 
-
   render() {
     const { savedaddress, searchInput, selectedAddress, isAccountDetailsExpanded } = this.state;
    
+      // Sort the addresses based on the 'First Name' in ascending order
+    const sortedAddresses = [...savedaddress].sort((a, b) => {
+    const nameA = a['First Name'].toLowerCase();
+    const nameB = b['First Name'].toLowerCase();
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+    return 0;
+  });
+
     // console.log(savedaddress)
     const buttonStyle = {
       backgroundColor: '#0066ff',
@@ -194,6 +205,34 @@ handleListItemClick = (index) => {
       marginRight:"10px"
     };
 
+    //List Content
+    let listContent;
+    if (savedaddress && savedaddress.length > 0) {
+      const visibleAddresses = sortedAddresses.filter(address => !address.isHidden);
+    
+      listContent = visibleAddresses.map((address, index) => (
+        <li 
+          key={address._id}
+          onClick={() => this.handleListItemClick(address)}
+          onMouseEnter={() => this.handleListItemHover(index)}
+          onMouseLeave={() => this.handleListItemLeave(index)}
+          style={{
+            backgroundColor: address.backgroundColor,
+            cursor: 'pointer',
+            borderBottom: '1px solid #ccc',
+            display: address.isHidden ? 'none' : 'block' // Hiding elements with isHidden set to true
+          }}
+        >
+          <p style={{ fontSize: "14px" }}>
+            <strong>{address['First Name']} {address['Last Name']}</strong><br></br>         
+            {address['Street Address']}, {address['City']}, {address['State']}, {address['ZIP Code']}
+          </p> 
+        </li>
+      ));
+    } else {
+      listContent = <h5>No Accounts found</h5>;
+    }
+
     return (
       <div >
         <h1 style={style}>Accounts</h1>
@@ -209,7 +248,7 @@ handleListItemClick = (index) => {
           style={{ display: "none" }}
         />
 
-<input
+          <input
           type="text"
           placeholder="Search Accounts"
           value={searchInput}
@@ -232,23 +271,8 @@ handleListItemClick = (index) => {
         <div style={{...listContainerStyle}}> 
       
       <ul  style={{ listStyleType: "none", padding: 0 }}>
-      {this.state.savedaddress.map((address, index) => (
-          <li 
-          key={address._id}
-          onClick={() => this.handleListItemClick(index)}
-          onMouseEnter={() => this.handleListItemHover(index)}
-          onMouseLeave={() => this.handleListItemLeave(index)}
-          style={{
-            backgroundColor: address.backgroundColor, // Use the background color from state
-            cursor: 'pointer', // Change the cursor to a pointer on hover for better UX
-            borderBottom: '1px solid #ccc',  
-          }}
-        >
-            <p style={{fontSize:"14px"}}><strong>{address['First Name']} {address['Last Name']}</strong><br></br>         
-            {address['Street Address']},{address['City']},{address['State']},{address['ZIP Code']}</p>   
-            
-          </li>
-        ))}
+      {listContent}
+
       </ul>
     </div>
      

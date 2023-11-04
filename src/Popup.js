@@ -11,6 +11,8 @@ class Popup extends Component {
       state: "",
       city: "",
       zipcode: "",
+      longitude: null,
+      latitude: null,
     };
   }
 
@@ -23,28 +25,58 @@ class Popup extends Component {
   };
 
   handleSave = () => {
-    const { firstName, lastName, address,state, city ,zipcode } = this.state;
-    
+    // ... existing code for handling user input
+
+    const { address, city, state, zipcode } = this.state;
+
+    // Use a geocoding service to fetch longitude and latitude
+    const addressString = `${address}, ${city}, ${state} ${zipcode}`;
+    axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+      params: {
+        address: addressString,
+        key: 'AIzaSyAEBs7HmfIN_AB-Anpl2YP4jIOewJBgt_U', // Replace with your actual API key
+      }
+    })
+      .then(response => {
+        const { results } = response.data;
+        if (results && results.length > 0) {
+          const { lat, lng } = results[0].geometry.location;
+          this.setState({ latitude: lat, longitude: lng }, () => {
+            // Once the state is updated with longitude and latitude, proceed to save the data
+            this.saveAddressData();
+          });
+        } else {
+          console.error('No results found for the address.');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching geocoding data:', error);
+      });
+  };
+
+  saveAddressData = () => {
+    const { firstName, lastName, address, state, city, zipcode, longitude, latitude } = this.state;
+
     const accountData = {
+      
       "First Name": firstName,
       "Last Name": lastName,
       "Street Address": address,
       "City": city,
       "State": state,
       "ZIP Code": zipcode,
+      "longitude": longitude,
+      "latitude": latitude,
     };
 
     axios.post('http://localhost:4000/api/store-address-data', accountData)
       .then(response => {
-        // Handle success, if needed
-        console.alert('Account data saved');
+        console.log('Account data saved');
+        this.onClose();
       })
       .catch(error => {
-        // Handle error, if any
         console.error('Error saving account data:', error);
       });
-
-      this.onClose();
   };
 
   onClose = () => {
