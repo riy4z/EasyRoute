@@ -13,7 +13,7 @@ const ExtendedScreen = ({ children, isExpanded, onToggleExpand }) => {
         position: 'absolute',
         top: 0,
         left: isExpanded ? 290 : -300,
-        padding: 20,
+        padding: 10,
         zIndex: 0,
         transition : 'opacity 0.6s ease',
         opacity : isExpanded ? 1:0, 

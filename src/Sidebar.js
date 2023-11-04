@@ -6,7 +6,9 @@ import Tools from './Screens/Tools';
 import HelpSupport from './Screens/HelpSupport';
 import Settings from './Screens/Settings';
 import About from './Screens/About';
+import Admin from './Screens/Admin';
 import '@fortawesome/fontawesome-free/css/all.css';
+
 
 function Sidebar(props) {
   const [selectedOption, setSelectedOption] = useState(null); 
@@ -41,6 +43,8 @@ function Sidebar(props) {
         return <Settings />;
       case 'about':
         return <About />;
+        case 'admin':
+          return <Admin />;
       default:
         return null;
     }
@@ -75,7 +79,13 @@ function Sidebar(props) {
       }}
     >
       <h2 style={{ fontSize: 40, color: 'white' }}>EasyRoute</h2>
-
+      <p
+        style={selectedOption === 'Admin' ? selectedOptionStyle : optionStyle}
+        onClick={() => handleOptionClick('Admin')}
+      >
+        <i className="fas fa-solid fa-lock" style={{ marginRight: 25 }} />
+        Admin
+      </p>
       <p
         style={selectedOption === 'Account' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Account')}
