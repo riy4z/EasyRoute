@@ -1,7 +1,7 @@
 import React from "react";
-import handleFileUpload from "../handleFileUpload";
-import Popup from "../Popup";
-import AccountDetails from "../AccountDetails";
+import handleFileUpload from "../components/handleFileUpload";
+import Popup from "./Popup";
+import AccountDetails from "./AccountDetails";
 
 
 class Account extends React.Component {
@@ -17,11 +17,11 @@ class Account extends React.Component {
   }
 
   fetchAddressData = () => {
-    // Fetch address data and update state every 10 seconds (for example)
+    // Fetch address data and update state every 1 second
     this.fetchAndUpdateAddressData(); // Fetch immediately when the component mounts
     this.fetchInterval = setInterval(() => {
       if (!this.state.searchInput) { // Only fetch if search input is empty
-        this.fetchAndUpdateAddressData(); // Fetch every 10 seconds only if no search is active
+        this.fetchAndUpdateAddressData(); 
       }
     }, 1000); // Fetch every 10 seconds
   };

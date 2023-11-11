@@ -1,9 +1,7 @@
 //App.js
 import React, { Component } from "react";
-import GMap from "./GMap";
-import Sidebar from "./Sidebar";
-
-
+import GMap from "./components/GMap";
+import Sidebar from "./Screens/Sidebar";
 
 class App extends Component {
   constructor(props) {
@@ -13,20 +11,17 @@ class App extends Component {
     };
   }
 
-  
-
   setAddresses = (addresses) => {
     this.setState({ addresses });
   };
 
   render() {
     const { addresses } = this.state;
-    
+    // console.log(addresses);
     return (
       <div>
         <Sidebar setAddresses={this.setAddresses} />
         <GMap addresses={addresses} />
-
       </div>
     );
   }
