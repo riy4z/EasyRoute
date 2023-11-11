@@ -5,7 +5,13 @@ module.exports = {
     "!./src/screens/**/*.{html,js}", // Exclude styles for files in src/screens
   ],
   theme: {
-    extend: {},
+    
+    extend: {
+      colors: {
+        customColor: '#282c34',
+        customColor1: '#394359', // Example color, replace with your desired color code
+      },
+    },
   },
   plugins: [],
 };

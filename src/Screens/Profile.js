@@ -46,12 +46,12 @@ export default function Profile() {
 
   return (
     <div>
-      <Toaster style={{}} position="top-center" reverseOrder={false}></Toaster>
+      <Toaster position="top-center" reverseOrder={false}></Toaster>
 
-      <div style={{ top: 90, position: 'absolute' }}>
+      <div style={{ top: 43, position: 'absolute' }}>
         <div>
           <div>
-            <h4 className="text-5xl font-bold">Profile</h4>
+            <h4 class="text-5xl font-medium text-customColor1 text-left  ">Profile</h4>
             <span className="py-4 text-xl w-2/3 text-center text-gray-500">You can update the details.</span>
           </div>
 
@@ -68,7 +68,7 @@ export default function Profile() {
               <input onChange={onUpload} type="file" id="profile" name="profile" />
             </div>
 
-            <div>
+            <div class="leading-loose">
               <div>
                 <input
                   {...formik.getFieldProps('firstName')}
@@ -83,7 +83,7 @@ export default function Profile() {
                   placeholder="LastName"
                 />
               </div>
-
+              
               <div>
                 <input
                   {...formik.getFieldProps('mobile')}
@@ -115,4 +115,3 @@ export default function Profile() {
     </div>
   );
 }
-// Hi there!

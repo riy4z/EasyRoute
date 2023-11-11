@@ -8,6 +8,7 @@ import Settings from './Settings';
 import About from './About';
 import '@fortawesome/fontawesome-free/css/all.css';
 import Profile from './Profile';
+import Admin from './Admin';
 
 function Sidebar(props) {
   const [selectedOption, setSelectedOption] = useState(null); 
@@ -30,6 +31,8 @@ function Sidebar(props) {
 
   const renderContent = () => {
     switch (selectedOption && selectedOption.toLowerCase()) {
+      case 'admin':
+        return <Admin />;
       case 'account':
         return <Account setAddresses={props.setAddresses} />;
       case 'route':
@@ -49,80 +52,90 @@ function Sidebar(props) {
     }
   };
 
-  const optionStyle = {
-    padding: 10,
-    cursor: 'pointer',
-  };
+  const optionStyle = "p-3 cursor-pointer"
+  // {
+  //   padding: 10,
+  //   cursor: 'pointer',
+  // };
 
-  const selectedOptionStyle = {
-    padding: '10px 18px',
-    cursor: 'pointer',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 10,
-  };
+  const selectedOptionStyle = "p-3 cursor-pointer bg-gray-100 bg-opacity-25 rounded-lg"
+  // {
+  //   padding: '10px 18px',
+  //   cursor: 'pointer',
+  //   backgroundColor: 'rgba(255,255,255,0.1)',
+  //   borderRadius: 10,
+  // };
 
   return (
     <div
-      style={{
-        width: 275,
-        height: '100%',
-        backgroundColor: '#282c34',
-        fontFamily: '',
-        fontSize: 23,
-        color: 'lightblue',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        padding: 10,
-        zIndex: 1,
-      }}
+      class="fixed w-[275px] h-full z-40 p-2 bg-customColor text-blue-200 leading-loose text-2xl"
+      // {{
+      //   width: 275,
+      //   height: '100%',
+      //   backgroundColor: '#282c34',
+      //   fontFamily: '',
+      //   fontSize: 23,
+      //   color: 'lightblue',
+      //   position: 'fixed',
+      //   top: 0,
+      //   left: 0,
+      //   padding: 10,
+      //   zIndex: 1,
+      // }}
     >
-      <h2 style={{ fontSize: 40, color: 'white' }}>EasyRoute</h2>
-
+      <h2 class="text-white text-5xl font-bold leading-loose">EasyRoute</h2>
+      
       <p
-        style={selectedOption === 'Account' ? selectedOptionStyle : optionStyle}
+        class={selectedOption === 'Admin' ? selectedOptionStyle : optionStyle}
+        onClick={() => handleOptionClick('Admin')}
+      >
+        <i className="fas fa-solid fa-user-tie" style={{ marginRight: 25 }} />
+        Admin
+      </p>
+      <p
+        class={selectedOption === 'Account' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Account')}
       >
         <i className="fas fa-user-circle" style={{ marginRight: 25 }} />
         Account
       </p>
       <p
-        style={selectedOption === 'Route' ? selectedOptionStyle : optionStyle}
+        class={selectedOption === 'Route' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Route')}
       >
         <i className="fas fa-map-marked-alt" style={{ marginRight: 25 }} />
         Route
       </p>
       <p
-        style={selectedOption === 'Tools' ? selectedOptionStyle : optionStyle}
+        class={selectedOption === 'Tools' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Tools')}
       >
         <i className="fas fa-tools" style={{ marginRight: 25 }} />
         Tools
       </p>
       <p
-        style={selectedOption === 'HelpSupport' ? selectedOptionStyle : optionStyle}
+        class={selectedOption === 'HelpSupport' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('HelpSupport')}
       >
         <i className="fas fa-question-circle" style={{ marginRight: 25 }} />
         Help & Support
       </p>
       <p
-        style={selectedOption === 'Settings' ? selectedOptionStyle : optionStyle}
+        class={selectedOption === 'Settings' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Settings')}
       >
         <i className="fas fa-cog" style={{ marginRight: 25 }} />
         Settings
       </p>
       <p
-        style={selectedOption === 'About' ? selectedOptionStyle : optionStyle}
+        class={selectedOption === 'About' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('About')}
       >
         <i className="fas fa-info-circle" style={{ marginRight: 25 }} />
         About
       </p>
       <p
-        style={selectedOption === 'Profile' ? selectedOptionStyle : optionStyle}
+        class={selectedOption === 'Profile' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Profile')}
       >
         <i className="fas fa-user" style={{ marginRight: 25 }} />
