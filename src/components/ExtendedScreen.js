@@ -12,7 +12,7 @@ const ExtendedScreen = ({ children, isExpanded, onToggleExpand }) => {
         color: 'black',
         position: 'absolute',
         top: 0,
-        left: isExpanded ? 290 : -300,
+        left: isExpanded ? 275 : -300,
         padding: 20,
         zIndex: 0,
         transition : 'opacity 0.6s ease',
@@ -21,7 +21,7 @@ const ExtendedScreen = ({ children, isExpanded, onToggleExpand }) => {
     >
       {isExpanded ? (
         <div>
-          <div style={{ marginBottom: '10px', marginLeft: '280px' }}>
+          <div style={{ marginBottom: '10px', marginLeft: '250px' }}>
             <RxCrossCircled onClick={onToggleExpand} style={{ cursor: 'pointer' }} />
           </div>
           {children}

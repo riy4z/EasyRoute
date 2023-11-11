@@ -1,7 +1,7 @@
 //App.js
 import React, { Component } from "react";
-import GMap from "./GMap";
-import Sidebar from "./Sidebar";
+import GMap from "./components/GMap";
+import Sidebar from "./Screens/Sidebar";
 
 class App extends Component {
   constructor(props) {

@@ -18,8 +18,7 @@ class GMap extends Component {
         headers: { 'Content-Type': 'application/json' },
       });
     } catch (error) {
-      // console.error('Errror saving address data:', error);
-      console.log("error")
+      console.error('Errror saving address data:', error);
     }
   }
   // Add a new method to get the user's current location
@@ -160,5 +159,5 @@ class GMap extends Component {
 
 
 export default GoogleApiWrapper({
-  apiKey: "AIzaSyAnjRnY_9rEuXPhMHafgvZLflazp61NgO4",
+  apiKey: "AIzaSyAEBs7HmfIN_AB-Anpl2YP4jIOewJBgt_U",
 })(GMap);

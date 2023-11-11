@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import axios from 'axios';
 
 class Popup extends Component {
   constructor(props) {
@@ -7,9 +8,16 @@ class Popup extends Component {
       firstName: "",
       lastName: "",
       address: "",
-      
+      state: "",
+      city: "",
+      zipcode: "",
+      longitude: null,
+      latitude: null,
     };
   }
+
+  
+
 
   handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -17,14 +25,72 @@ class Popup extends Component {
   };
 
   handleSave = () => {
-    const { firstName, lastName, address } = this.state;
-    // You can perform any necessary actions with this data here
-    // For example, you can send it to the parent component using a callback function.
-    this.props.onSave({ firstName, lastName, address,  });
+    // ... existing code for handling user input
+
+    const { address, city, state, zipcode } = this.state;
+
+    // Use a geocoding service to fetch longitude and latitude
+    const addressString = `${address}, ${city}, ${state} ${zipcode}`;
+    axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+      params: {
+        address: addressString,
+        key: 'AIzaSyAEBs7HmfIN_AB-Anpl2YP4jIOewJBgt_U', // Replace with your actual API key
+      }
+    })
+      .then(response => {
+        const { results } = response.data;
+        if (results && results.length > 0) {
+          const { lat, lng } = results[0].geometry.location;
+          this.setState({ latitude: lat, longitude: lng }, () => {
+            // Once the state is updated with longitude and latitude, proceed to save the data
+            this.saveAddressData();
+          });
+        } else {
+          console.error('No results found for the address.');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching geocoding data:', error);
+      });
   };
 
+  saveAddressData = () => {
+    const { firstName, lastName, address, state, city, zipcode, longitude, latitude } = this.state;
+
+    const accountData = {
+      
+      "First Name": firstName,
+      "Last Name": lastName,
+      "Street Address": address,
+      "City": city,
+      "State": state,
+      "ZIP Code": zipcode,
+      "longitude": longitude,
+      "latitude": latitude,
+    };
+
+    axios.post('http://localhost:4000/api/store-address-data', accountData)
+      .then(response => {
+        console.log('Account data saved');
+        this.onClose();
+      })
+      .catch(error => {
+        console.error('Error saving account data:', error);
+      });
+  };
+
+  onClose = () => {
+    const { onClose } = this.props;
+    if (onClose) {
+      onClose(); // Close the popup using the provided onClose function
+    }
+  };
+
+
+  
+
   render() {
-    const { firstName, lastName, address } = this.state;
+    const { firstName, lastName, address, state, city, zipcode } = this.state;
     const { onClose } = this.props;
 
     const popupStyle = {
@@ -87,7 +153,7 @@ class Popup extends Component {
     return (
       <div className="popup-overlay">
         <div style={popupStyle}>
-          <h2 style={labelStyle}>Create New Account</h2>
+          <h2 style={labelStyle}>Add New Account</h2>
           <label style={labelStyle}>First Name:</label>
           <input
             type="text"
@@ -106,12 +172,42 @@ class Popup extends Component {
             onChange={this.handleInputChange}
             style={inputStyle}
           />
-          <label style={labelStyle}>Address:</label>
+          <label style={labelStyle}>Street Address:</label>
           <input
             type="text"
             name="address"
             placeholder="Address"
             value={address}
+            onChange={this.handleInputChange}
+            style={inputStyle}
+          />
+
+<label style={labelStyle}>City:</label>
+          <input
+            type="text"
+            name="city"
+            placeholder="City"
+            value={city}
+            onChange={this.handleInputChange}
+            style={inputStyle}
+          />
+
+<label style={labelStyle}>State:</label>
+          <input
+            type="text"
+            name="state"
+            placeholder="State"
+            value={state}
+            onChange={this.handleInputChange}
+            style={inputStyle}
+          />
+
+<label style={labelStyle}>Zip Code:</label>
+          <input
+            type="text"
+            name="zipcode"
+            placeholder="Zip Code"
+            value={zipcode}
             onChange={this.handleInputChange}
             style={inputStyle}
           />

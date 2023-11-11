@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import ExtendedScreen from './ExtendedScreen';
-import Account from './Screens/Account'; 
-import RoutesS from './Screens/RoutesS';
-import Tools from './Screens/Tools';
-import HelpSupport from './Screens/HelpSupport';
-import Settings from './Screens/Settings';
-import About from './Screens/About';
+import ExtendedScreen from '../components/ExtendedScreen';
+import Account from './Account'; 
+import RoutesS from './RoutesS';
+import Tools from './Tools';
+import HelpSupport from './HelpSupport';
+import Settings from './Settings';
+import About from './About';
 import '@fortawesome/fontawesome-free/css/all.css';
+import Profile from './Profile';
 
 function Sidebar(props) {
   const [selectedOption, setSelectedOption] = useState(null); 
@@ -41,6 +42,8 @@ function Sidebar(props) {
         return <Settings />;
       case 'about':
         return <About />;
+      case 'profile':
+        return <Profile />;
       default:
         return null;
     }
@@ -61,16 +64,16 @@ function Sidebar(props) {
   return (
     <div
       style={{
-        width: 250,
+        width: 275,
         height: '100%',
         backgroundColor: '#282c34',
         fontFamily: '',
-        fontSize: 25,
+        fontSize: 23,
         color: 'lightblue',
         position: 'fixed',
         top: 0,
         left: 0,
-        padding: 20,
+        padding: 10,
         zIndex: 1,
       }}
     >
@@ -117,6 +120,13 @@ function Sidebar(props) {
       >
         <i className="fas fa-info-circle" style={{ marginRight: 25 }} />
         About
+      </p>
+      <p
+        style={selectedOption === 'Profile' ? selectedOptionStyle : optionStyle}
+        onClick={() => handleOptionClick('Profile')}
+      >
+        <i className="fas fa-user" style={{ marginRight: 25 }} />
+        Profile
       </p>
 
       <ExtendedScreen isExpanded={isExpanded} onToggleExpand={handleToggleExpand}>
