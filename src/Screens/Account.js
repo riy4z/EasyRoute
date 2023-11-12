@@ -158,52 +158,58 @@ handleListItemClick = (selectedAddress) => {
   });
 
     // console.log(savedaddress)
-    const buttonStyle = {
-      backgroundColor: '#0066ff',
-      border: "none",
-      borderRadius: 10,
-      color: "white",
-      padding: "10px 80px",
-      textAlign: "center",
-      textDecoration: "none",
-      display: "inline-block",
-      fontWeight: 600,
-      position: "absolute",
-      fontSize: "16px",
-      cursor: "pointer",
-      top:"160px"
-    };
+    const buttonStyle = "cursor-pointer bg-blue-600 rounded-lg px-14 py-1.5 text-white font-medium absolute top-32 text-xl"
+    // {
+    //   backgroundColor: '#0066ff',
+    //   border: "none",
+    //   borderRadius: 10,
+    //   color: "white",
+    //   padding: "10px 80px",
+    //   textAlign: "center",
+    //   textDecoration: "none",
+    //   display: "inline-block",
+    //   fontWeight: 600,
+    //   position: "absolute",
+    //   fontSize: "16px",
+    //   cursor: "pointer",
+    //   top:"160px"
+    // };
 
-    const buttonStyle1 = {
-      bottom:70,
-      backgroundColor: '#394359',
-      border: "none",
-      borderRadius: 10,
-      color: "white",
-      padding: "10px 10px",
-      textAlign: "center",
-      textDecoration: "none",
-      display: "inline-block",
-      fontWeight: 600,
-      position: "absolute",
-      fontSize: "16px",
-      cursor: "pointer",
-      justifyContent:"center",
-      left:"85px",
-    };
+    const buttonStyle1 = "cursor-pointer bg-customColor1 rounded-lg p-2 text-white font-medium absolute bottom-4 left-16 text-xl"
+    // {
+    //   bottom:70,
+    //   backgroundColor: '#394359',
+    //   border: "none",
+    //   borderRadius: 10,
+    //   color: "white",
+    //   padding: "10px 10px",
+    //   textAlign: "center",
+    //   textDecoration: "none",
+    //   display: "inline-block",
+    //   fontWeight: 600,
+    //   position: "absolute",
+    //   fontSize: "16px",
+    //   cursor: "pointer",
+    //   justifyContent:"center",
+    //   left:"85px",
+    // };
 
-    const style= {
-      color: "#282c34",
-      textAlign:"left",
-    }
+    // const style="text-5xl font-medium text-customColor1 text-left"
+    // // {
+    // //   fontSize: 50,
+    // //   fontWeight:600,
+    // //   color: "#282c34",
+    // //   textAlign:"left",
+    // // }
     
-    const listContainerStyle = {
-      position:"absolute",
-      height: "600px", // Set a fixed height for the container
-      overflow: "auto", // Enable vertical scrolling
-      marginTop:"110px",
-      marginRight:"10px"
-    };
+    const listContainerStyle =  "absolute overflow-y-scroll h-3/5 mt-48 "
+    // {
+    //   position:"absolute",
+    //   height: "600px", // Set a fixed height for the container
+    //   overflow: "auto", // Enable vertical scrolling
+    //   marginTop:"110px",
+    //   marginRight:"10px"
+    // };
 
     //List Content
     let listContent;
@@ -235,9 +241,9 @@ handleListItemClick = (selectedAddress) => {
 
     return (
       <div >
-        <h1 style={style}>Accounts</h1>
+        <h1 class="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
 
-        <button style={buttonStyle} onClick={this.handleFileSelect}>
+        <button class={buttonStyle} onClick={this.handleFileSelect}>
           Import Accounts
         </button>
         <input
@@ -253,22 +259,23 @@ handleListItemClick = (selectedAddress) => {
           placeholder="Search Accounts"
           value={searchInput}
           onChange={this.handleSearchInputChange}
-          style={{
+          class="absolute p-1 w-11/12 border-solid border-2 rounded-full mt-28 text-xl"
+          // {{
           
-            padding: "10px",
-            width: "85%",
-            border: "1px solid #ccc",
-            borderRadius: "15px",
-            marginTop:"50px",
-            position:"absolute"
-          }}
+          //   padding: "10px",
+          //   width: "85%",
+          //   border: "1px solid #ccc",
+          //   borderRadius: "15px",
+          //   marginTop:"50px",
+          //   position:"absolute"
+          // }}
         />       
 
-        <button style={buttonStyle1} onClick={this.openPopup}>
+        <button class={buttonStyle1} onClick={this.openPopup}>
         <i className="fas fa-plus-circle" style={{ marginRight: 10}}></i>
           Add Account
         </button>
-        <div style={{...listContainerStyle}}> 
+        <div class={listContainerStyle}> 
       
       <ul  style={{ listStyleType: "none", padding: 0 }}>
       {listContent}

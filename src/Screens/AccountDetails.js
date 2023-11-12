@@ -3,21 +3,21 @@ import { RxCrossCircled } from 'react-icons/rx';
 import axios from 'axios';
 
 const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) => {
-  const [buttonStyle, setButtonStyle] = useState({
-    backgroundColor: 'white',
-    color: '#ff0000', // Text color
-    borderColor: '#ff0000',
-    borderRadius: 10,
-    padding: '10px 115px',
-    textAlign: 'center',
-    textDecoration: 'none',
-    display: 'inline-block',
-    fontWeight: 600,
-    position: 'absolute',
-    fontSize: 16,
-    cursor: 'pointer',
-    top: 500,
-  });
+  // const [buttonStyle, setButtonStyle] = useState({
+  //   backgroundColor: 'white',
+  //   color: '#ff0000', // Text color
+  //   borderColor: '#ff0000',
+  //   borderRadius: 10,
+  //   padding: '10px 115px',
+  //   textAlign: 'center',
+  //   textDecoration: 'none',
+  //   display: 'inline-block',
+  //   fontWeight: 600,
+  //   position: 'absolute',
+  //   fontSize: 16,
+  //   cursor: 'pointer',
+  //   top: 500,
+  // });
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -26,21 +26,23 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
     city: '',
   });
 
-  const handleMouseEnter = () => {
-    setButtonStyle({
-      ...buttonStyle,
-      backgroundColor: '#ff0000', // Change the background color to red on hover
-      color: 'white', // Change the text color to black on hover
-    });
-  };
+  // const handleMouseEnter = () => {
+  //   setButtonStyle({
+  //     ...buttonStyle,
+  //     backgroundColor: '#ff0000', // Change the background color to red on hover
+  //     color: 'white', // Change the text color to black on hover
+  //   });
+  // };
 
-  const handleMouseLeave = () => {
-    setButtonStyle({
-      ...buttonStyle,
-      backgroundColor: 'white', // Revert the background color on leave
-      color: '#ff0000', // Revert the text color on leave
-    });
-  };
+  // const handleMouseLeave = () => {
+  //   setButtonStyle({
+  //     ...buttonStyle,
+  //     backgroundColor: 'white', // Revert the background color on leave
+  //     color: '#ff0000', // Revert the text color on leave
+  //   });
+  // };
+
+ 
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -71,22 +73,27 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
         });
     }
   };
+  
+  const buttonStyle="border-2 border-red-600 w-11/12  py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
 
-  const buttonStyle1 = {
-    backgroundColor: '#0066ff',
-    border: "none",
-    borderRadius: 10,
-    color: "white",
-    padding: "10px 10px",
-    textAlign: "center",
-    textDecoration: "none",
-    display: "inline-block",
-    fontWeight: 600,
-    position: "absolute",
-    fontSize: 16,
-    cursor: "pointer",
-    top: 560,
-  };
+  const buttonStyle1 = "bg-blue-600 rounded-lg text-white p-2 text-center font-medium absolute text-xl cursor-pointer bottom-64 left-4"
+  const buttonStyle2 = "bg-blue-600 rounded-lg text-white p-2 text-center font-medium absolute text-xl cursor-pointer bottom-64 left-48"
+ 
+  // {
+  //   backgroundColor: '#0066ff',
+  //   border: "none",
+  //   borderRadius: 10,
+  //   color: "white",
+  //   padding: "10px 10px",
+  //   textAlign: "center",
+  //   textDecoration: "none",
+  //   display: "inline-block",
+  //   fontWeight: 600,
+  //   position: "absolute",
+  //   fontSize: 16,
+  //   cursor: "pointer",
+  //   top: 560,
+  // };
 
   return (
     <div
@@ -164,17 +171,17 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
           
 
           <button
-            style={buttonStyle}
+            class={buttonStyle}
             onClick={handleDelete}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+            // onMouseEnter={handleMouseEnter}
+            // onMouseLeave={handleMouseLeave}
           >
             Delete
           </button>
 
           {/* Add two more buttons */}
           <button
-            style={buttonStyle1}
+            class={buttonStyle1}
             onClick={() => {
               // Handle the action for the first additional button
               alert('Button 1 clicked');
@@ -183,11 +190,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
             Add to Route
           </button>
           <button
-            style={{
-              ...buttonStyle1,
-              top: 560,
-              right: 10, // Adjust the top and right positions for the second additional button
-            }}
+            class={buttonStyle2}
             onClick={() => {
               // Handle the action for the second additional button
               alert('Button 2 clicked');
