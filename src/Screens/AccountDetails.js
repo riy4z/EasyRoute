@@ -74,10 +74,10 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
     }
   };
   
-  const buttonStyle="border-2 border-red-600 w-11/12  py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
+  const buttonStyle="border-2 border-red-600 mt-6 w-full py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
 
-  const buttonStyle1 = "bg-blue-600 rounded-lg text-white p-2 text-center font-medium absolute text-xl cursor-pointer bottom-64 left-4"
-  const buttonStyle2 = "bg-blue-600 rounded-lg text-white p-2 text-center font-medium absolute text-xl cursor-pointer bottom-64 left-48"
+  const buttonStyle1 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium absolute text-xl cursor-pointer bottom-64 left-2"
+  const buttonStyle2 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium absolute text-xl cursor-pointer bottom-64 right-2.5"
  
   // {
   //   backgroundColor: '#0066ff',
@@ -96,8 +96,11 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
   // };
 
   return (
-    <div
-      style={{
+    <div class={`${
+      isExpanded ? 'opacity-100' : 'opacity-0'
+    } fixed top-0 right-0 bg-white text-black w-[300px] h-full p-0 z-0 transition-opacity ease-out duration-700 `}
+  >
+      {/* style={{
         width: 300,
         height: '100%',
         backgroundColor: 'white',
@@ -111,14 +114,14 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
         opacity: isExpanded ? 1 : 0,
         visibility: isExpanded ? 'visible' : 'hidden',
       }}
-    >
-      <div style={{ backgroundColor: "#282c34", padding: 1 }}>
-        <h3 style={{ color: "white", margin: 15 }}>
+    > */}
+      <div style={{ backgroundColor: "#282c34", padding:4}}>
+        <h3 style={{ color: "white", marginLeft:7}}>
           Account Details
           <RxCrossCircled
             size={25}
             onClick={onToggleExpand}
-            style={{ cursor: 'pointer', position: "absolute", right: 10, top: 25 }}
+            style={{ cursor: 'pointer', position: "absolute", right: 12, top: 16 }}
           />
         </h3>
       </div>
@@ -127,45 +130,49 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
         <div style={{ margin: '10px' }}>
           {/* Display account details */}
           <p style={{ fontSize: "14px" }}>
-            <strong> {addressData['First Name']} {addressData['Last Name']}</strong> <i className="fas fa-thin fa-pencil" style={{ marginRight: 25 }} /><br></br>
+            <strong style={{fontSize:20}}> {addressData['First Name']} {addressData['Last Name']}</strong> <i className="fas fa-thin fa-pencil" style={{ marginRight: 25, cursor:'pointer' }} /><br></br>
             {addressData['Street Address']},{addressData['City']},{addressData['State'] },{addressData['ZIP Code']}</p>
 
           {/* Input fields for user data */}
           
           <div>
-            <label style={{fontSize:14}}>Phone:</label>
-            <input
-              type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleInputChange}
-            />
+             <label className="text-sm">Phone:</label>
+             <input
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                type="number"
+                className="w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"   
+              />
           </div>
           <div>
-            <label style={{fontSize:14}}>Email:</label>
+            <label className="text-sm">Email:</label>
             <input
-              type="text"
+              type="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
+              className=" w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"
             />
           </div>
           <div>
-            <label style={{fontSize:14}}>last Check-in:</label>
+            <label className="text-sm">last Check-in:</label>
             <input
               type="text"
               name="lastCheckIn"
               value={formData.lastCheckIn}
               onChange={handleInputChange}
+              className=" w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"
             />
           </div>
           <div>
-            <label style={{fontSize:14}}>Follow Up:</label>
+            <label className="text-sm">Follow Up:</label>
             <input
               type="text"
               name="followUp"
               value={formData.followUp}
               onChange={handleInputChange}
+              className="w-full px-3  border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"
             />
           </div>
           

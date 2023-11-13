@@ -105,7 +105,7 @@ export default function Profile() {
                 type="text"
                 placeholder="Address"
               />
-              <button className={styles.btn} type="submit">
+              <button className="border-2 border-indigo-500 w-3/4 py-2 rounded-lg text-indigo-500 text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white" type="submit">
                 Update
               </button>
             </div>

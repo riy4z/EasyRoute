@@ -41,6 +41,11 @@ export async function registerValidation(values){
     return errors;
 }
 
+export async function emailValidation(values){
+    const errors = emailVerify({}, values);
+    return errors;
+}
+
 /** validate profile page */
 export async function profileValidation(values){
     const errors = emailVerify({}, values);
@@ -86,8 +91,8 @@ function emailVerify(error ={}, values){
         error.email = toast.error("Email Required...!");
     }else if(values.email.includes(" ")){
         error.email = toast.error("Wrong Email...!")
-    }else if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)){
-        error.email = toast.error("Invalid email address...!")
+    }else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email) && !/^[0-9]+@[A-Za-z]+\.[A-Za-z]{2,}$/i.test(values.email)) {
+        error.email = toast.error("Invalid email address...!");
     }
 
     return error;

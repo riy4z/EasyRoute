@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { useFormik } from 'formik';
 import styles from '../../styles/ProfileStyle.module.css';
 import toast, { Toaster } from 'react-hot-toast';
@@ -12,7 +12,7 @@ export default function Reset() {
   const { username } = useAuthStore((state) => state.auth);
   const navigate = useNavigate();
   const [{ isLoading, apiData, status, serverError }] = useFetch('createResetSession');
-
+  const [showPassword, setShowPassword] = useState(false);
   const formik = useFormik({
     initialValues: {
       password: '',
@@ -45,6 +45,9 @@ export default function Reset() {
       }
     },
   });
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   if (isLoading) return <h1 className="text-2xl font-bold">Loading...</h1>;
   if (serverError) return <h1 className="text-xl text-red-500">{serverError.message}</h1>;
@@ -66,7 +69,7 @@ export default function Reset() {
               <input
                 {...formik.getFieldProps('password')}
                 className={styles.textbox}
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="New Password"
               />
               <input
@@ -75,6 +78,12 @@ export default function Reset() {
                 type="password"
                 placeholder="Repeat Password"
               />
+              <i
+                onClick={handleTogglePassword}
+                className={`fixed mt-8 right-8 text-gray-300 cursor-pointer ${
+                  showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'
+                }`}
+              ></i>
               <button className={styles.btn} type="submit">
                 Reset
               </button>

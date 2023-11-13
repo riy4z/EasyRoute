@@ -5,9 +5,6 @@ import { useAuthStore } from '../store/store';
 import { generateOTP, verifyOTP } from '../helper/helper';
 import { useNavigate } from 'react-router-dom';
 
-
-
-
 export default function Recovery() {
 
   const {username} = useAuthStore(state => state.auth);

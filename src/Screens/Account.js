@@ -202,7 +202,9 @@ handleListItemClick = (selectedAddress) => {
     // //   textAlign:"left",
     // // }
     
-    const listContainerStyle =  "absolute overflow-y-scroll h-3/5 mt-48 "
+    const listContainerStyle =  `absolute ${
+      savedaddress && savedaddress.length > 0 ? 'overflow-y-scroll h-3/5 mt-48' : 'overflow-hidden'
+    }`;
     // {
     //   position:"absolute",
     //   height: "600px", // Set a fixed height for the container
@@ -236,7 +238,8 @@ handleListItemClick = (selectedAddress) => {
         </li>
       ));
     } else {
-      listContent = <h5>No Accounts found</h5>;
+      listContent = <h5 class='mt-48'>No accounts found</h5>
+      
     }
 
     return (
@@ -253,13 +256,13 @@ handleListItemClick = (selectedAddress) => {
           ref={(fileInput) => (this.fileInput = fileInput)}
           style={{ display: "none" }}
         />
-
+        <div>
           <input
           type="text"
           placeholder="Search Accounts"
           value={searchInput}
           onChange={this.handleSearchInputChange}
-          class="absolute p-1 w-11/12 border-solid border-2 rounded-full mt-28 text-xl"
+          class="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-28 text-xl"
           // {{
           
           //   padding: "10px",
@@ -269,8 +272,9 @@ handleListItemClick = (selectedAddress) => {
           //   marginTop:"50px",
           //   position:"absolute"
           // }}
-        />       
-
+        />
+        <i className="absolute top-[226px] right-7 text-gray-300 fas fa-solid fa-magnifying-glass"/>   
+        </div>
         <button class={buttonStyle1} onClick={this.openPopup}>
         <i className="fas fa-plus-circle" style={{ marginRight: 10}}></i>
           Add Account

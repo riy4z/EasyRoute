@@ -29,10 +29,11 @@ export async function getUser({username}){
     }
 }
 
+
 export async function registerUser(credentials) {
     try {
         const { data: { msg, error }, status } = await axios.post(`/api/register`, credentials);
-
+        
         let { username, email } = credentials;
 
         if (status === 201) {
@@ -49,7 +50,37 @@ export async function registerUser(credentials) {
             return { error: 'Internal server error' };
         }
     }
+
 }
+export async function authenticate1(email) {
+    try {
+      const response = await axios.post('/api/authenticate', { email });
+      return response.data;
+    } catch (error) {
+      return { error: 'Error checking email existence' };
+    }
+  }
+// export async function verifyEmail(credentials) {
+//     try {
+//         const { data: { msg, error }, status } = await axios.get(`/api/verifyEmail`, credentials);
+        
+//         let email = credentials;
+
+//         if (status === 201) {
+//             return { msg: 'Verified', email };
+//         }
+
+//         return { msg, error };
+//     } catch (error) {
+//         if (error.response) {
+//             const { data } = error.response;
+//             return { error: data.error };
+//         } else {
+//             console.error('Error occurred during registration:', error);
+//             return { error: 'Internal server error' };
+//         }
+//     }
+// }
 
 
 export async function verifyPassword({username, password}){
@@ -79,6 +110,7 @@ export async function generateOTP(username){
         const {data : {code}, status} = await axios.get('/api/generateOTP', {params : {username}})
     
         if (status === 201){
+
           let {data : {email}} = await getUser({username});
           let text = `Your Password Recovery OTP is ${code}. Verify and recover your password.`;
           await axios.post('/api/registerMail', {username, userEmail: email, text, subject: "Password Recovery OTP"})  
@@ -89,6 +121,22 @@ export async function generateOTP(username){
     }
 }
 
+export async function generateOTPbyEmail(email) {
+    try {
+        const { data: { code }, status } = await axios.get('/api/generateOTPbyEmail', { params: { email } });
+
+        if (status === 201) {
+            let text = `Your EasyRoute Registration OTP is ${code}. Verify to continue registration.`;
+            await axios.post('/api/registerMail', { userEmail: email, text, subject: "Registration OTP" });
+        }
+
+        return Promise.resolve(code);
+    } catch (error) {
+        return Promise.reject({ error });
+    }
+}
+
+
 export async function verifyOTP({username, code}){
     try {
         const {data, status} = await axios.get('/api/verifyOTP', {params : {username, code}})
@@ -98,6 +146,17 @@ export async function verifyOTP({username, code}){
     }
 
 }
+export async function verifyOTPbyEmail({email, code}){
+    try {
+        const {data, status} = await axios.get('/api/verifyOTPbyEmail', {params : {email, code}})
+        return {data, status}
+    } catch (error) {
+        return Promise.reject(error);
+    }
+
+}
+
+
 
 export async function resetPassword({username, password}){
     try {

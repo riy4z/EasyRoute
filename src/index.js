@@ -13,6 +13,7 @@ import "./index.css";
 import { AuthorizeUser, ProtectRoute } from './authentication/middleware/auth';
 
 
+
 const Root = () => (
   <BrowserRouter>
     <Routes>

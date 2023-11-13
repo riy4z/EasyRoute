@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom';
 
 function Settings() {
   const navigate = useNavigate();
-  const buttonStyle1 = "cursor-pointer bg-gray-200 rounded-lg px-8 py-1 text-white font-medium absolute mt-16 left-11 text-xl text-red-700"
+  const buttonStyle1 = "cursor-pointer bg-gray-200 rounded-lg px-8 py-1 text-red font-medium absolute mt-16 left-11 text-xl text-red-700"
   // {
   //   top:200,
   //   backgroundColor: 'red',
