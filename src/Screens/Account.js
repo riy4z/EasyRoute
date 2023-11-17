@@ -2,6 +2,7 @@ import React from "react";
 import handleFileUpload from "../components/handleFileUpload";
 import Popup from "./Popup";
 import AccountDetails from "./AccountDetails";
+import './popup.css';
 
 
 class Account extends React.Component {
@@ -9,6 +10,7 @@ class Account extends React.Component {
     super(props);
     this.state = {
       isPopupOpen: false,
+      isOverlayVisible: false,
       savedaddress: [],
       searchInput: "", // State variable to store the search input
       selectedAddress: null, 
@@ -73,11 +75,11 @@ class Account extends React.Component {
   };
 
   openPopup = () => {
-    this.setState({ isPopupOpen: true });
+    this.setState({ isPopupOpen: true,isOverlayVisible: true });
   };
 
   closePopup = () => {
-    this.setState({ isPopupOpen: false });
+    this.setState({ isPopupOpen: false,isOverlayVisible: false });
   };
 
 handleListItemHover = (index) => {
@@ -146,8 +148,9 @@ handleListItemClick = (selectedAddress) => {
    
       // Sort the addresses based on the 'First Name' in ascending order
     const sortedAddresses = [...savedaddress].sort((a, b) => {
-    const nameA = a['First Name'].toLowerCase();
-    const nameB = b['First Name'].toLowerCase();
+      const nameA = (a['First Name'] || '').toLowerCase(); // Use an empty string if 'First Name' is undefined
+      const nameB = (b['First Name'] || '').toLowerCase(); // Use an empty string if 'First Name' is undefined
+    
     if (nameA < nameB) {
       return -1;
     }
@@ -175,7 +178,7 @@ handleListItemClick = (selectedAddress) => {
     //   top:"160px"
     // };
 
-    const buttonStyle1 = "cursor-pointer bg-customColor1 rounded-lg p-2 text-white font-medium absolute bottom-4 left-16 text-xl"
+    const buttonStyle1 = "cursor-pointer bg-customColor1 rounded-lg p-1 text-white font-medium absolute bottom-2 left-16 text-lg"
     // {
     //   bottom:70,
     //   backgroundColor: '#394359',
@@ -279,6 +282,10 @@ handleListItemClick = (selectedAddress) => {
         <i className="fas fa-plus-circle" style={{ marginRight: 10}}></i>
           Add Account
         </button>
+        <div className={`overlay ${this.state.isOverlayVisible ? 'active' : ''}`} onClick={this.closePopup}></div>
+
+
+        
         <div class={listContainerStyle}> 
       
       <ul  style={{ listStyleType: "none", padding: 0 }}>
