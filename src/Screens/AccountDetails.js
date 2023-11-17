@@ -43,7 +43,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
       isExpanded ? 'opacity-100' : 'opacity-0'
     }`}>
       <div className="bg-customColor1 text-white py-4 px-4">
-        <h3 className="text-xl font-semibold">Account Details</h3>
+        <h3 className="text-2xl font-bold">Account Details</h3>
         <RxCrossCircled
           size={25}
           onClick={onToggleExpand}
@@ -105,23 +105,22 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
 
           {/* Buttons */}
           <button
-            className="border-2 border-red-600 mt-6 w-full py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
-            onClick={handleDelete}
-          >
-            Delete
-          </button>
-
-          <button
-            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded-md transition duration-300 text-sm"
+            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded-md transition duration-300 text-sm mb-2"
             onClick={() => alert('Add to Route clicked')}
           >
             Add to Route
           </button>
           <button
-            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded-md transition duration-300 text-sm"
+            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded-md transition duration-300 text-sm mb-2"
             onClick={() => alert('Check-in clicked')}
           >
             Check-in
+          </button>
+          <button
+            className="border-2 border-red-600 w-full py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white mb-4"
+            onClick={handleDelete}
+          >
+            Delete
           </button>
         </div>
         {children}
