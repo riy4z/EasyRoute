@@ -74,13 +74,12 @@ handleFileChange = (e) => {
 
   handleFileUpload(file, (data) => {
     this.props.setAddresses(data); // Pass the parsed data to the parent component
-    
     fetch('http://localhost:4000/api/process-csv', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ csvData: data }), 
+      body: JSON.stringify({ csvData: data, fileName: file.name }), 
     })
       .then((res) => res.json())
       .then((response) => {
