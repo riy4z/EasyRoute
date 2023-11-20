@@ -74,23 +74,23 @@ handleFileChange = (e) => {
 
   handleFileUpload(file, (data) => {
     this.props.setAddresses(data); // Pass the parsed data to the parent component
-    // Assuming your server endpoint for processing the CSV file is '/api/process-csv'
+    
     fetch('http://localhost:4000/api/process-csv', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ csvData: data }), // Send the parsed data to the server
+      body: JSON.stringify({ csvData: data }), 
     })
       .then((res) => res.json())
       .then((response) => {
         if (response.success) {
-          // CSV file processed successfully
+          
           console.log('CSV file processed successfully:', response.details);
 
-          // You can add additional logic here, such as updating the UI or triggering other actions
+          
         } else {
-          // Handle errors from the server
+          
           console.error('Error processing CSV file:', response.error);
         }
       })
