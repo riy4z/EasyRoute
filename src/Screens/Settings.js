@@ -1,8 +1,16 @@
-import React from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, { useState } from 'react';
+import LogoutPopup from './LogoutPopup';
 
 function Settings() {
-  const navigate = useNavigate();
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const openPopup = () => {
+    setPopupOpen(true);
+  }
+
+  const closePopup = () => {
+    setPopupOpen(false);
+  }
+
   const buttonStyle1 = "cursor-pointer bg-gray-200 rounded-lg px-8 py-1 text-red font-medium absolute mt-16 left-11 text-xl text-red-700"
   // {
   //   top:200,
@@ -19,19 +27,19 @@ function Settings() {
   //   justifyContent:"center",
   //   left:"20px",
   // };
-  function userLogout(){
-    localStorage.removeItem('token');
-    navigate('/')
-    
-  }
+ 
   return (
     <div>
       <h1 class="text-5xl font-medium text-customColor1 text-left ">Settings</h1>
       <p> <br></br></p>
-      <span className='text-gray-500 '>Come back later? <button class={buttonStyle1} onClick={userLogout}>
+      <span className='text-gray-500 '>Come back later? <button class={buttonStyle1} onClick={openPopup}>
         {/* <i className="fas fa-right-from-bracket" style={{ marginRight: 25}}></i> */}
           Logout Account
         </button></span>
+
+        {isPopupOpen && (
+        <LogoutPopup closePopup={closePopup} />
+      )}
       
     </div>
   );

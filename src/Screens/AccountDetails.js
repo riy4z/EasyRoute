@@ -12,6 +12,23 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
     city: '',
   });
 
+  // const handleMouseEnter = () => {
+  //   setButtonStyle({
+  //     ...buttonStyle,
+  //     backgroundColor: '#ff0000', // Change the background color to red on hover
+  //     color: 'white', // Change the text color to black on hover
+  //   });
+  // };
+
+  // const handleMouseLeave = () => {
+  //   setButtonStyle({
+  //     ...buttonStyle,
+  //     backgroundColor: 'white', // Revert the background color on leave
+  //     color: '#ff0000', // Revert the text color on leave
+  //   });
+  // };
+
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

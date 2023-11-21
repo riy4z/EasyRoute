@@ -12,7 +12,7 @@
 }
 
 .profile_img{
-    @apply border-4 border-gray-100 w-[110px] rounded-full shadow-lg cursor-pointer ;
+    @apply w-[140px] border-4 border-gray-100 rounded-full shadow-lg cursor-pointer ;
     @apply hover:border-gray-200;
     
 }
