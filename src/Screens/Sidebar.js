@@ -37,15 +37,9 @@ function Sidebar(props) {
         return <Admin />;
       case 'Account':
         return <Account setAddresses={props.setAddresses} />;
-<<<<<<< Updated upstream
-      case 'route':
-        return <Routes setAddresses={props.setAddresses} />;
-      case 'tools':
-=======
       case 'Route':
-        return <RoutesS />;
+        return <Routes />;
       case 'Tools':
->>>>>>> Stashed changes
         return <Tools />;
       case 'HelpSupport':
         return <HelpSupport />;
