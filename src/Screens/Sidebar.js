@@ -32,22 +32,28 @@ function Sidebar(props) {
   }, [isExpanded]);
 
   const renderContent = () => {
-    switch (selectedOption && selectedOption.toLowerCase()) {
-      case 'admin':
+    switch (selectedOption) {
+      case 'Admin':
         return <Admin />;
-      case 'account':
+      case 'Account':
         return <Account setAddresses={props.setAddresses} />;
+<<<<<<< Updated upstream
       case 'route':
         return <Routes setAddresses={props.setAddresses} />;
       case 'tools':
+=======
+      case 'Route':
+        return <RoutesS />;
+      case 'Tools':
+>>>>>>> Stashed changes
         return <Tools />;
-      case 'helpsupport':
+      case 'HelpSupport':
         return <HelpSupport />;
-      case 'settings':
+      case 'Settings':
         return <Settings />;
-      case 'about':
+      case 'About':
         return <About />;
-      case 'profile':
+      case 'Profile':
         return <Profile />;
       default:
         return null;
