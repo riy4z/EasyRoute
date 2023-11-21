@@ -15,9 +15,10 @@ class App extends Component {
     this.setState({ addresses });
   };
 
+  
   render() {
     const { addresses } = this.state;
-    // console.log(addresses);
+    console.log(addresses)
     return (
       <div>
         <Sidebar setAddresses={this.setAddresses} />

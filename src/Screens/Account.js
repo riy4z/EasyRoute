@@ -23,7 +23,7 @@ class Account extends React.Component {
       if (!this.state.searchInput) { // Only fetch if search input is empty
         this.fetchAndUpdateAddressData(); 
       }
-    }, 1000); // Fetch every 10 seconds
+    }, 20000); // Fetch every 10 seconds
   };
   fetchAndUpdateAddressData = () => {
     fetch('http://localhost:4000/api/get-address-data')
@@ -123,8 +123,17 @@ searchAddresses = () => {
       address['ZIP Code']
     ];
 
+    const isValidAddress =
+    address &&
+    Object.keys(address).every((key) => address[key] !== undefined && address[key] !== null);
+
+  if (!isValidAddress) {
+    return false;
+  }
     // Check if any field contains the search input
-    const matchesSearch = addressFields.some(field => field.toLowerCase().includes(searchInput.toLowerCase()));
+    const matchesSearch = addressFields.some(
+      (field) => field && field.toLowerCase().includes(searchInput.toLowerCase())
+    );
 
     // Check if the full name contains the search input
     const fullNameMatches = fullName.toLowerCase().includes(searchInput.toLowerCase());
@@ -146,8 +155,8 @@ handleListItemClick = (selectedAddress) => {
    
       // Sort the addresses based on the 'First Name' in ascending order
     const sortedAddresses = [...savedaddress].sort((a, b) => {
-    const nameA = a['First Name'].toLowerCase();
-    const nameB = b['First Name'].toLowerCase();
+      const nameA = a['First Name'] ? a['First Name'].toLowerCase() : '';
+      const nameB = b['First Name'] ? b['First Name'].toLowerCase() : '';
     if (nameA < nameB) {
       return -1;
     }

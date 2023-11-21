@@ -3,21 +3,7 @@ import { RxCrossCircled } from 'react-icons/rx';
 import axios from 'axios';
 
 const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) => {
-  // const [buttonStyle, setButtonStyle] = useState({
-  //   backgroundColor: 'white',
-  //   color: '#ff0000', // Text color
-  //   borderColor: '#ff0000',
-  //   borderRadius: 10,
-  //   padding: '10px 115px',
-  //   textAlign: 'center',
-  //   textDecoration: 'none',
-  //   display: 'inline-block',
-  //   fontWeight: 600,
-  //   position: 'absolute',
-  //   fontSize: 16,
-  //   cursor: 'pointer',
-  //   top: 500,
-  // });
+
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -26,23 +12,6 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
     city: '',
   });
 
-  // const handleMouseEnter = () => {
-  //   setButtonStyle({
-  //     ...buttonStyle,
-  //     backgroundColor: '#ff0000', // Change the background color to red on hover
-  //     color: 'white', // Change the text color to black on hover
-  //   });
-  // };
-
-  // const handleMouseLeave = () => {
-  //   setButtonStyle({
-  //     ...buttonStyle,
-  //     backgroundColor: 'white', // Revert the background color on leave
-  //     color: '#ff0000', // Revert the text color on leave
-  //   });
-  // };
-
- 
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -79,42 +48,11 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
   const buttonStyle1 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium absolute text-xl cursor-pointer bottom-64 left-2"
   const buttonStyle2 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium absolute text-xl cursor-pointer bottom-64 right-2.5"
  
-  // {
-  //   backgroundColor: '#0066ff',
-  //   border: "none",
-  //   borderRadius: 10,
-  //   color: "white",
-  //   padding: "10px 10px",
-  //   textAlign: "center",
-  //   textDecoration: "none",
-  //   display: "inline-block",
-  //   fontWeight: 600,
-  //   position: "absolute",
-  //   fontSize: 16,
-  //   cursor: "pointer",
-  //   top: 560,
-  // };
-
   return (
     <div class={`${
       isExpanded ? 'opacity-100' : 'opacity-0'
     } fixed top-0 right-0 bg-white text-black w-[300px] h-full p-0 z-0 transition-opacity ease-out duration-700 `}
   >
-      {/* style={{
-        width: 300,
-        height: '100%',
-        backgroundColor: 'white',
-        color: 'black',
-        position: 'fixed',
-        top: 0,
-        right: 0,
-        padding: 0,
-        zIndex: 0,
-        transition: 'opacity 0.6s ease',
-        opacity: isExpanded ? 1 : 0,
-        visibility: isExpanded ? 'visible' : 'hidden',
-      }}
-    > */}
       <div style={{ backgroundColor: "#282c34", padding:4}}>
         <h3 style={{ color: "white", marginLeft:7}}>
           Account Details
@@ -133,7 +71,6 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
             <strong style={{fontSize:20}}> {addressData['First Name']} {addressData['Last Name']}</strong> <i className="fas fa-thin fa-pencil" style={{ marginRight: 25, cursor:'pointer' }} /><br></br>
             {addressData['Street Address']},{addressData['City']},{addressData['State'] },{addressData['ZIP Code']}</p>
 
-          {/* Input fields for user data */}
           
           <div>
              <label className="text-sm">Phone:</label>

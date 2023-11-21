@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ExtendedScreen from '../components/ExtendedScreen';
 import Account from './Account'; 
-import RoutesS from './RoutesS';
+import Routes from './Routes';
 import Tools from './Tools';
 import HelpSupport from './HelpSupport';
 import Settings from './Settings';
@@ -14,11 +14,13 @@ function Sidebar(props) {
   const [selectedOption, setSelectedOption] = useState(null); 
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleOptionClick = (option) => {
+  const handleOptionClick = (option, addresses) => {
     setSelectedOption(option);
     setIsExpanded(true); // Expand the ExtendedScreen on option click
+  
+    // Pass the addresses to the parent component
+    props.setAddresses(addresses);
   };
-
   const handleToggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
@@ -36,7 +38,7 @@ function Sidebar(props) {
       case 'account':
         return <Account setAddresses={props.setAddresses} />;
       case 'route':
-        return <RoutesS />;
+        return <Routes setAddresses={props.setAddresses} />;
       case 'tools':
         return <Tools />;
       case 'helpsupport':

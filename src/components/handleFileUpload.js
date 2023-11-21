@@ -12,7 +12,6 @@ const handleFileUpload = (file, callback) => {
         complete: (result) => {
           if (result && result.data) {
             callback(result.data);
-            // console.log(result.data);
           }
         },
       });
