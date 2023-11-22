@@ -50,7 +50,7 @@ export default function Profile() {
   const email="relative left-3 border-2 px-5 py-3 rounded-xl px-[26px] shadow-sm text-lg  mt-4 focus:outline-none"
   const address="relative left-3 border-2 px-5 py-3 rounded-xl px-[26px] shadow-sm text-lg  mt-4 focus:outline-none"
   const img="relative mt-8 left-[75px] w-32 cursor-pointer border-4 border-gray-100 rounded-full shadow-lg cursor-pointer hover:border-gray-200"
-  const buttonStyle1="border-2  border-red-600 mt-28 ml-1 px-16 py-2 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
+  const buttonStyle1="border-2 border-red-600 mt-28 ml-3 px-[58px] py-2 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
   const onUpload = async (e) => {
     const base64 = await convertToBase64(e.target.files[0]);
     setFile(base64);

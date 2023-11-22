@@ -66,6 +66,10 @@ export default function Register() {
   };
   
   const handleVerifyEmail = async () => {
+    if (!formik.values.email) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
     const isEmailValid = await checkEmailExistence();
 
     if (isEmailValid) {
@@ -111,7 +115,7 @@ export default function Register() {
   })
   }
 
-
+ const verifyemailbutton = "border border-indigo-500  w-full py-2 rounded-lg text-black text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white"
 
   return (
     <div className="container mx-auto">
@@ -141,12 +145,12 @@ export default function Register() {
               
               <i
                 onClick={handleTogglePassword}
-                className={`fixed mt-[120px] right-8 text-gray-300 cursor-pointer text-2xl ${
+                className={`fixed mt-[105px] right-7 text-gray-300 cursor-pointer text-2xl ${
                   showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'
                 }`}
               ></i>
               <i
-                className={`fixed mt-[217px] right-8 text-green-500 text-2xl ${
+                className={`fixed mt-[195px] right-8 text-green-500 text-2xl ${
                   isEmailVerified ? 'fas fa-regular fa-circle-check' : ''
                 }`}
               ></i>
@@ -202,8 +206,7 @@ export default function Register() {
        {/*VERIFY BUTTON*/}
        {!isVerificationVisible && !isRegisterVisible && (
             <button
-              className={styles.btn}
-              style={{left:41,position:'absolute'}}
+              className={verifyemailbutton}
               onClick={handleVerifyEmail}
             >
               Verify Email
