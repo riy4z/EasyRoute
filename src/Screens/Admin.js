@@ -86,9 +86,9 @@ function Admin() {
       <div className="mt-24">
         {/* Render the user names as a list */}
         <h2><strong>Current Users:</strong></h2>
-        <ul class="overflow-y-scroll h-32 mt-4">
+        <ul className="overflow-y-scroll h-32 mt-4">
           {userDetails.map((user, index) => (
-            <li key={index} class="cursor-pointer border-b-2" onClick={() => openUserDetails(user.Name)}>
+            <li key={index} className="cursor-pointer border-b-2" onClick={() => openUserDetails(user.Name)}>
               {user.Name}
             </li>
           ))}

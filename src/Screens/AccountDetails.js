@@ -6,10 +6,10 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
 
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    streetAddress: '',
-    city: '',
+    phone: '',
+    email: '',
+    lastCheckIn: '',
+    followUp: '',
   });
 
   // const handleMouseEnter = () => {
@@ -66,30 +66,34 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
   const buttonStyle2 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium absolute text-xl cursor-pointer bottom-64 right-2.5"
  
   return (
-    <div class={`${
+    <div className={`${
       isExpanded ? 'opacity-100' : 'opacity-0'
     } fixed top-0 right-0 bg-white text-black w-[300px] h-full p-0 z-0 transition-opacity ease-out duration-700 `}
   >
-      <div style={{ backgroundColor: "#282c34", padding:4}}>
-        <h3 style={{ color: "white", marginLeft:7}}>
+      <div className="bg-customColor1 text-white py-4 px-3">
+        <h3 className="text-2xl font-normal">
           Account Details
           <RxCrossCircled
             size={25}
             onClick={onToggleExpand}
-            style={{ cursor: 'pointer', position: "absolute", right: 12, top: 16 }}
+            className="cursor-pointer absolute right-4 top-5"
           />
         </h3>
       </div>
 
-      <div style={{ display: isExpanded ? 'block' : 'none' }}>
-        <div style={{ margin: '10px' }}>
+      <div className={`${isExpanded ? 'block' : 'none' }`}>
+        <div className="m-2">
           {/* Display account details */}
-          <p style={{ fontSize: "14px" }}>
-            <strong style={{fontSize:20}}> {addressData['First Name']} {addressData['Last Name']}</strong> <i className="fas fa-thin fa-pencil" style={{ marginRight: 25, cursor:'pointer' }} /><br></br>
-            {addressData['Street Address']},{addressData['City']},{addressData['State'] },{addressData['ZIP Code']}</p>
+          <p className="text-lg font-semibold mb-4">
+            {addressData['First Name']} {addressData['Last Name']}
+          </p>
+          <p className="text-sm mb-2">
+            {addressData['Street Address']}, {addressData['City']}, {addressData['State']},{' '}
+            {addressData['ZIP Code']}
+          </p>
 
           
-          <div>
+          <div className="mb-2">
              <label className="text-sm">Phone:</label>
              <input
                 name="phone"
@@ -99,7 +103,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
                 className="w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"   
               />
           </div>
-          <div>
+          <div className="mb-2">
             <label className="text-sm">Email:</label>
             <input
               type="email"
@@ -109,7 +113,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
               className=" w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"
             />
           </div>
-          <div>
+          <div className="mb-2">
             <label className="text-sm">last Check-in:</label>
             <input
               type="text"
@@ -119,7 +123,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
               className=" w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"
             />
           </div>
-          <div>
+          <div className="mb-2">
             <label className="text-sm">Follow Up:</label>
             <input
               type="text"
@@ -132,7 +136,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
           
 
           <button
-            class={buttonStyle}
+            className={buttonStyle}
             onClick={handleDelete}
             // onMouseEnter={handleMouseEnter}
             // onMouseLeave={handleMouseLeave}
@@ -142,19 +146,19 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
 
           {/* Add two more buttons */}
           <button
-            class={buttonStyle1}
+            className={buttonStyle1}
             onClick={() => {
               // Handle the action for the first additional button
-              alert('Button 1 clicked');
+              alert('Add to Route clicked');
             }}
           >
             Add to Route
           </button>
           <button
-            class={buttonStyle2}
+            className={buttonStyle2}
             onClick={() => {
               // Handle the action for the second additional button
-              alert('Button 2 clicked');
+              alert('Check-in clicked');
             }}
           >
             Check-in

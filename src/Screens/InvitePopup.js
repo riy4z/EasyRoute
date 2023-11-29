@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { RxCrossCircled } from 'react-icons/rx';
 
 function InvitePopup(props) {
   const [email, setEmail] = useState('');
@@ -36,56 +37,56 @@ function InvitePopup(props) {
     props.closePopup();
   };
 
-  const popupStyle = {
-    position: 'fixed',
-    top: '35%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    backgroundColor: '#fff',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)',
-    zIndex: 999, // Make sure it's on top
-    background: '#394359',
-  };
+  // const popupStyle = {
+  //   position: 'fixed',
+  //   top: '35%',
+  //   left: '50%',
+  //   transform: 'translate(-50%, -50%)',
+  //   backgroundColor: '#fff',
+  //   padding: '20px',
+  //   borderRadius: '10px',
+  //   boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)',
+  //   zIndex: 999, // Make sure it's on top
+  //   background: '#394359',
+  // };
 
-  const labelStyle = {
-    display: 'block',
-    marginBottom: '5px',
-    color: 'white',
-  };
+  // const labelStyle = {
+  //   display: 'block',
+  //   marginBottom: '5px',
+  //   color: 'white',
+  // };
 
-  const inputStyle = {
-    marginBottom: '10px',
-  };
+  // const inputStyle = {
+  //   marginBottom: '10px',
+  // };
 
-  const buttonStyle1 = {
-    margin: '5px',
-    marginTop: '30px',
-    marginLeft: '50px',
-    width: '50%',
-    padding: '8px 20px',
-    fontSize: '16px',
-    backgroundColor: 'white',
-    fontWeight: '600',
-    color: '#394359',
-    borderRadius: '10px',
-    cursor: 'pointer',
-  };
+  // const buttonStyle1 = {
+  //   margin: '5px',
+  //   marginTop: '30px',
+  //   marginLeft: '50px',
+  //   width: '50%',
+  //   padding: '8px 20px',
+  //   fontSize: '16px',
+  //   backgroundColor: 'white',
+  //   fontWeight: '600',
+  //   color: '#394359',
+  //   borderRadius: '10px',
+  //   cursor: 'pointer',
+  // };
 
-  const buttonStyle2 = {
-    margin: '5px',
-    marginTop: '30px',
-    marginLeft: '26%',
-    width: '50%',
-    padding: '8px 20px',
-    fontSize: '16px',
-    backgroundColor: 'white',
-    fontWeight: '600',
-    color: '#394359',
-    borderRadius: '10px',
-    cursor: 'pointer',
-  };
+  // const buttonStyle2 = {
+  //   margin: '5px',
+  //   marginTop: '30px',
+  //   marginLeft: '26%',
+  //   width: '50%',
+  //   padding: '8px 20px',
+  //   fontSize: '16px',
+  //   backgroundColor: 'white',
+  //   fontWeight: '600',
+  //   color: '#394359',
+  //   borderRadius: '10px',
+  //   cursor: 'pointer',
+  // };
 
   const buttonContainerStyle = {
     display: 'flex',
@@ -93,11 +94,17 @@ function InvitePopup(props) {
   };
 
   return (
-    <div className="popup">
-      <div style={popupStyle}>
-        <h2 style={labelStyle}>Invite Users</h2>
+    <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
+      <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto">
+      <div className='relative left-[360px]'>
+      <button onClick={props.closePopup}>
+            <RxCrossCircled />
+          </button>
+          </div>
+        <h2 className="text-3xl font-bold text-center mb-4">Invite Users</h2>
+        
 
-        <label style={labelStyle}>Email:</label>
+        <label className="block mb-1 text-gray-700 text-sm">Email:</label>
         <input
           type="email"
           value={email}
@@ -106,8 +113,8 @@ function InvitePopup(props) {
           required
         />
 
-        <label style={labelStyle}>Role:</label>
-        <select value={role} onChange={handleRoleChange} style={inputStyle} required>
+        <label className="block mb-1 text-gray-700 text-sm">Role:</label>
+        <select value={role} onChange={handleRoleChange} className='mb-2' required>
           <option value="">Select Role</option>
           <option value="Admin">Corporate Admin</option>
           <option value="Admin">Local Admin</option>
@@ -115,21 +122,19 @@ function InvitePopup(props) {
           {/* Add more roles as needed */}
         </select>
 
-        <label style={labelStyle}>Location:</label>
-        <select value={location} onChange={handleLocationChange} style={inputStyle} required>
+        <label className="block mb-1 text-gray-700 text-sm">Location:</label>
+        <select value={location} onChange={handleLocationChange} className='mb-2' required>
           <option value="">Select Location</option>
           <option value="Location1">Location 1</option>
           <option value="Location2">Location 2</option>
           {/* Add more locations as needed */}
         </select>
 
-        <div style={buttonContainerStyle}>
-          <button onClick={handleInviteClick} style={buttonStyle1}>
+        <div>
+          <button onClick={handleInviteClick}  className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm">
             Invite
           </button>
-          <button onClick={props.closePopup} style={buttonStyle2}>
-            Close
-          </button>
+          
         </div>
       </div>
     </div>

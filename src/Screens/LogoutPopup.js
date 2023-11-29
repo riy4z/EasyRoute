@@ -1,12 +1,21 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
-import Settings from './Settings';
+import useFetch from '../authentication/hooks/fetch.hook';
 
 function LogoutPopup(props) {
-    const navigate = useNavigate();
-    function userLogout(){
-        localStorage.removeItem('token');
-        navigate('/')}
+  const navigate = useNavigate();
+  const [getData, setData, clearSessionStorage] = useFetch();
+
+  function userLogout() {
+    // Clear 'token' from localStorage
+    localStorage.removeItem('token');
+
+    // Clear session storage
+    clearSessionStorage();
+
+    // Navigate to the home page or any other desired page after logout
+    navigate('/');
+  }
 
   const popupStyle = {
     position: "fixed",
@@ -25,10 +34,6 @@ function LogoutPopup(props) {
     display: "block",
     marginBottom: "5px",
     color: 'white',
-  };
-
-  const inputStyle = {
-    marginBottom: "10px",
   };
 
   const buttonStyle1 = {

@@ -2,6 +2,7 @@ import React from "react";
 import handleFileUpload from "../components/handleFileUpload";
 import Popup from "./Popup";
 import AccountDetails from "./AccountDetails";
+import {useAuthStore} from '../authentication/store/store';
 
 
 class Account extends React.Component {
@@ -9,6 +10,7 @@ class Account extends React.Component {
     super(props);
     this.state = {
       isPopupOpen: false,
+      isOverlayVisible: false,
       savedaddress: [],
       searchInput: "", // State variable to store the search input
       selectedAddress: null, 
@@ -67,8 +69,32 @@ class Account extends React.Component {
 
   handleFileChange = (e) => {
     const file = e.target.files[0];
+  
     handleFileUpload(file, (data) => {
+      // Get the username from your Zustand authentication store
+      const { setUsername, auth } = useAuthStore.getState();
+      const username = auth.username;
+  
       this.props.setAddresses(data); // Pass the parsed data to the parent component
+  
+      fetch('http://localhost:4000/api/process-csv', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ csvData: data, fileName: file.name, username }), // Include the username in the request
+      })
+        .then((res) => res.json())
+        .then((response) => {
+          if (response.success) {
+            console.log('CSV file processed successfully:', response.details);
+          } else {
+            console.error('Error processing CSV file:', response.error);
+          }
+        })
+        .catch((error) => {
+          console.error('Error sending CSV data to the server:', error);
+        });
     });
   };
 
@@ -247,15 +273,15 @@ handleListItemClick = (selectedAddress) => {
         </li>
       ));
     } else {
-      listContent = <h5 class='mt-48'>No accounts found</h5>
+      listContent = <h5 className='mt-48'>No accounts found</h5>
       
     }
 
     return (
       <div >
-        <h1 class="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
+        <h1 className="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
 
-        <button class={buttonStyle} onClick={this.handleFileSelect}>
+        <button className={buttonStyle} onClick={this.handleFileSelect}>
           Import Accounts
         </button>
         <input
@@ -271,7 +297,7 @@ handleListItemClick = (selectedAddress) => {
           placeholder="Search Accounts"
           value={searchInput}
           onChange={this.handleSearchInputChange}
-          class="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-28 text-xl"
+          className="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-28 text-xl"
           // {{
           
           //   padding: "10px",
@@ -284,11 +310,12 @@ handleListItemClick = (selectedAddress) => {
         />
         <i className="absolute top-[226px] right-7 text-gray-300 fas fa-solid fa-magnifying-glass"/>   
         </div>
-        <button class={buttonStyle1} onClick={this.openPopup}>
+        <button className={buttonStyle1} onClick={this.openPopup}>
         <i className="fas fa-plus-circle" style={{ marginRight: 10}}></i>
           Add Account
         </button>
-        <div class={listContainerStyle}> 
+        <div className={`overlay ${this.state.isOverlayVisible ? 'active' : ''}`} onClick={this.closePopup}></div>
+        <div className={listContainerStyle}> 
       
       <ul  style={{ listStyleType: "none", padding: 0 }}>
       {listContent}

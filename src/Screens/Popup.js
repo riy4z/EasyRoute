@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from 'axios';
+import { RxCrossCircled } from "react-icons/rx";
 
 class Popup extends Component {
   constructor(props) {
@@ -13,6 +14,7 @@ class Popup extends Component {
       zipcode: "",
       longitude: null,
       latitude: null,
+      isHovered: false
     };
   }
 
@@ -151,75 +153,118 @@ class Popup extends Component {
     };
 
     return (
-      <div className="popup-overlay">
-        <div style={popupStyle}>
-          <h2 style={labelStyle}>Add New Account</h2>
-          <label style={labelStyle}>First Name:</label>
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-lg shadow-lg z-50 w-11/12 max-w-md font-sans">
+        <button onClick={onClose}>
+              <RxCrossCircled className="absolute top-4 right-4 cursor-pointer"/>
+            </button>
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-4">Add New Account</h2>
+          <hr className="my-4" />
+          <label className="block mb-1 text-gray-700 text-sm">First Name:</label>
           <input
             type="text"
             name="firstName"
             placeholder="First Name"
             value={firstName}
             onChange={this.handleInputChange}
-            style={inputStyle}
+            style={{
+              padding: '8px', // Adjust the padding as needed
+              fontSize: '1rem', // Equivalent to text-sm in Tailwind CSS
+              width: '100%', // Make it full width
+              border: '1px solid #ccc', // Add a border
+              borderRadius: '0.375rem', // Add some border radius
+            }}
           />
-          <label style={labelStyle}>Last Name:</label>
+          <label className="block mb-1 text-gray-700 text-sm">Last Name:</label>
           <input
             type="text"
             name="lastName"
             placeholder="Last Name"
             value={lastName}
             onChange={this.handleInputChange}
-            style={inputStyle}
+            style={{
+              padding: '8px', // Adjust the padding as needed
+              fontSize: '1rem', // Equivalent to text-sm in Tailwind CSS
+              width: '100%', // Make it full width
+              border: '1px solid #ccc', // Add a border
+              borderRadius: '0.375rem', // Add some border radius
+            }}
           />
-          <label style={labelStyle}>Street Address:</label>
+          <label className="block mb-1 text-gray-700 text-sm">Street Address:</label>
           <input
             type="text"
             name="address"
             placeholder="Address"
             value={address}
             onChange={this.handleInputChange}
-            style={inputStyle}
+            style={{
+              padding: '8px', // Adjust the padding as needed
+              fontSize: '1rem', // Equivalent to text-sm in Tailwind CSS
+              width: '100%', // Make it full width
+              border: '1px solid #ccc', // Add a border
+              borderRadius: '0.375rem', // Add some border radius
+            }}
           />
 
-<label style={labelStyle}>City:</label>
+<label className="block mb-1 text-gray-700 text-sm">City:</label>
           <input
             type="text"
             name="city"
             placeholder="City"
             value={city}
             onChange={this.handleInputChange}
-            style={inputStyle}
+            style={{
+              padding: '8px', // Adjust the padding as needed
+              fontSize: '1rem', // Equivalent to text-sm in Tailwind CSS
+              width: '100%', // Make it full width
+              border: '1px solid #ccc', // Add a border
+              borderRadius: '0.375rem', // Add some border radius
+            }}
           />
 
-<label style={labelStyle}>State:</label>
+<label className="block mb-1 text-gray-700 text-sm">State:</label>
           <input
             type="text"
             name="state"
             placeholder="State"
             value={state}
             onChange={this.handleInputChange}
-            style={inputStyle}
+            style={{
+              padding: '8px', // Adjust the padding as needed
+              fontSize: '1rem', // Equivalent to text-sm in Tailwind CSS
+              width: '100%', // Make it full width
+              border: '1px solid #ccc', // Add a border
+              borderRadius: '0.375rem', // Add some border radius
+            }}
           />
 
-<label style={labelStyle}>Zip Code:</label>
+<label className="block mb-1 text-gray-700 text-sm">Zip Code:</label>
           <input
             type="text"
             name="zipcode"
             placeholder="Zip Code"
             value={zipcode}
             onChange={this.handleInputChange}
-            style={inputStyle}
+            style={{
+              padding: '8px', // Adjust the padding as needed
+              fontSize: '1rem', // Equivalent to text-sm in Tailwind CSS
+              width: '100%', // Make it full width
+              border: '1px solid #ccc', // Add a border
+              borderRadius: '0.375rem', // Add some border radius
+            }}
           />
           
           <p style={{ margin: "10px 0" }}></p> {/* Empty paragraph for spacing */}
           <div style={buttonContainerStyle}>
-            <button onClick={this.handleSave} style={buttonStyle1}>
-              Save
-            </button>
-            <button onClick={onClose} style={buttonStyle2}>
-              Close
-            </button>
+          <button
+          onClick={this.handleSave}
+          className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded-md transition duration-300 text-sm"
+          onMouseEnter={() => this.setState({ isHovered: true })}
+          onMouseLeave={() => this.setState({ isHovered: false })}
+        >
+          Save
+        </button>
+            
           </div>
         </div>
       </div>

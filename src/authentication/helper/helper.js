@@ -23,7 +23,12 @@ export async function authenticate(username){
 export async function getUser({username}){
     try {
         const {data} = await axios.get(`api/user/${username}`)
-        return {data};
+        const userData = {
+            ...data,
+            isAdmin: data.isAdmin || false,
+          };
+      
+          return { data: userData };
     } catch (error) {
         return {error : "Password doesn't match..!"}
     }
