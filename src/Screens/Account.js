@@ -2,6 +2,7 @@ import React from "react";
 import handleFileUpload from "../components/handleFileUpload";
 import Popup from "./Popup";
 import AccountDetails from "./AccountDetails";
+import '../styles/popup.css';
 import {useAuthStore} from '../authentication/store/store';
 
 
@@ -99,11 +100,11 @@ class Account extends React.Component {
   };
 
   openPopup = () => {
-    this.setState({ isPopupOpen: true });
+    this.setState({ isPopupOpen: true,isOverlayVisible: true });
   };
 
   closePopup = () => {
-    this.setState({ isPopupOpen: false });
+    this.setState({ isPopupOpen: false,isOverlayVisible: false });
   };
 
 handleListItemHover = (index) => {

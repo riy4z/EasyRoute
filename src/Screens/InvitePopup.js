@@ -37,104 +37,58 @@ function InvitePopup(props) {
     props.closePopup();
   };
 
-  // const popupStyle = {
-  //   position: 'fixed',
-  //   top: '35%',
-  //   left: '50%',
-  //   transform: 'translate(-50%, -50%)',
-  //   backgroundColor: '#fff',
-  //   padding: '20px',
-  //   borderRadius: '10px',
-  //   boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)',
-  //   zIndex: 999, // Make sure it's on top
-  //   background: '#394359',
-  // };
-
-  // const labelStyle = {
-  //   display: 'block',
-  //   marginBottom: '5px',
-  //   color: 'white',
-  // };
-
-  // const inputStyle = {
-  //   marginBottom: '10px',
-  // };
-
-  // const buttonStyle1 = {
-  //   margin: '5px',
-  //   marginTop: '30px',
-  //   marginLeft: '50px',
-  //   width: '50%',
-  //   padding: '8px 20px',
-  //   fontSize: '16px',
-  //   backgroundColor: 'white',
-  //   fontWeight: '600',
-  //   color: '#394359',
-  //   borderRadius: '10px',
-  //   cursor: 'pointer',
-  // };
-
-  // const buttonStyle2 = {
-  //   margin: '5px',
-  //   marginTop: '30px',
-  //   marginLeft: '26%',
-  //   width: '50%',
-  //   padding: '8px 20px',
-  //   fontSize: '16px',
-  //   backgroundColor: 'white',
-  //   fontWeight: '600',
-  //   color: '#394359',
-  //   borderRadius: '10px',
-  //   cursor: 'pointer',
-  // };
-
-  const buttonContainerStyle = {
-    display: 'flex',
-    justifyContent: 'flex-end',
-  };
-
   return (
     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
       <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto">
-      <div className='relative left-[360px]'>
-      <button onClick={props.closePopup}>
+        <div className="absolute top-4 right-4 cursor-pointer">
+          <button onClick={props.closePopup} className="text-gray-500 hover:text-gray-700">
             <RxCrossCircled />
           </button>
-          </div>
+        </div>
         <h2 className="text-3xl font-bold text-center mb-4">Invite Users</h2>
-        
 
-        <label className="block mb-1 text-gray-700 text-sm">Email:</label>
+        <label className="block mb-2 text-gray-700 text-sm">Email:</label>
         <input
           type="email"
           value={email}
           onChange={handleEmailChange}
           placeholder="Email"
           required
+          className="w-full p-2 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
         />
 
-        <label className="block mb-1 text-gray-700 text-sm">Role:</label>
-        <select value={role} onChange={handleRoleChange} className='mb-2' required>
+        <label className="block mb-2 text-gray-700 text-sm">Role:</label>
+        <select
+          value={role}
+          onChange={handleRoleChange}
+          className="w-full p-2 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
+          required
+        >
           <option value="">Select Role</option>
           <option value="Admin">Corporate Admin</option>
-          <option value="Admin">Local Admin</option>
+          <option value="LocalAdmin">Local Admin</option>
           <option value="User">User</option>
-          {/* Add more roles as needed */}
         </select>
 
-        <label className="block mb-1 text-gray-700 text-sm">Location:</label>
-        <select value={location} onChange={handleLocationChange} className='mb-2' required>
+        <label className="block mb-2 text-gray-700 text-sm">Location:</label>
+        <select
+          value={location}
+          onChange={handleLocationChange}
+          className="w-full p-2 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
+          required
+        >
           <option value="">Select Location</option>
           <option value="Location1">Location 1</option>
           <option value="Location2">Location 2</option>
-          {/* Add more locations as needed */}
         </select>
 
-        <div>
-          <button onClick={handleInviteClick}  className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm">
+        <div className="flex justify-end">
+          <button
+            onClick={handleInviteClick}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+          >
             Invite
           </button>
-          
         </div>
       </div>
     </div>
