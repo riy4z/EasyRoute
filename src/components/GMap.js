@@ -1,30 +1,20 @@
+// GMap.js
 import React, { Component } from "react";
 import { Map, GoogleApiWrapper, Marker } from "google-maps-react";
-import axios from 'axios';
+import * as MapFunctions from "./mapFunctions";
 
 class GMap extends Component {
   constructor(props) {
     super(props);
     this.state = {
       markers: [],
-      initialCenter: null, 
+      initialCenter: null,
     };
   }
-       
-  sendAddressDataToBackend = async (addressData) => {
-  
-    try {
-      const response = await axios.post('http://localhost:4000/api/store-address-data', addressData, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-    } catch (error) {
-      console.error('Errror saving address data:', error);
-    }
-  }
-  // Add a new method to get the user's current location
-  getUserLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
+
+  componentDidMount() {
+    MapFunctions.getUserLocation(
+      (position) => {
         const { coords } = position;
         this.setState({
           initialCenter: {
@@ -32,101 +22,34 @@ class GMap extends Component {
             lng: coords.longitude,
           },
         });
-      }, () => {
-        // Error handling when the user's location is not available
+      },
+      () => {
         this.setState({
           initialCenter: {
             lat: 41.977226,
             lng: -87.836723,
           },
         });
-      });
-    } else {
-      // If geolocation is not supported, set the default coordinates
-      this.setState({
-        initialCenter: {
-          lat: 41.977226,
-          lng: -87.836723,
-        },
-      });
-    }
+      }
+    );
+    this.createPinsFromAddresses(this.props.addresses); 
+    // MapFunctions.getAddressesFromDatabase(this.createPinsFromAddresses);
   }
 
-  componentDidMount() {
-    // Get the user's location when the component mounts
-    this.getUserLocation();
-  }
-
-  createPinsFromAddresses = (addresses) => {
-    if (!addresses || addresses.length === 0) {
-      return;
-    }
-
-    const { google } = this.props;
-    const geocoder = new google.maps.Geocoder();
-    const markers = [];
-
-    const logGeocodingError = (status, address) => {
-      if (status === 'ZERO_RESULTS') {
-        console.error('No results found for the address:', address);
-      } else {
-        console.error('Geocode was not successful for the following reason: ' + status);
-      }
-    };
-
-    const geocodeAddress = async (addressData) => {
-      if (!addressData["Street Address"] || !addressData["City"] || !addressData["ZIP Code"]) {
-        console.error('Invalid address data:', addressData);
-        return;
-      }
-      const fullAddress = `${addressData["Street Address"]}, ${addressData["City"]}, ${addressData["ZIP Code"]}`;
-    
-      try {
-        const geo = await new Promise((resolve) =>
-          geocoder.geocode({ address: fullAddress }, (results, status) => {
-            if (status === 'OK' && results[0]) {
-              const location = results[0].geometry.location;
-              const longitude = location.lng();
-              const latitude = location.lat();
-              
-              // Include longitude and latitude in the addressData object
-              addressData.longitude = longitude;
-              addressData.latitude = latitude;
-    
-              markers.push({ position: { lat: latitude, lng: longitude } });
-            } else {
-              logGeocodingError(status, fullAddress);
-            }
-            resolve();
-          })
-        );
-      } catch (error) {
-        console.error('Geocoding error:', error);
-      }
-
-    
-      // Send addressData to the backend
-      this.sendAddressDataToBackend(addressData);
-    
-    };
-
-    // Iterate through the addresses and geocode them sequentially
-    const geocodePromises = addresses.map((addressData) => geocodeAddress(addressData));
-
-    // Wait for all geocoding promises to complete
-    Promise.all(geocodePromises).then(() => {
-      this.setState({ markers });
-    });
-  };
-
-
-  
   componentDidUpdate(prevProps) {
+    // Check if addresses prop has changed
     if (prevProps.addresses !== this.props.addresses) {
+      console.log("Addresses changed:", this.props.addresses);
       this.createPinsFromAddresses(this.props.addresses);
     }
   }
-  
+  createPinsFromAddresses = (addresses) => {
+    MapFunctions.createPinsFromAddresses(addresses, this.props.google, this.setMarkers);
+  };
+
+  setMarkers = (markers) => {
+    this.setState({ markers });
+  };
 
   render() {
     const { markers, initialCenter } = this.state;
@@ -156,8 +79,6 @@ class GMap extends Component {
     );
   }
 }
-
-
 export default GoogleApiWrapper({
   apiKey: "AIzaSyAEBs7HmfIN_AB-Anpl2YP4jIOewJBgt_U",
 })(GMap);

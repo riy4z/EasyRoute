@@ -6,7 +6,7 @@ import avatar from '../assets/avatar.png';
 import { Link, useNavigate } from 'react-router-dom';
 import convertToBase64 from '../helper/convert';
 import { registerValidation } from '../helper/validate';
-import { registerUser, generateOTPbyEmail, verifyOTPbyEmail } from '../helper/helper';
+import { registerUser, generateOTPbyEmail, verifyOTPbyEmail} from '../helper/helper';
 
 
 export default function Register() {
@@ -15,7 +15,6 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [isVerificationVisible, setVerificationVisible] = useState(false);
   const [isRegisterVisible, setRegisterVisible] = useState(false);
-  const [emailForOTP, setEmailForOTP] = useState('');
   const [enteredOTP, setEnteredOTP] = useState('');
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   
@@ -51,6 +50,34 @@ export default function Register() {
   
   })
 
+  const checkEmailExistence = async () => {
+    const { error: emailError } = await registerUser({
+      email: formik.values.email,
+      password: '',
+    });
+  
+    if (emailError && emailError.includes('email')) {
+      // Email already exists, show an error message
+      toast.error('Email already exists. Please use a different email.');
+      return false;
+    }
+  
+    return true;
+  };
+  
+  const handleVerifyEmail = async () => {
+    if (!formik.values.email) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    const isEmailValid = await checkEmailExistence();
+
+    if (isEmailValid) {
+      setVerificationVisible(true); // Show the verification popup
+      // The useEffect will handle OTP generation
+    }
+  };
+
 
   const onUpload = async (e) => {
     const base64 = await convertToBase64(e.target.files[0]);
@@ -63,14 +90,8 @@ export default function Register() {
 
   
   useEffect(() => {
-    return () => {
-      toast.dismiss();
-    };
-  }, []);
-
-  useEffect(() => {
     if (isVerificationVisible) {
-      generateOTPbyEmail(emailForOTP).then((OTP) => {
+      generateOTPbyEmail(formik.values.email).then((OTP) => {
         if (OTP) {
           toast.success('OTP has been sent to your email');
         } else {
@@ -78,10 +99,10 @@ export default function Register() {
         }
       });
     }
-  }, [emailForOTP, isVerificationVisible]);
+  }, [formik.values.email, isVerificationVisible]);
 
   function resendOTP(){
-    let sendPromise = generateOTPbyEmail(emailForOTP);
+    let sendPromise = generateOTPbyEmail(formik.values.email);
 
     toast.promise(sendPromise, {
     loading: 'Sending...',
@@ -93,6 +114,8 @@ export default function Register() {
     // console.log(OTP)
   })
   }
+
+ const verifyemailbutton = "border border-indigo-500  w-full py-2 rounded-lg text-black text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white"
 
   return (
     <div className="container mx-auto">
@@ -117,17 +140,17 @@ export default function Register() {
 
             <div className="textbox flex flex-col items-center gap-6">
               <input {...formik.getFieldProps('username')} className={styles.textbox} type="text" placeholder="Username*" />
-              <input {...formik.getFieldProps('password')} className={styles.textbox} type={showPassword? 'password' : 'text'} placeholder="Password*" />
+              <input {...formik.getFieldProps('password')} className={styles.textbox} type={showPassword? 'text' : 'password'} placeholder="Password*" />
               <input {...formik.getFieldProps('email')} className={`${styles.textbox}`} type="email" placeholder="Email*" disabled={isEmailVerified}  />
               
               <i
                 onClick={handleTogglePassword}
-                className={`fixed mt-[120px] right-8 text-gray-300 cursor-pointer text-2xl ${
-                  showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'
+                className={`fixed mt-[105px] right-7 text-gray-300 cursor-pointer text-2xl ${
+                  showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'
                 }`}
               ></i>
               <i
-                className={`fixed mt-[217px] right-8 text-green-500 text-2xl ${
+                className={`fixed mt-[195px] right-8 text-green-500 text-2xl ${
                   isEmailVerified ? 'fas fa-regular fa-circle-check' : ''
                 }`}
               ></i>
@@ -161,7 +184,7 @@ export default function Register() {
               <button className="border border-indigo-500 py-2 px-3  rounded-lg text-black text-xl shadow-sm relative text-center mt-[70px] right-[61px] hover:bg-indigo-500 hover:text-white hover:border-none"
               onClick={async () => {
                 try {
-                  const response = await verifyOTPbyEmail({ email: emailForOTP, code: enteredOTP });
+                  const response = await verifyOTPbyEmail({ email: formik.values.email, code: enteredOTP });
             
                   if (response.status === 201) {
                     // OTP is correct, proceed with registration or any other action
@@ -183,20 +206,8 @@ export default function Register() {
        {/*VERIFY BUTTON*/}
        {!isVerificationVisible && !isRegisterVisible && (
             <button
-              className={styles.btn}
-              style={{left:41,position:'absolute'}}
-              onClick={() => {
-                // Check if the email field is not empty
-                if (formik.values.email.trim() !== '') {
-
-                  // Set Verification pop-up visible
-                  setEmailForOTP(formik.values.email);
-                  setVerificationVisible(true);
-                } else {
-                  // Show an error message or handle the case where the email is empty
-                  toast.error("Please enter a valid email address.");
-                }
-              }}
+              className={verifyemailbutton}
+              onClick={handleVerifyEmail}
             >
               Verify Email
             </button>

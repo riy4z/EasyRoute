@@ -11,7 +11,7 @@ import Reset from './authentication/Screens/Reset';
 import Register from './authentication/Screens/Register';
 import "./index.css";
 import { AuthorizeUser, ProtectRoute } from './authentication/middleware/auth';
-
+import AdminRequest from  "./Screens/AdminRequest";
 
 
 const Root = () => (
@@ -23,6 +23,7 @@ const Root = () => (
       <Route path="/recovery" element={<Recovery/>}/>
       <Route path="/reset" element={<Reset/>}/>
       <Route path="/app" element={<div><AuthorizeUser><App /></AuthorizeUser></div>} />
+      <Route path="/adminrequest" element={<AdminRequest/>}/>
     </Routes>
   </BrowserRouter>
 );

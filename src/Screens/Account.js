@@ -2,7 +2,8 @@ import React from "react";
 import handleFileUpload from "../components/handleFileUpload";
 import Popup from "./Popup";
 import AccountDetails from "./AccountDetails";
-import './popup.css';
+import '../styles/popup.css';
+import {useAuthStore} from '../authentication/store/store';
 
 
 class Account extends React.Component {
@@ -25,7 +26,7 @@ class Account extends React.Component {
       if (!this.state.searchInput) { // Only fetch if search input is empty
         this.fetchAndUpdateAddressData(); 
       }
-    }, 1000); // Fetch every 10 seconds
+    }, 20000); // Fetch every 10 seconds
   };
   fetchAndUpdateAddressData = () => {
     fetch('http://localhost:4000/api/get-address-data')
@@ -67,38 +68,36 @@ class Account extends React.Component {
     this.fileInput.click();
   };
 
-  h// ... (your existing imports and code)
-
-handleFileChange = (e) => {
-  const file = e.target.files[0];
-
-  handleFileUpload(file, (data) => {
-    this.props.setAddresses(data); // Pass the parsed data to the parent component
-    fetch('http://localhost:4000/api/process-csv', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ csvData: data, fileName: file.name }), 
-    })
-      .then((res) => res.json())
-      .then((response) => {
-        if (response.success) {
-          
-          console.log('CSV file processed successfully:', response.details);
-
-          
-        } else {
-          
-          console.error('Error processing CSV file:', response.error);
-        }
+  handleFileChange = (e) => {
+    const file = e.target.files[0];
+  
+    handleFileUpload(file, (data) => {
+      // Get the username from your Zustand authentication store
+      const { setUsername, auth } = useAuthStore.getState();
+      const username = auth.username;
+  
+      this.props.setAddresses(data); // Pass the parsed data to the parent component
+  
+      fetch('http://localhost:4000/api/process-csv', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ csvData: data, fileName: file.name, username }), // Include the username in the request
       })
-      .catch((error) => {
-        console.error('Error sending CSV data to the server:', error);
-      });
-  });
-};
-
+        .then((res) => res.json())
+        .then((response) => {
+          if (response.success) {
+            console.log('CSV file processed successfully:', response.details);
+          } else {
+            console.error('Error processing CSV file:', response.error);
+          }
+        })
+        .catch((error) => {
+          console.error('Error sending CSV data to the server:', error);
+        });
+    });
+  };
 
   openPopup = () => {
     this.setState({ isPopupOpen: true,isOverlayVisible: true });
@@ -151,8 +150,17 @@ searchAddresses = () => {
       address['ZIP Code']
     ];
 
+    const isValidAddress =
+    address &&
+    Object.keys(address).every((key) => address[key] !== undefined && address[key] !== null);
+
+  if (!isValidAddress) {
+    return false;
+  }
     // Check if any field contains the search input
-    const matchesSearch = addressFields.some(field => field.toLowerCase().includes(searchInput.toLowerCase()));
+    const matchesSearch = addressFields.some(
+      (field) => field && field.toLowerCase().includes(searchInput.toLowerCase())
+    );
 
     // Check if the full name contains the search input
     const fullNameMatches = fullName.toLowerCase().includes(searchInput.toLowerCase());
@@ -174,9 +182,8 @@ handleListItemClick = (selectedAddress) => {
    
       // Sort the addresses based on the 'First Name' in ascending order
     const sortedAddresses = [...savedaddress].sort((a, b) => {
-      const nameA = (a['First Name'] || '').toLowerCase(); // Use an empty string if 'First Name' is undefined
-      const nameB = (b['First Name'] || '').toLowerCase(); // Use an empty string if 'First Name' is undefined
-    
+      const nameA = a['First Name'] ? a['First Name'].toLowerCase() : '';
+      const nameB = b['First Name'] ? b['First Name'].toLowerCase() : '';
     if (nameA < nameB) {
       return -1;
     }
@@ -204,7 +211,7 @@ handleListItemClick = (selectedAddress) => {
     //   top:"160px"
     // };
 
-    const buttonStyle1 = "cursor-pointer bg-customColor1 rounded-lg p-1 text-white font-medium absolute bottom-2 left-16 text-lg"
+    const buttonStyle1 = "cursor-pointer bg-customColor1 rounded-lg p-2 text-white font-medium absolute bottom-4 left-16 text-xl"
     // {
     //   bottom:70,
     //   backgroundColor: '#394359',
@@ -267,15 +274,15 @@ handleListItemClick = (selectedAddress) => {
         </li>
       ));
     } else {
-      listContent = <h5 class='mt-48'>No accounts found</h5>
+      listContent = <h5 className='mt-48'>No accounts found</h5>
       
     }
 
     return (
       <div >
-        <h1 class="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
+        <h1 className="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
 
-        <button class={buttonStyle} onClick={this.handleFileSelect}>
+        <button className={buttonStyle} onClick={this.handleFileSelect}>
           Import Accounts
         </button>
         <input
@@ -291,7 +298,7 @@ handleListItemClick = (selectedAddress) => {
           placeholder="Search Accounts"
           value={searchInput}
           onChange={this.handleSearchInputChange}
-          class="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-28 text-xl"
+          className="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-28 text-xl"
           // {{
           
           //   padding: "10px",
@@ -304,15 +311,12 @@ handleListItemClick = (selectedAddress) => {
         />
         <i className="absolute top-[226px] right-7 text-gray-300 fas fa-solid fa-magnifying-glass"/>   
         </div>
-        <button class={buttonStyle1} onClick={this.openPopup}>
+        <button className={buttonStyle1} onClick={this.openPopup}>
         <i className="fas fa-plus-circle" style={{ marginRight: 10}}></i>
           Add Account
         </button>
         <div className={`overlay ${this.state.isOverlayVisible ? 'active' : ''}`} onClick={this.closePopup}></div>
-
-
-        
-        <div class={listContainerStyle}> 
+        <div className={listContainerStyle}> 
       
       <ul  style={{ listStyleType: "none", padding: 0 }}>
       {listContent}

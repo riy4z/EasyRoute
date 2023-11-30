@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import GMap from "./components/GMap";
 import Sidebar from "./Screens/Sidebar";
 
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -15,12 +16,13 @@ class App extends Component {
     this.setState({ addresses });
   };
 
+  
   render() {
     const { addresses } = this.state;
-    // console.log(addresses);
+    console.log(addresses)
     return (
       <div>
-        <Sidebar setAddresses={this.setAddresses} />
+        <Sidebar setAddresses={this.setAddresses} />  
         <GMap addresses={addresses} />
       </div>
     );

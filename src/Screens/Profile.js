@@ -6,10 +6,18 @@ import useFetch from '../authentication/hooks/fetch.hook';
 import { updateUser } from '../authentication/helper/helper';
 import convertToBase64 from '../authentication/helper/convert';
 import { profileValidation } from '../authentication/helper/validate';
-import styles from '../styles/ProfileStyle.module.css';
-import extend from '../styles/Profile.module.css';
+import LogoutPopup from './LogoutPopup';
 
 export default function Profile() {
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const openPopup = () => {
+    setPopupOpen(true);
+  }
+
+  const closePopup = () => {
+    setPopupOpen(false);
+  }
+
   const [file, setFile] = useState();
   const [{ isLoading, apiData, serverError }] = useFetch(''); // Update the query here
 
@@ -35,7 +43,14 @@ export default function Profile() {
       });
     },
   });
-
+  const update="absolute mt-28 left-3 border-2 border-indigo-500 px-24 py-2 rounded-lg text-indigo-500 text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white"
+  const first="relative left-3 border-2 px-5 py-3 rounded-xl px-[26px] shadow-sm text-lg  mt-8 focus:outline-none"
+  const last="relative left-3 border-2 px-5 py-3 rounded-xl px-[26px] shadow-sm text-lg  mt-4 focus:outline-none"
+  const mobile="relative left-3 border-2 px-5 py-3 rounded-xl px-[26px] shadow-sm text-lg  mt-4 focus:outline-none"
+  const email="relative left-3 border-2 px-5 py-3 rounded-xl px-[26px] shadow-sm text-lg  mt-4 focus:outline-none"
+  const address="relative left-3 border-2 px-5 py-3 rounded-xl px-[26px] shadow-sm text-lg  mt-4 focus:outline-none"
+  const img="relative mt-8 left-[75px] w-32 cursor-pointer border-4 border-gray-100 rounded-full shadow-lg cursor-pointer hover:border-gray-200"
+  const buttonStyle1="border-2 border-red-600 mt-28 ml-3 px-[58px] py-2 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
   const onUpload = async (e) => {
     const base64 = await convertToBase64(e.target.files[0]);
     setFile(base64);
@@ -51,8 +66,8 @@ export default function Profile() {
       <div style={{ top: 43, position: 'absolute' }}>
         <div>
           <div>
-            <h4 class="text-5xl font-medium text-customColor1 text-left  ">Profile</h4>
-            <span className="py-4 text-xl w-2/3 text-center text-gray-500">You can update the details.</span>
+            <h4 className="text-5xl font-medium text-customColor1 text-left  ">Profile</h4>
+            {/* <span className="py-4 text-xl w-2/3 text-center text-gray-500">You can update the details.</span> */}
           </div>
 
           <form onSubmit={formik.handleSubmit}>
@@ -60,7 +75,7 @@ export default function Profile() {
               <label htmlFor="profile">
                 <img
                   src={apiData?.profile || file || avatar}
-                  className={`${styles.profile_img} ${extend.profile_img}`}
+                  className={img}
                   alt="avatar"
                 />
               </label>
@@ -68,17 +83,17 @@ export default function Profile() {
               <input onChange={onUpload} type="file" id="profile" name="profile" />
             </div>
 
-            <div class="leading-loose">
+            <div className="leading-loose">
               <div>
                 <input
                   {...formik.getFieldProps('firstName')}
-                  className={`${styles.textbox} ${extend.textbox}`}
+                  className={first} 
                   type="text"
                   placeholder="FirstName"
                 />
                 <input
                   {...formik.getFieldProps('lastName')}
-                  className={`${styles.textbox} ${extend.textbox}`}
+                  className={last}
                   type="text"
                   placeholder="LastName"
                 />
@@ -87,13 +102,13 @@ export default function Profile() {
               <div>
                 <input
                   {...formik.getFieldProps('mobile')}
-                  className={`${styles.textbox} ${extend.textbox}`}
+                  className={mobile}
                   type="text"
                   placeholder="Mobile No."
                 />
                 <input
                   {...formik.getFieldProps('email')}
-                  className={`${styles.textbox} ${extend.textbox}`}
+                  className={email}
                   type="text"
                   placeholder="Email*"
                 />
@@ -101,17 +116,29 @@ export default function Profile() {
 
               <input
                 {...formik.getFieldProps('address')}
-                className={`${styles.textbox} ${extend.textbox}`}
+                className={address}
                 type="text"
                 placeholder="Address"
               />
-              <button className="border-2 border-indigo-500 w-3/4 py-2 rounded-lg text-indigo-500 text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white" type="submit">
+              <button className={update} type="submit">
                 Update
               </button>
             </div>
+            
           </form>
+          <div>
+            <button className={buttonStyle1} onClick={openPopup}>
+          Logout Account
+        </button>
+
+        {isPopupOpen && (
+        <LogoutPopup closePopup={closePopup} />
+      )}
+      
+    </div>
         </div>
       </div>
     </div>
+    
   );
 }
