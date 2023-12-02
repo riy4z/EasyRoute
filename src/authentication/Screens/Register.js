@@ -30,6 +30,9 @@ export default function Register() {
     validateOnChange: false,
     onSubmit: async (values) => {
       values = await Object.assign(values, { profile: file || '' });
+      // const { roleFromUrl, companyIdFromUrl } = formik.values;
+      // values = { ...values, roleFromUrl, companyIdFromUrl };
+      console.log(values)
       let registerPromise = registerUser(values);
       toast.promise(
         registerPromise.then((response) => {
@@ -101,6 +104,35 @@ export default function Register() {
     }
   }, [formik.values.email, isVerificationVisible]);
 
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailFromUrl = urlParams.get('email');
+    const locationFromUrl = urlParams.get('location');
+    const roleFromUrl = urlParams.get('role');
+    const companyIdFromUrl = urlParams.get('companyid');
+  
+    console.log('Email from URL:', emailFromUrl);
+    console.log('Location from URL:', locationFromUrl);
+    console.log('Role from URL:', roleFromUrl);
+    console.log('Company ID from URL:', companyIdFromUrl);
+  
+    formik.setValues({
+      email: emailFromUrl || '',
+      username: '',
+      password: '',
+      role: roleFromUrl || '', // Set roleFromUrl in formik.values
+      companyId: companyIdFromUrl || '', // Set companyIdFromUrl in formik.values
+    });
+  
+    formik.setFieldTouched('email');
+    formik.setFieldError('email', 'Email locked from URL parameter.');
+  
+    // Set other state values if needed
+    // ...
+  
+  }, []);
+
   function resendOTP(){
     let sendPromise = generateOTPbyEmail(formik.values.email);
 
@@ -141,7 +173,7 @@ export default function Register() {
             <div className="textbox flex flex-col items-center gap-6">
               <input {...formik.getFieldProps('username')} className={styles.textbox} type="text" placeholder="Username*" />
               <input {...formik.getFieldProps('password')} className={styles.textbox} type={showPassword? 'text' : 'password'} placeholder="Password*" />
-              <input {...formik.getFieldProps('email')} className={`${styles.textbox}`} type="email" placeholder="Email*" disabled={isEmailVerified}  />
+              <input {...formik.getFieldProps('email')} className={`${styles.textbox}`} type="email" placeholder="Email*" disabled={isEmailVerified || formik.values.email !== ''}  />
               
               <i
                 onClick={handleTogglePassword}

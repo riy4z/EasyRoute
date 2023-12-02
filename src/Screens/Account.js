@@ -2,13 +2,14 @@ import React from "react";
 import handleFileUpload from "../components/handleFileUpload";
 import Popup from "./Popup";
 import AccountDetails from "./AccountDetails";
-
+import { useAuthStore } from "../authentication/store/store";
 
 class Account extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       isPopupOpen: false,
+      isOverlayVisible: false,
       savedaddress: [],
       searchInput: "", // State variable to store the search input
       selectedAddress: null, 
@@ -67,17 +68,42 @@ class Account extends React.Component {
 
   handleFileChange = (e) => {
     const file = e.target.files[0];
+  
     handleFileUpload(file, (data) => {
+      // Get the username from your Zustand authentication store
+      const { setUsername, auth } = useAuthStore.getState();
+      const username = auth.username;
+  
       this.props.setAddresses(data); // Pass the parsed data to the parent component
+  
+      fetch('http://localhost:4000/api/processCSV', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ csvData: data, fileName: file.name, username }), // Include the username in the request
+      })
+        .then((res) => res.json())
+        .then((response) => {
+          if (response.success) {
+            console.log('CSV file processed successfully:', response.details);
+          } else {
+            console.error('Error processing CSV file:', response.error);
+          }
+        })
+        .catch((error) => {
+          console.error('Error sending CSV data to the server:', error);
+        });
     });
   };
 
+
   openPopup = () => {
-    this.setState({ isPopupOpen: true });
+    this.setState({ isPopupOpen: true, isOverlayVisible: true });
   };
 
   closePopup = () => {
-    this.setState({ isPopupOpen: false });
+    this.setState({ isPopupOpen: false, isOverlayVisible: false });
   };
 
 handleListItemHover = (index) => {
@@ -168,61 +194,15 @@ handleListItemClick = (selectedAddress) => {
 
     // console.log(savedaddress)
     const buttonStyle = "cursor-pointer bg-blue-600 rounded-lg px-14 py-1.5 text-white font-medium absolute top-32 text-xl"
-    // {
-    //   backgroundColor: '#0066ff',
-    //   border: "none",
-    //   borderRadius: 10,
-    //   color: "white",
-    //   padding: "10px 80px",
-    //   textAlign: "center",
-    //   textDecoration: "none",
-    //   display: "inline-block",
-    //   fontWeight: 600,
-    //   position: "absolute",
-    //   fontSize: "16px",
-    //   cursor: "pointer",
-    //   top:"160px"
-    // };
+
 
     const buttonStyle1 = "cursor-pointer bg-customColor1 rounded-lg p-2 text-white font-medium absolute bottom-4 left-16 text-xl"
-    // {
-    //   bottom:70,
-    //   backgroundColor: '#394359',
-    //   border: "none",
-    //   borderRadius: 10,
-    //   color: "white",
-    //   padding: "10px 10px",
-    //   textAlign: "center",
-    //   textDecoration: "none",
-    //   display: "inline-block",
-    //   fontWeight: 600,
-    //   position: "absolute",
-    //   fontSize: "16px",
-    //   cursor: "pointer",
-    //   justifyContent:"center",
-    //   left:"85px",
-    // };
 
-    // const style="text-5xl font-medium text-customColor1 text-left"
-    // // {
-    // //   fontSize: 50,
-    // //   fontWeight:600,
-    // //   color: "#282c34",
-    // //   textAlign:"left",
-    // // }
     
     const listContainerStyle =  `absolute ${
       savedaddress && savedaddress.length > 0 ? 'overflow-y-scroll h-3/5 mt-48' : 'overflow-hidden'
     }`;
-    // {
-    //   position:"absolute",
-    //   height: "600px", // Set a fixed height for the container
-    //   overflow: "auto", // Enable vertical scrolling
-    //   marginTop:"110px",
-    //   marginRight:"10px"
-    // };
 
-    //List Content
     let listContent;
     if (savedaddress && savedaddress.length > 0) {
       const visibleAddresses = sortedAddresses.filter(address => !address.isHidden);
@@ -272,15 +252,7 @@ handleListItemClick = (selectedAddress) => {
           value={searchInput}
           onChange={this.handleSearchInputChange}
           class="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-28 text-xl"
-          // {{
-          
-          //   padding: "10px",
-          //   width: "85%",
-          //   border: "1px solid #ccc",
-          //   borderRadius: "15px",
-          //   marginTop:"50px",
-          //   position:"absolute"
-          // }}
+
         />
         <i className="absolute top-[226px] right-7 text-gray-300 fas fa-solid fa-magnifying-glass"/>   
         </div>
