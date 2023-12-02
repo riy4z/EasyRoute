@@ -91,6 +91,6 @@ export const getAddressesFromDatabase = async (createPinsFromAddresses) => {
 
     createPinsFromAddresses(addresses);
   } catch (error) {
-    console.error('Error retrieving addresses from the database:', error);
-  }
+    console.error('Error retrieving addresses from the database:', error);
+  }
 };
