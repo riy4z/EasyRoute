@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.glass{
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px #4747470b;
+    backdrop-filter: blur(7.1px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    @apply border-4 border-gray-50 shrink-0 h-3/4 w-[30%] rounded-3xl py-20 px-7 min-w-max;
+}
+
+.profile_img{
+    @apply w-[140px] border-4 border-gray-100 rounded-full shadow-lg cursor-pointer mb-2 ;
+    @apply hover:border-gray-200;
+    
+}
+
+.textbox{
+    @apply border-2 px-5 py-4 rounded-xl w-3/4 shadow-sm text-lg ;
+    @apply focus:outline-none;
+    
+}
+
+.verified{
+    icon: fas fa-regular fa-circle-check
+}
+
+.btn{
+    @apply border border-indigo-500 w-3/4 py-2 rounded-lg text-black text-xl shadow-sm text-center;  
+}
+
+.btn:hover{
+    @apply bg-indigo-500 text-white border-none ;
+}
+
+input[type='file']{
+    display: none;
+}
+
+.verificationPopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    @apply px-20 py-6
+  }
