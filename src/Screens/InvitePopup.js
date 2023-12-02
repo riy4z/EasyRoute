@@ -1,12 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';  
 import getCompanyID from "../components/getCompany"
 import { RxCrossCircled } from 'react-icons/rx';
+import fetchLocations from '../components/fetchLocations';
 
 function InvitePopup(props) {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
   const [location, setLocation] = useState('');
+  const [locationsFromServer, setLocationsFromServer] = useState([]);
+
+
+  useEffect(() => {
+    // Fetch locations from the server when the component mounts
+    const fetchData = async () => {
+      try {
+        const locations = await fetchLocations();
+        setLocationsFromServer(locations);
+         // Update the state with locations
+      } catch (error) {
+        // Handle the error as needed
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -100,9 +118,12 @@ function InvitePopup(props) {
         className="w-full p-2 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
         required
       >
-        <option value="">Select Location</option>
-        <option value="Location1">Location 1</option>
-        <option value="Location2">Location 2</option>
+        <option>Select Location</option>
+          {locationsFromServer.map((loc) => (
+            <option key={loc.id} value={loc._id}>
+              {loc.Location}
+            </option>
+          ))}
       </select>
 
       <div className="flex justify-end">
