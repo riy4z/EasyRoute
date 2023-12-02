@@ -34,10 +34,14 @@ export async function registerUser(credentials ) {
     try {
         const { data: { msg, error }, status } = await axios.post(`/api/register`, credentials );
         
-        let { username, email } = credentials;
+        let { username, email, location, role } = credentials;
+        console.log(credentials)
 
         if (status === 201) {
             await axios.post('/api/registerMail', { username, userEmail: email });
+            const userID = await axios.get(`/api/user/${username}`)
+            console.log(userID)
+            await axios.post('/api/addUserLocation', {userId:userID.data._id, locationId:location})
         }
 
         return { msg, error };

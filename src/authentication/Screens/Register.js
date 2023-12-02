@@ -122,7 +122,8 @@ export default function Register() {
       username: '',
       password: '',
       role: roleFromUrl || '', // Set roleFromUrl in formik.values
-      companyId: companyIdFromUrl || '', // Set companyIdFromUrl in formik.values
+      companyId: companyIdFromUrl || '',
+      location: locationFromUrl || '' // Set companyIdFromUrl in formik.values
     });
   
     formik.setFieldTouched('email');
