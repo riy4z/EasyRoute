@@ -192,15 +192,17 @@ handleListItemClick = (selectedAddress) => {
     return 0;
   });
 
+   
+
     // console.log(savedaddress)
-    const buttonStyle = "cursor-pointer bg-blue-600 rounded-lg px-14 py-1.5 text-white font-medium absolute top-32 text-xl"
+    const buttonStyle = "cursor-pointer bg-blue-600 rounded-lg px-14 py-1.5 text-white font-medium absolute text-xl top-32"
 
 
     const buttonStyle1 = "cursor-pointer bg-customColor1 rounded-lg p-2 text-white font-medium absolute bottom-4 left-16 text-xl"
 
     
     const listContainerStyle =  `absolute ${
-      savedaddress && savedaddress.length > 0 ? 'overflow-y-scroll h-3/5 mt-48' : 'overflow-hidden'
+      savedaddress && savedaddress.length > 0 ? 'overflow-y-scroll h-3/5 mt-40' : 'overflow-hidden'
     }`;
 
     let listContent;
@@ -227,15 +229,15 @@ handleListItemClick = (selectedAddress) => {
         </li>
       ));
     } else {
-      listContent = <h5 class='mt-48'>No accounts found</h5>
+      listContent = <h5 className='mt-48'>No accounts found</h5>
       
     }
 
     return (
       <div >
-        <h1 class="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
-
-        <button class={buttonStyle} onClick={this.handleFileSelect}>
+        <h1 className="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
+      
+        <button className={buttonStyle} onClick={this.handleFileSelect}>
           Import Accounts
         </button>
         <input
@@ -245,22 +247,33 @@ handleListItemClick = (selectedAddress) => {
           ref={(fileInput) => (this.fileInput = fileInput)}
           style={{ display: "none" }}
         />
+         
+      <select
+        className="relative top-20 w-full rounded-md focus:outline-none focus:border-blue-500"
+        required
+      >
+        <option value="">Select Role</option>
+        <option value="Admin">Corporate Admin</option>
+        <option value="LocalAdmin">Local Admin</option>
+        <option value="User">User</option>
+      </select>
+      
         <div>
           <input
           type="text"
           placeholder="Search Accounts"
           value={searchInput}
           onChange={this.handleSearchInputChange}
-          class="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-28 text-xl"
+          className="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-28 text-xl"
 
         />
-        <i className="absolute top-[226px] right-7 text-gray-300 fas fa-solid fa-magnifying-glass"/>   
+        <i className="absolute top-[273px] right-7 text-gray-300 fas fa-solid fa-magnifying-glass"/>   
         </div>
-        <button class={buttonStyle1} onClick={this.openPopup}>
+        <button className={buttonStyle1} onClick={this.openPopup}>
         <i className="fas fa-plus-circle" style={{ marginRight: 10}}></i>
           Add Account
         </button>
-        <div class={listContainerStyle}> 
+        <div className={listContainerStyle}> 
       
       <ul  style={{ listStyleType: "none", padding: 0 }}>
       {listContent}

@@ -19,7 +19,7 @@ function Routes({ setAddresses }) {
 
   return (
     <div>
-      <h1 style={{ color: 'black' }}>Route</h1>
+      <h1 className="text-5xl font-medium text-customColor1 text-left ">Route</h1>
       <p style={{ color: 'black' }}>Explore Routes! Come on let's explore</p>
       {/* Your component content here */}
     </div>
