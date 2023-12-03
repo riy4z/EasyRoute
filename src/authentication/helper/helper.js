@@ -32,9 +32,10 @@ export async function getUser({username}){
 
 export async function registerUser(credentials ) {
     try {
+        console.log(credentials);
         const { data: { msg, error }, status } = await axios.post(`/api/register`, credentials );
         
-        let { username, email, location, role } = credentials;
+        let { username, email, location } = credentials;
         console.log(credentials)
 
         if (status === 201) {

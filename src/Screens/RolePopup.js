@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import getCompanyID from '../components/getCompany';
+import fetchRoles from '../components/fetchRoles';
 
 function RolePopup({ closePopup }) {
   const [roles, setRoles] = useState([]);
@@ -8,20 +9,18 @@ function RolePopup({ closePopup }) {
 
   
   useEffect(() => {
-    // Fetch roles from the server when the component mounts
-    fetchRoles();
-  }, []);
+    // Fetch locations from the server when the component mounts
+    const fetchRole = async () => {
+      try {
+        const rolesFromServer = await fetchRoles();
+        setRoles(rolesFromServer);
+      } catch (error) {
+        // Handle the error as needed
+      }
+    };
 
-  const fetchRoles = async () => {
-    const companyid = getCompanyID();
-    try {
-      const response = await fetch(`http://localhost:4000/api/getRoles?companyid=${companyid}`);
-      const rolesFromServer = await response.json();
-      setRoles(rolesFromServer);
-    } catch (error) {
-      console.error('Error fetching roles:', error);
-    }
-  };
+    fetchRole();
+  }, []);
 
   const handleAddRoleClick = () => {
     setShowInput(true);

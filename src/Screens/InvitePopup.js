@@ -3,13 +3,14 @@ import axios from 'axios';
 import getCompanyID from "../components/getCompany"
 import { RxCrossCircled } from 'react-icons/rx';
 import fetchLocations from '../components/fetchLocations';
+import fetchRoles from '../components/fetchRoles';
 
 function InvitePopup(props) {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
   const [location, setLocation] = useState('');
   const [locationsFromServer, setLocationsFromServer] = useState([]);
-
+  const [rolesFromServer, setRolesFromServer] = useState([]);
 
   useEffect(() => {
     // Fetch locations from the server when the component mounts
@@ -18,6 +19,8 @@ function InvitePopup(props) {
         const locations = await fetchLocations();
         setLocationsFromServer(locations);
          // Update the state with locations
+        const roles = await fetchRoles();
+        setRolesFromServer(roles);
       } catch (error) {
         // Handle the error as needed
       }
@@ -25,6 +28,8 @@ function InvitePopup(props) {
 
     fetchData();
   }, []);
+
+  console.log(rolesFromServer);
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -105,10 +110,12 @@ function InvitePopup(props) {
         className="w-full p-2 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
         required
       >
-        <option value="">Select Role</option>
-        <option value="Admin">Corporate Admin</option>
-        <option value="LocalAdmin">Local Admin</option>
-        <option value="User">User</option>
+        <option>Select Role</option>
+        {rolesFromServer.map((rol) => (
+            <option key={rol.id} value={rol._id}>
+              {rol.Role}
+            </option>
+          ))}
       </select>
 
       <label className="block mb-2 text-gray-700 text-sm">Location:</label>
