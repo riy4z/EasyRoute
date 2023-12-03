@@ -76,60 +76,6 @@ function LocationPopup({ closePopup }) {
     closePopup();
   };
 
-  const popupStyle = {
-    position: 'fixed',
-    top: '35%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    backgroundColor: '#fff',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)',
-    zIndex: 999,
-  };
-
-  const labelStyle = {
-    display: 'block',
-    marginBottom: '5px',
-  };
-
-  const inputStyle = {
-    marginBottom: '10px',
-  };
-
-  const buttonStyle1 = {
-    margin: '5px',
-    marginTop: '30px',
-    marginLeft: '50px',
-    width: '50%',
-    padding: '8px 20px',
-    fontSize: '16px',
-    backgroundColor: 'white',
-    fontWeight: '600',
-    color: '#394359',
-    borderRadius: '10px',
-    cursor: 'pointer',
-  };
-
-  const buttonStyle2 = {
-    margin: '5px',
-    marginTop: '30px',
-    marginLeft: '26%',
-    width: '50%',
-    padding: '8px 20px',
-    fontSize: '16px',
-    backgroundColor: 'white',
-    fontWeight: '600',
-    color: '#394359',
-    borderRadius: '10px',
-    cursor: 'pointer',
-  };
-
-  const buttonContainerStyle = {
-    display: 'flex',
-    justifyContent: 'flex-end',
-  };
-
   return (
     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
       <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto">

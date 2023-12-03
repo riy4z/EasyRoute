@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import getCompanyID from '../components/getCompany';
 import fetchRoles from '../components/fetchRoles';
+import { RxCrossCircled } from 'react-icons/rx';
 
-function RolePopup({ closePopup }) {
+function RolePopup(props) {
   const [roles, setRoles] = useState([]);
   const [showInput, setShowInput] = useState(false);
   const [newRole, setNewRole] = useState('');
 
-  
   useEffect(() => {
-    // Fetch locations from the server when the component mounts
     const fetchRole = async () => {
       try {
         const rolesFromServer = await fetchRoles();
@@ -38,7 +37,6 @@ function RolePopup({ closePopup }) {
     }
 
     try {
-      // Send the new role to the server to be saved
       const response = await fetch('http://localhost:4000/api/addRoles', {
         method: 'POST',
         headers: {
@@ -50,7 +48,6 @@ function RolePopup({ closePopup }) {
       const result = await response.json();
 
       if (result.message) {
-        // If the role is added successfully, update the roles state
         setRoles([...roles, result.role]);
         setNewRole('');
         setShowInput(false);
@@ -72,99 +69,64 @@ function RolePopup({ closePopup }) {
     }
 
     alert(`Roles submitted: ${roles.map((role) => role.Role).join(', ')}`);
-    closePopup();
-  };
-
-  const popupStyle = {
-    position: 'fixed',
-    top: '35%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    backgroundColor: '#fff',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)',
-    zIndex: 999,
-  };
-
-  const labelStyle = {
-    display: 'block',
-    marginBottom: '5px',
-  };
-
-  const inputStyle = {
-    marginBottom: '10px',
-  };
-
-  const buttonStyle1 = {
-    margin: '5px',
-    marginTop: '30px',
-    marginLeft: '50px',
-    width: '50%',
-    padding: '8px 20px',
-    fontSize: '16px',
-    backgroundColor: 'white',
-    fontWeight: '600',
-    color: '#394359',
-    borderRadius: '10px',
-    cursor: 'pointer',
-  };
-
-  const buttonStyle2 = {
-    margin: '5px',
-    marginTop: '30px',
-    marginLeft: '26%',
-    width: '50%',
-    padding: '8px 20px',
-    fontSize: '16px',
-    backgroundColor: 'white',
-    fontWeight: '600',
-    color: '#394359',
-    borderRadius: '10px',
-    cursor: 'pointer',
-  };
-
-  const buttonContainerStyle = {
-    display: 'flex',
-    justifyContent: 'flex-end',
+    props.closePopup();
   };
 
   return (
-    <div>
-      <div style={popupStyle}>
-        <h2 style={labelStyle}>Roles:</h2>
-        <ul>
+    <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
+    <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto">
+    <div className="absolute top-4 right-4 cursor-pointer">
+          <button onClick={props.closePopup} className="text-gray-500 hover:text-gray-700">
+            <RxCrossCircled />
+          </button>
+        </div>
+        <h2 className="text-3xl font-bold text-center mb-4">Invite Users</h2>
+        <hr className="my-4" />
+        <h2 className="text-2xl font-semibold mb-4">Roles:</h2>
+        <ul className="mb-4">
           {roles.map((role, index) => (
-            <li key={index}>{role.Role}</li>
+            <li key={index} className="text-gray-800">{role.Role}</li>
           ))}
         </ul>
         <div>
           {showInput && (
-            <>
-              <form onSubmit={handleSubmit}>
-                <input type="text" value={newRole} onChange={handleRoleChange} style={inputStyle} />
-                <button type="button" onClick={handleAddRole} style={buttonStyle1}>
-                  Add Role
-                </button>
-              </form>
-            </>
+            <form onSubmit={handleSubmit} className="mb-4">
+              <input
+                type="text"
+                value={newRole}
+                onChange={handleRoleChange}
+                className="w-full p-2 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
+              />
+              <button
+                type="button"
+                onClick={handleAddRole}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+              >
+                Add Role
+              </button>
+            </form>
           )}
           {!showInput && (
-            <button onClick={handleAddRoleClick} style={buttonStyle1}>
+            <button
+              onClick={handleAddRoleClick}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 absolute rounded-md transition duration-300 text-sm"
+            >
               Add Role
             </button>
           )}
-          <div style={buttonContainerStyle}>
-            <button type="submit" style={buttonStyle1} onClick={handleSubmit}>
+          <div className="flex justify-end space-x-4">
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+            >
               Submit
-            </button>
-            <button onClick={closePopup} style={buttonStyle2}>
-              Cancel
             </button>
           </div>
         </div>
       </div>
     </div>
+   
   );
 }
 
