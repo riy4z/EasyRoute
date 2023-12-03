@@ -96,7 +96,7 @@ function LocationPopup({ closePopup }) {
             <>
               <form onSubmit={handleSubmit}>
                 <input type="text" value={newLocation} onChange={handleLocationChange}  className="w-full p-1 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500" />
-                <button type="button" onClick={handleAddLocation} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm">
+                <button type="button" onClick={handleAddLocation} className="border border-black text-black bg-blue-500 hover:bg-blue-500 hover:text-white hover:border-none font-bold py-2 px-4 rounded-md transition duration-300 text-sm">
                   Add Location
                 </button>
               </form>

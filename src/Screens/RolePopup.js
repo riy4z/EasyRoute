@@ -80,10 +80,9 @@ function RolePopup(props) {
             <RxCrossCircled />
           </button>
         </div>
-        <h2 className="text-3xl font-bold text-center mb-4">Invite Users</h2>
+        <h2 className="text-3xl font-bold text-center mb-4">Roles</h2>
         <hr className="my-4" />
-        <h2 className="text-2xl font-semibold mb-4">Roles:</h2>
-        <ul className="mb-4">
+        <ul>
           {roles.map((role, index) => (
             <li key={index} className="text-gray-800">{role.Role}</li>
           ))}
@@ -95,12 +94,12 @@ function RolePopup(props) {
                 type="text"
                 value={newRole}
                 onChange={handleRoleChange}
-                className="w-full p-2 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
+                className="w-full p-1 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
               />
               <button
                 type="button"
                 onClick={handleAddRole}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+                className="border border-black text-black bg-blue-500 hover:bg-blue-500 hover:text-white hover:border-none font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
               >
                 Add Role
               </button>
@@ -109,20 +108,11 @@ function RolePopup(props) {
           {!showInput && (
             <button
               onClick={handleAddRoleClick}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 absolute rounded-md transition duration-300 text-sm"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
             >
               Add Role
             </button>
           )}
-          <div className="flex justify-end space-x-4">
-            <button
-              type="submit"
-              onClick={handleSubmit}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
-            >
-              Submit
-            </button>
-          </div>
         </div>
       </div>
     </div>
