@@ -3,6 +3,8 @@ import handleFileUpload from "../components/handleFileUpload";
 import Popup from "./Popup";
 import AccountDetails from "./AccountDetails";
 import { useAuthStore } from "../authentication/store/store";
+import fetchLocations from '../components/fetchLocations';
+import fetchUserLocations from '../components/fetchUserLocations';
 
 class Account extends React.Component {
   constructor(props) {
@@ -14,6 +16,8 @@ class Account extends React.Component {
       searchInput: "", // State variable to store the search input
       selectedAddress: null, 
       isAccountDetailsExpanded: false,
+      userLocations: [],
+      selectedLocation: '',
     };
   }
 
@@ -60,7 +64,23 @@ class Account extends React.Component {
   // Automatically fetch address data when the component mounts
   componentDidMount() {
     this.fetchAddressData();
+    this.fetchLocationData();
   }
+
+  fetchLocationData = async () => {
+    try {
+      const locationsData = await fetchLocations();
+      const userLocationsData = await fetchUserLocations();
+
+      this.setState({
+        locations: locationsData,
+        userLocations: userLocationsData,
+      });
+    } catch (error) {
+      console.error('Error fetching location data:', error);
+      // Handle error as needed
+    }
+  };
 
   handleFileSelect = () => {
     this.fileInput.click();
@@ -176,6 +196,34 @@ handleListItemClick = (selectedAddress) => {
   });
 };
 
+renderLocationDropdown() {
+  const { locations, userLocations, selectedLocation } = this.state;
+
+  return (
+    <select
+      id="locationDropdown"
+      value={selectedLocation}
+      onChange={(e) => this.setState({ selectedLocation: e.target.value })}
+    >
+      <option value="">Select a location</option>
+      {Array.isArray(userLocations) && userLocations.length > 0 ? (
+        userLocations.map((userLocation) => {
+          const location = locations.find(loc => loc._id === userLocation.LocationID);
+          return (
+            <option key={userLocation._id} value={userLocation.LocationID}>
+              {location ? location.Location : 'Unknown Location'}
+            </option>
+          );
+        })
+      ) : (
+        <option value="" disabled>
+          No locations available
+        </option>
+      )}
+    </select>
+  );
+}
+
   render() {
     const { savedaddress, searchInput, selectedAddress, isAccountDetailsExpanded } = this.state;
    
@@ -247,17 +295,9 @@ handleListItemClick = (selectedAddress) => {
           ref={(fileInput) => (this.fileInput = fileInput)}
           style={{ display: "none" }}
         />
-         
-      <select
-        className="relative top-20 w-full rounded-md focus:outline-none focus:border-blue-500"
-        required
-      >
-        <option value="">Select Role</option>
-        <option value="Admin">Corporate Admin</option>
-        <option value="LocalAdmin">Local Admin</option>
-        <option value="User">User</option>
-      </select>
-      
+        <div className= "relative top-20"> 
+         {this.renderLocationDropdown()}
+         </div>
         <div>
           <input
           type="text"
