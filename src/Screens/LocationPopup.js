@@ -85,6 +85,7 @@ function LocationPopup({ closePopup }) {
           </button>
         </div>
         <h2 className="text-3xl font-bold text-center mb-4">Locations</h2>
+        <hr className="my-4" />
         <ul>
           {locations.map((location, index) => (
             <li key={index}>{location.Location}</li>
