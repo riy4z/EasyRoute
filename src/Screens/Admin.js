@@ -5,13 +5,14 @@ import LocationPopup from './LocationPopup';
 import RolePopup from './RolePopup';
 import UserDetails from './UserDetails'; // Import UserDetails component
 import userDetails from '../userdetails.json';
+import getRoleHierarchy from '../components/getRoleHierarchy';
 
 function Admin() {
   const [isInvitePopupOpen, setInvitePopupOpen] = useState(false);
   const [isLocationPopupOpen, setLocationPopupOpen] = useState(false);
   const [isRolePopupOpen, setRolePopupOpen] = useState(false);
   const [selectedUserName, setSelectedUserName] = useState(null); // Track selected user name
-
+  
   const openInvitePopup = () => {
     setInvitePopupOpen(true);
   }
@@ -44,19 +45,27 @@ function Admin() {
     setSelectedUserName(null);
   }
 
+  const isCorpAdmin = getRoleHierarchy();
+  const showAddButtons= isCorpAdmin;
   return (
     <div>
       <h1 className="text-5xl font-medium text-customColor1 text-left">Admin</h1>
-
-      <button className="mt-6 bg-customColor1 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-16" onClick={openLocationPopup}>
+      {showAddButtons==0 && (
+        <button className="mt-6 bg-customColor1 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-16" onClick={openLocationPopup}>
         <i className="fas fa-info-circle" style={{ marginRight: 10 }}></i>
         Location
-      </button>
+      </button> 
+      )
+      }
+      {showAddButtons==0 &&(
+       <button className="mt-4 bg-customColor1 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-20" onClick={openRolePopup}>
+       <i className="fas fa-solid fa-users" style={{ marginRight: 10 }}></i>
+       Role
+     </button>
+      )}
 
-      <button className="mt-4 bg-customColor1 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-20" onClick={openRolePopup}>
-        <i className="fas fa-question-circle" style={{ marginRight: 10 }}></i>
-        Role
-      </button>
+      
+      
 
       <button className="mt-4 bg-customColor1 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-11" onClick={openInvitePopup}>
         <i className="fas fa-user-plus" style={{ marginRight: 10 }}></i>

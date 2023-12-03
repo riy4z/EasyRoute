@@ -62,8 +62,8 @@ function Sidebar(props) {
   const selectedOptionStyle = "p-3 cursor-pointer bg-gray-100 bg-opacity-25 rounded-lg"
 
 
-  const isAdmin = apiData?.isAdmin || false;
-  
+  const isAdmin = apiData?.RoleHierarchy;
+ 
 
   // Constant to determine whether to display the Admin option
   const shouldDisplayAdmin = isAdmin;
@@ -74,7 +74,7 @@ function Sidebar(props) {
     >
       <h2 className="text-white text-5xl font-bold leading-loose">EasyRoute</h2>
 
-      {shouldDisplayAdmin && (
+      {(shouldDisplayAdmin === 0 || shouldDisplayAdmin === 1) && (
         <p
           className={selectedOption === 'Admin' ? selectedOptionStyle : optionStyle}
           onClick={() => handleOptionClick('Admin')}

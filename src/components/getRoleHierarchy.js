@@ -1,24 +1,23 @@
-export default function getCompanyID () {
+export default function getRoleHierarchy () {
     // Retrieve the JSON string from sessionStorage
-    const companyString = sessionStorage.getItem('userData');
-
+    const roleHierarchyNumber = sessionStorage.getItem('userData');
+    
   
     // Check if the string is not null or undefined
-    if (companyString) {
+    if (roleHierarchyNumber) {
       // Parse the JSON string into an object
-      const companyData = JSON.parse(companyString);
+      const roleHierarchyData = JSON.parse(roleHierarchyNumber);
   
       // Access the CompanyID property
-      const companyId = companyData.CompanyID;
+      const roleHierarchy = roleHierarchyData.RoleHierarchy;
   
       // Optionally, log the companyId
-      console.log("Company ID:", companyId);
+      console.log("Company ID:", roleHierarchy);
   
       // Return the companyId
-      return companyId;
+      return roleHierarchy;
     } else {
       console.log("userData not found in sessionStorage");
       return null;
     }
   };
-

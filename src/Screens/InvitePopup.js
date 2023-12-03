@@ -112,7 +112,7 @@ function InvitePopup(props) {
       >
         <option>Select Role</option>
         {rolesFromServer.map((rol) => (
-            <option key={rol.id} value={rol._id}>
+            <option key={rol.id} value={rol.RoleHierarchy}>
               {rol.Role}
             </option>
           ))}
