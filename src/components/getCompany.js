@@ -12,7 +12,7 @@ export default function getCompanyID () {
       const companyId = companyData.CompanyID;
   
       // Optionally, log the companyId
-      console.log("Company ID:", companyId);
+      // console.log("Company ID:", companyId);
   
       // Return the companyId
       return companyId;

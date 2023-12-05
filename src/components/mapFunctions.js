@@ -3,6 +3,7 @@ import axios from 'axios';
 
 export const sendAddressDataToBackend = async (addressData) => {
   try {
+    // console.log(addressData)
     const response = await axios.post('http://localhost:4000/api/store-address-data', addressData, {
       headers: { 'Content-Type': 'application/json' },
     });
@@ -64,7 +65,7 @@ export const createPinsFromAddresses = (addresses, google, setMarkers) => {
 
             addressData.longitude = longitude;
             addressData.latitude = latitude;
-
+            sendAddressDataToBackend(addressData);
             createMarker(latitude, longitude);
           } else {
             logGeocodingError(status, fullAddress);

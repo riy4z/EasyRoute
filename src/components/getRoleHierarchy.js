@@ -12,7 +12,7 @@ export default function getRoleHierarchy () {
       const roleHierarchy = roleHierarchyData.RoleHierarchy;
   
       // Optionally, log the companyId
-      console.log("Company ID:", roleHierarchy);
+      // console.log("RoleHierarchy:", roleHierarchy);
   
       // Return the companyId
       return roleHierarchy;

@@ -108,11 +108,12 @@ class Popup extends Component {
             borderRadius: '0.375rem', // Add some border radius
           }}
         />
-        <label className="block mb-1 text-gray-700 text-sm">Second Name:</label>
+
+        <label className="block mb-1 text-gray-700 text-sm">Last Name:</label>
         <input
           type="text"
-          name="lastname"
-          placeholder="Enter Second Name"
+          name="lastName"
+          placeholder="Enter Last Name"
           value={lastName}
           onChange={this.handleInputChange}
           style={{
@@ -123,10 +124,11 @@ class Popup extends Component {
             borderRadius: '0.375rem', // Add some border radius
           }}
         />
+        
         <label className="block mb-1 text-gray-700 text-sm">Phone Number:</label>
         <input
           type="text"
-          name="phoneNumer"
+          name="phoneNumber"
           placeholder="Enter Phone Number"
           value={phoneNumber}
           onChange={this.handleInputChange}
@@ -171,7 +173,7 @@ class Popup extends Component {
         <label className="block mb-1 text-gray-700 text-sm">City:</label>
         <input
           type="text"
-          name="City"
+          name="city"
           placeholder="Enter City"
           value={city}
           onChange={this.handleInputChange}

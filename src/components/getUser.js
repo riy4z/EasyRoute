@@ -12,7 +12,7 @@ export default function getUserID () {
       const userID = userData._id;
   
       // Optionally, log the userID
-      console.log("User ID:", userID);
+      // console.log("User ID:", userID);
   
       // Return the userID
       return userID;

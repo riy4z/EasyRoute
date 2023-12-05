@@ -3,8 +3,6 @@ import React, { Component } from "react";
 import GMap from "./components/GMap";
 import Sidebar from "./Screens/Sidebar";
 
-import os from "os";
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -20,7 +18,6 @@ class App extends Component {
   
   render() {
     const { addresses } = this.state;
-    console.log(window.location.hostname)
     return (
       <div>
         <Sidebar setAddresses={this.setAddresses} />  

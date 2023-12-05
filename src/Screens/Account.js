@@ -5,6 +5,8 @@ import AccountDetails from "./AccountDetails";
 import { useAuthStore } from "../authentication/store/store";
 import fetchLocations from '../components/fetchLocations';
 import fetchUserLocations from '../components/fetchUserLocations';
+import getCompanyID from "../components/getCompany";
+import getUserID from "../components/getUser";
 
 class Account extends React.Component {
   constructor(props) {
@@ -12,11 +14,14 @@ class Account extends React.Component {
     this.state = {
       isPopupOpen: false,
       isOverlayVisible: false,
-      savedaddress: [],
-      searchInput: "", // State variable to store the search input
       selectedAddress: null, 
-      isAccountDetailsExpanded: false,
+      locations: [],
       userLocations: [],
+      savedaddress: [],
+      companyId:'',
+      userId:'',
+      searchInput: "", // State variable to store the search input
+      isAccountDetailsExpanded: false,
       selectedLocation: '',
     };
   }
@@ -30,6 +35,8 @@ class Account extends React.Component {
       }
     }, 20000); // Fetch every 10 seconds
   };
+
+  
   fetchAndUpdateAddressData = () => {
     fetch('http://localhost:4000/api/get-address-data')
       .then((res) => {
@@ -63,18 +70,43 @@ class Account extends React.Component {
 
   // Automatically fetch address data when the component mounts
   componentDidMount() {
-    this.fetchAddressData();
     this.fetchLocationData();
+    this.fetchCompanyID();
+    this.fetchAddressData();
+    this.fetchUserID();
+  }
+
+  fetchCompanyID = async () => {
+    try {
+      const companyIDData = await getCompanyID();
+      this.setState({
+        companyId : companyIDData
+      })
+    } catch (error) {
+      console.error("Error fetching companyID:", error)
+      
+    }
+  };
+
+  fetchUserID = async () => {
+    try {
+      const userIDData = await getUserID();
+      this.setState({
+        userId : userIDData
+      })
+    } catch (error) {
+      console.error("Error fetching userID:", error)
+    }
   }
 
   fetchLocationData = async () => {
     try {
       const locationsData = await fetchLocations();
       const userLocationsData = await fetchUserLocations();
-
       this.setState({
         locations: locationsData,
         userLocations: userLocationsData,
+
       });
     } catch (error) {
       console.error('Error fetching location data:', error);
@@ -83,17 +115,30 @@ class Account extends React.Component {
   };
 
   handleFileSelect = () => {
-    this.fileInput.click();
+    if (this.state.selectedLocation) {
+      this.fileInput.click();
+    } else {
+      // Show a message or take any action to prompt the user to select a location
+      alert("Please select a location before importing accounts.");
+    }
   };
 
   handleFileChange = (e) => {
     const file = e.target.files[0];
+  // Check if a location is selected before processing the file
+  if (!this.state.selectedLocation) {
+    alert("Please select a location before importing accounts.");
+    return;
+  }
   
     handleFileUpload(file, (data) => {
-      // Get the username from your Zustand authentication store
-      const { setUsername, auth } = useAuthStore.getState();
-      const username = auth.username;
-  
+      // Get the userId from session storage
+      const userID = this.state.userId;
+      const username = userID;
+      for (let i = 0; i < data.length; i++) {
+        data[i].CompanyID = this.state.companyId;
+        data[i].LocationID = this.state.selectedLocation;
+      }
       this.props.setAddresses(data); // Pass the parsed data to the parent component
   
       fetch('http://localhost:4000/api/processCSV', {
@@ -101,12 +146,12 @@ class Account extends React.Component {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ csvData: data, fileName: file.name, username }), // Include the username in the request
+        body: JSON.stringify({ csvData: data, fileName: file.name, userId: username }), // Include the username in the request
       })
         .then((res) => res.json())
         .then((response) => {
           if (response.success) {
-            console.log('CSV file processed successfully:', response.details);
+            console.log('CSV file processed successfully');
           } else {
             console.error('Error processing CSV file:', response.error);
           }
@@ -139,6 +184,7 @@ handleListItemLeave = (index) => {
 };
 
 searchTimeout;
+
 
 handleSearchInputChange = (e) => {
   const value = e.target.value;
@@ -189,6 +235,7 @@ searchAddresses = () => {
   this.setSavedAddresses(filteredAddresses);
 };
 
+
 handleListItemClick = (selectedAddress) => {
   this.setState({
     selectedAddress,
@@ -198,12 +245,13 @@ handleListItemClick = (selectedAddress) => {
 
 renderLocationDropdown() {
   const { locations, userLocations, selectedLocation } = this.state;
-
+  const locationdropdownstyle = "mt-20"
   return (
     <select
       id="locationDropdown"
       value={selectedLocation}
       onChange={(e) => this.setState({ selectedLocation: e.target.value })}
+      className = {locationdropdownstyle}
     >
       <option value="">Select a location</option>
       {Array.isArray(userLocations) && userLocations.length > 0 ? (
@@ -223,6 +271,7 @@ renderLocationDropdown() {
     </select>
   );
 }
+
 
   render() {
     const { savedaddress, searchInput, selectedAddress, isAccountDetailsExpanded } = this.state;
@@ -250,7 +299,7 @@ renderLocationDropdown() {
 
     
     const listContainerStyle =  `absolute ${
-      savedaddress && savedaddress.length > 0 ? 'overflow-y-scroll h-3/5 mt-40' : 'overflow-hidden'
+      savedaddress && savedaddress.length > 0 ? 'overflow-y-scroll h-3/5 mt-20' : 'overflow-hidden'
     }`;
 
     let listContent;
@@ -282,9 +331,14 @@ renderLocationDropdown() {
     }
 
     return (
-      <div >
-        <h1 className="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
       
+      <div >
+        
+        <h1 className="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
+        <div>
+        {this.renderLocationDropdown()}
+        </div>
+        <div>
         <button className={buttonStyle} onClick={this.handleFileSelect}>
           Import Accounts
         </button>
@@ -295,26 +349,30 @@ renderLocationDropdown() {
           ref={(fileInput) => (this.fileInput = fileInput)}
           style={{ display: "none" }}
         />
-        <div className= "relative top-20"> 
-         {this.renderLocationDropdown()}
-         </div>
+       
+       </div>
+        
+        
+        
+        <div>
         <div>
           <input
           type="text"
           placeholder="Search Accounts"
           value={searchInput}
           onChange={this.handleSearchInputChange}
-          className="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-28 text-xl"
+          className="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-6 text-xl"
 
         />
-        <i className="absolute top-[273px] right-7 text-gray-300 fas fa-solid fa-magnifying-glass"/>   
+        </div>
+        <i className="absolute mt-8 right-7 text-gray-300 fas fa-solid fa-magnifying-glass"/>   
         </div>
         <button className={buttonStyle1} onClick={this.openPopup}>
         <i className="fas fa-plus-circle" style={{ marginRight: 10}}></i>
           Add Account
         </button>
-        <div className={listContainerStyle}> 
-      
+        <div className={listContainerStyle}>
+         
       <ul  style={{ listStyleType: "none", padding: 0 }}>
       {listContent}
 
