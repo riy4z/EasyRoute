@@ -7,6 +7,7 @@ function RolePopup(props) {
   const [roles, setRoles] = useState([]);
   const [showInput, setShowInput] = useState(false);
   const [newRole, setNewRole] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false); 
 
   useEffect(() => {
     const fetchRole = async () => {
@@ -21,6 +22,11 @@ function RolePopup(props) {
     fetchRole();
   }, []);
 
+  const handleCheckboxChange = (e) => {
+    setIsAdmin(e.target.checked);
+    console.log(isAdmin);
+  };
+
   const handleAddRoleClick = () => {
     setShowInput(true);
   };
@@ -31,10 +37,13 @@ function RolePopup(props) {
 
   const handleAddRole = async () => {
     const companyid = getCompanyID();
+    const roleHierarchy = isAdmin ? 1 : 2;
     if (!newRole.trim()) {
       alert('Please enter a valid role.');
       return;
     }
+
+    
 
     try {
       const response = await fetch('http://localhost:4000/api/addRoles', {
@@ -42,7 +51,7 @@ function RolePopup(props) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Role: newRole, CompanyID: companyid }),
+        body: JSON.stringify({ Role: newRole, CompanyID: companyid,RoleHierarchy:roleHierarchy}),
       });
 
       const result = await response.json();
@@ -95,7 +104,17 @@ function RolePopup(props) {
                 value={newRole}
                 onChange={handleRoleChange}
                 className="w-full p-1 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
-              />
+              />    
+                <input
+            type="checkbox"
+            id="isAdmin"
+            name="isAdmin"
+            checked={isAdmin}
+            onChange={handleCheckboxChange}
+          />
+              <label htmlFor="isAdmin">Admin</label>
+
+              <div>
               <button
                 type="button"
                 onClick={handleAddRole}
@@ -103,6 +122,7 @@ function RolePopup(props) {
               >
                 Add Role
               </button>
+                </div>
             </form>
           )}
           {!showInput && (

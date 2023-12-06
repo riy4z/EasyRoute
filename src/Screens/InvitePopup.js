@@ -4,6 +4,7 @@ import getCompanyID from "../components/getCompany"
 import { RxCrossCircled } from 'react-icons/rx';
 import fetchLocations from '../components/fetchLocations';
 import fetchRoles from '../components/fetchRoles';
+import getRoleHierarchy from '../components/getRoleHierarchy';
 
 function InvitePopup(props) {
   const [email, setEmail] = useState('');
@@ -56,7 +57,8 @@ function InvitePopup(props) {
       console.error('Company ID is not available');
       return;
     }
-  
+    
+    const isLocalAdmin = getRoleHierarchy();
 
     const uniqueLink = generateUniqueLink(email, location, role, companyId);
 
@@ -439,20 +441,26 @@ function InvitePopup(props) {
         className="w-full p-2 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
       />
 
-      <label className="block mb-2 text-gray-700 text-sm">Role:</label>
-      <select
-        value={role}
-        onChange={handleRoleChange}
-        className="w-full p-2 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
-        required
-      >
-        <option>Select Role</option>
-        {rolesFromServer.map((rol) => (
-            <option key={rol.id} value={rol.RoleHierarchy}>
-              {rol.Role}
-            </option>
-          ))}
-      </select>
+<label className="block mb-2 text-gray-700 text-sm">Role:</label>
+<select
+  value={role}
+  onChange={handleRoleChange}
+  className="w-full p-2 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
+  required
+>
+  <option>Select Role</option>
+  {rolesFromServer.map((rol) => (
+    (getRoleHierarchy() === 0) || 
+    (getRoleHierarchy() === 1 && rol.RoleHierarchy === 2) ? ( 
+      <option key={rol.id} value={rol.RoleHierarchy}>
+        {rol.Role}
+      </option>
+    ) : null
+  ))}
+</select>
+
+
+
 
       <label className="block mb-2 text-gray-700 text-sm">Location:</label>
       <select

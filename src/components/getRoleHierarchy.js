@@ -8,13 +8,13 @@ export default function getRoleHierarchy () {
       // Parse the JSON string into an object
       const roleHierarchyData = JSON.parse(roleHierarchyNumber);
   
-      // Access the CompanyID property
+      // Access the RoleHierarchy property
       const roleHierarchy = roleHierarchyData.RoleHierarchy;
   
-      // Optionally, log the companyId
+      // Optionally, log the roleHierarchy
       // console.log("RoleHierarchy:", roleHierarchy);
   
-      // Return the companyId
+      // Return the roleHierarchy
       return roleHierarchy;
     } else {
       console.log("userData not found in sessionStorage");
