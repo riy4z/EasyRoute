@@ -51,7 +51,14 @@ class Popup extends Component {
 
   saveAddressData = () => {
     const { firstName, lastName, phoneNumber, address, state, city, zipcode, longitude, latitude } = this.state;
-
+    const { selectedLocation } = this.props;
+    if (!selectedLocation) {
+      console.error('No location selected for the account.');
+      // Handle the error or inform the user as needed
+      return;
+    }
+    const {companyId} = this.props
+    
     const accountData = {
       "First Name": firstName,
       "Last Name": lastName,
@@ -62,6 +69,8 @@ class Popup extends Component {
       "ZIP Code": zipcode,
       "longitude": longitude,
       "latitude": latitude,
+      "CompanyID": companyId,
+      "LocationID": selectedLocation,
     };
 
     axios.post('http://localhost:4000/api/store-address-data', accountData)
@@ -155,21 +164,7 @@ class Popup extends Component {
             borderRadius: '0.375rem', // Add some border radius
           }}
         />
-        <label className="block mb-1 text-gray-700 text-sm">State:</label>
-        <input
-          type="text"
-          name="state"
-          placeholder="Enter State"
-          value={state}
-          onChange={this.handleInputChange}
-          style={{
-            padding: '8px', // Adjust the padding as needed
-            fontSize: '1rem', // Equivalent to text-sm in Tailwind CSS
-            width: '100%', // Make it full width
-            border: '1px solid #ccc', // Add a border
-            borderRadius: '0.375rem', // Add some border radius
-          }}
-        />
+        
         <label className="block mb-1 text-gray-700 text-sm">City:</label>
         <input
           type="text"
@@ -185,6 +180,23 @@ class Popup extends Component {
             borderRadius: '0.375rem', // Add some border radius
           }}
         />
+
+        <label className="block mb-1 text-gray-700 text-sm">State:</label>
+        <input
+          type="text"
+          name="state"
+          placeholder="Enter State"
+          value={state}
+          onChange={this.handleInputChange}
+          style={{
+            padding: '8px', // Adjust the padding as needed
+            fontSize: '1rem', // Equivalent to text-sm in Tailwind CSS
+            width: '100%', // Make it full width
+            border: '1px solid #ccc', // Add a border
+            borderRadius: '0.375rem', // Add some border radius
+          }}
+        />
+
         <label className="block mb-1 text-gray-700 text-sm">Zipcode:</label>
         <input
           type="text"

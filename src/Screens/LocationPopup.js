@@ -7,6 +7,10 @@ function LocationPopup({ closePopup }) {
   const [locations, setLocations] = useState([]);
   const [showInput, setShowInput] = useState(false);
   const [newLocation, setNewLocation] = useState('');
+  const [newStreetAddress,setNewStreetAddress] = useState('');
+  const [newCity,setNewCity] = useState('');
+  const [newState,setNewState] = useState('');
+  const [newZipCode,setNewZipCode] = useState('');
 
   
   useEffect(() => {
@@ -30,6 +34,18 @@ function LocationPopup({ closePopup }) {
   const handleLocationChange = (e) => {
     setNewLocation(e.target.value);
   };
+  const handleStreetAddressChange = (e) => {
+    setNewStreetAddress(e.target.value);
+  };
+  const handleCityChange = (e) => {
+    setNewCity(e.target.value);
+  };
+  const handleStateChange = (e) => {
+    setNewState(e.target.value);
+  };
+  const handleZipCodeChange = (e) => {
+    setNewZipCode(e.target.value);
+  };
 
   const handleAddLocation = async () => {
     const companyid = getCompanyID();
@@ -45,7 +61,7 @@ function LocationPopup({ closePopup }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Location: newLocation, CompanyID: companyid }),
+        body: JSON.stringify({ Location: newLocation, CompanyID: companyid, StreetAddress: newStreetAddress, City: newCity, State: newState, ZipCode: newZipCode }),
       });
 
       const result = await response.json();
@@ -54,6 +70,10 @@ function LocationPopup({ closePopup }) {
         // If the role is added successfully, update the roles state
         setLocations([...locations, result.location]);
         setNewLocation('');
+        setNewStreetAddress('');
+        setNewCity('');
+        setNewState('');
+        setNewZipCode('');
         setShowInput(false);
       } else {
         alert(result.error || 'Error adding location');
@@ -95,7 +115,11 @@ function LocationPopup({ closePopup }) {
           {showInput && (
             <>
               <form onSubmit={handleSubmit}>
-                <input type="text" value={newLocation} onChange={handleLocationChange}  className="w-full p-1 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500" />
+                <input type="text" value={newLocation} onChange={handleLocationChange} placeholder='Location' className="w-full p-1 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500" />
+                <input type="text" value={newStreetAddress} onChange={handleStreetAddressChange}  placeholder='Street Address' className='border border-gray-300 w-full rounded-md p-1 mb-2'/>
+                <input type="text" value={newCity} onChange={handleCityChange}  placeholder='City' className='border border-gray-300 w-full rounded-md p-1 mb-2'/>
+                <input type="text" value={newState} onChange={handleStateChange}  placeholder='State' className='border border-gray-300 w-full rounded-md p-1 mb-2'/>
+                <input type="text" value={newZipCode} onChange={handleZipCodeChange} placeholder='Zip Code' className='border border-gray-300 w-full rounded-md p-1 mb-2'/>
                 <button type="button" onClick={handleAddLocation} className="border border-black text-black bg-blue-500 hover:bg-blue-500 hover:text-white hover:border-none font-bold py-2 px-4 rounded-md transition duration-300 text-sm">
                   Add Location
                 </button>

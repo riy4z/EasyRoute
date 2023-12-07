@@ -2,7 +2,6 @@ import React from "react";
 import handleFileUpload from "../components/handleFileUpload";
 import Popup from "./Popup";
 import AccountDetails from "./AccountDetails";
-import { useAuthStore } from "../authentication/store/store";
 import fetchLocations from '../components/fetchLocations';
 import fetchUserLocations from '../components/fetchUserLocations';
 import getCompanyID from "../components/getCompany";
@@ -164,6 +163,14 @@ class Account extends React.Component {
 
 
   openPopup = () => {
+    const { selectedLocation } = this.state;
+
+    if (!selectedLocation) {
+      // Show a message or take any action to prompt the user to select a location
+      alert("Please select a location before adding an account.");
+      return;
+    }
+
     this.setState({ isPopupOpen: true, isOverlayVisible: true });
   };
 
@@ -243,6 +250,7 @@ handleListItemClick = (selectedAddress) => {
   });
 };
 
+
 renderLocationDropdown() {
   const { locations, userLocations, selectedLocation } = this.state;
   const locationdropdownstyle = "mt-20"
@@ -274,20 +282,25 @@ renderLocationDropdown() {
 
 
   render() {
-    const { savedaddress, searchInput, selectedAddress, isAccountDetailsExpanded } = this.state;
+    const { savedaddress, searchInput, selectedAddress, isAccountDetailsExpanded, selectedLocation } = this.state;
    
       // Sort the addresses based on the 'First Name' in ascending order
-    const sortedAddresses = [...savedaddress].sort((a, b) => {
-      const nameA = a['First Name'] ? a['First Name'].toLowerCase() : '';
-      const nameB = b['First Name'] ? b['First Name'].toLowerCase() : '';
-    if (nameA < nameB) {
-      return -1;
-    }
-    if (nameA > nameB) {
-      return 1;
-    }
-    return 0;
-  });
+      const filteredAddresses = savedaddress.filter(
+        (address) => address.LocationID === selectedLocation
+      );
+    
+      // Sort the filtered addresses based on the 'First Name' in ascending order
+      const sortedAddresses = filteredAddresses.sort((a, b) => {
+        const nameA = a['First Name'] ? a['First Name'].toLowerCase() : '';
+        const nameB = b['First Name'] ? b['First Name'].toLowerCase() : '';
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        return 0;
+      });
 
    
 
@@ -303,10 +316,10 @@ renderLocationDropdown() {
     }`;
 
     let listContent;
-    if (savedaddress && savedaddress.length > 0) {
-      const visibleAddresses = sortedAddresses.filter(address => !address.isHidden);
+    if (sortedAddresses && sortedAddresses.length > 0) {
+      // const visibleAddresses = sortedAddresses.filter(address => !address.isHidden);
     
-      listContent = visibleAddresses.map((address, index) => (
+      listContent = sortedAddresses.map((address, index) => (
         <li 
           key={address._id}
           onClick={() => this.handleListItemClick(address)}
@@ -326,7 +339,7 @@ renderLocationDropdown() {
         </li>
       ));
     } else {
-      listContent = <h5 className='mt-48'>No accounts found</h5>
+      listContent = <h5 className='mt-40 text-center'>No accounts found for the selected location</h5>
       
     }
 
@@ -389,7 +402,7 @@ renderLocationDropdown() {
             />
             )}
 
-{this.state.isPopupOpen && <Popup onClose={this.closePopup} />
+{this.state.isPopupOpen && <Popup onClose={this.closePopup} selectedLocation={this.state.selectedLocation} companyId={this.state.companyId} />
   }
     
       </div>

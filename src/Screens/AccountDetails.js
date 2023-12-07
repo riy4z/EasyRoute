@@ -29,8 +29,8 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
 
     if (confirmed) {
       const updatedData = { ...addressData, isHidden: true };
-
-      axios.patch(`http://localhost:4000/api/update-address-data/${addressData._id}`, updatedData)
+      
+      axios.patch(`http://localhost:4000/api/update-address-data/:${addressData._id}`, updatedData)
         .then(response => {
           // Handle success, update UI or show success message
           console.log('Document marked as isHidden:');
