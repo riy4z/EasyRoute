@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import getCompanyID from '../components/getCompany';
 import { RxCrossCircled } from 'react-icons/rx';
 import fetchLocations from '../components/fetchLocations';
+import toast, { Toaster } from 'react-hot-toast';
 
 function LocationPopup({ closePopup }) {
   const [locations, setLocations] = useState([]);
@@ -75,6 +76,8 @@ function LocationPopup({ closePopup }) {
         setNewState('');
         setNewZipCode('');
         setShowInput(false);
+        // Show a success toast notification
+        toast.success('Location added successfully');
       } else {
         alert(result.error || 'Error adding location');
       }
@@ -97,6 +100,8 @@ function LocationPopup({ closePopup }) {
   };
 
   return (
+    <div>
+      <Toaster position="top-center" reverseOrder={false}></Toaster>
     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
       <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto">
       <div className="absolute top-4 right-4 cursor-pointer">
@@ -133,6 +138,7 @@ function LocationPopup({ closePopup }) {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 }

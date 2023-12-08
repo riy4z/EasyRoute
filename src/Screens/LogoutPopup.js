@@ -2,6 +2,7 @@ import React from 'react';
 import {useNavigate} from 'react-router-dom';
 import useFetch from '../authentication/hooks/fetch.hook';
 import { RxCrossCircled } from 'react-icons/rx';
+import toast, { Toaster } from 'react-hot-toast';
 
 function LogoutPopup(props) {
     const navigate = useNavigate();
@@ -9,9 +10,13 @@ function LogoutPopup(props) {
     function userLogout(){
         localStorage.removeItem('token');
         clearSessionStorage();
+        // Show a success toast notification
+        toast.success('Logout successful');
         navigate('/')}
 
   return (
+    <div>
+      <Toaster position="top-center" reverseOrder={false}></Toaster>
     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-opacity-50 backdrop-filter backdrop-blur-md flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md mx-auto">
         <h2 className="text-xl font-medium text-customColor1 text-left ">Do you want to Logout?</h2>
@@ -30,6 +35,7 @@ function LogoutPopup(props) {
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 }

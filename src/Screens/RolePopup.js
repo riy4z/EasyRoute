@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import getCompanyID from '../components/getCompany';
 import fetchRoles from '../components/fetchRoles';
 import { RxCrossCircled } from 'react-icons/rx';
+import toast, { Toaster } from 'react-hot-toast';
 
 function RolePopup(props) {
   const [roles, setRoles] = useState([]);
@@ -60,6 +61,8 @@ function RolePopup(props) {
         setRoles([...roles, result.role]);
         setNewRole('');
         setShowInput(false);
+        // Show a success toast notification
+        toast.success('Role added successfully');
       } else {
         alert(result.error || 'Error adding role');
       }
@@ -82,6 +85,8 @@ function RolePopup(props) {
   };
 
   return (
+    <div>
+      <Toaster position="top-center" reverseOrder={false}></Toaster>
     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
     <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto">
     <div className="absolute top-4 right-4 cursor-pointer">
@@ -136,7 +141,7 @@ function RolePopup(props) {
         </div>
       </div>
     </div>
-   
+   </div>
   );
 }
 
