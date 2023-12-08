@@ -6,6 +6,7 @@ import fetchLocations from '../components/fetchLocations';
 import fetchUserLocations from '../components/fetchUserLocations';
 import getCompanyID from "../components/getCompany";
 import getUserID from "../components/getUser";
+import toast, { Toaster } from 'react-hot-toast';
 
 class Account extends React.Component {
   constructor(props) {
@@ -151,12 +152,15 @@ class Account extends React.Component {
         .then((response) => {
           if (response.success) {
             console.log('CSV file processed successfully');
+            toast.success('Accounts imported successfully');
           } else {
             console.error('Error processing CSV file:', response.error);
+            toast.error('Error processing CSV file');
           }
         })
         .catch((error) => {
           console.error('Error sending CSV data to the server:', error);
+          toast.error('Error sending CSV data to the server');
         });
     });
   };
@@ -346,7 +350,7 @@ renderLocationDropdown() {
     return (
       
       <div >
-        
+        <Toaster position="top-center" reverseOrder={false}></Toaster>
         <h1 className="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
         <div>
         {this.renderLocationDropdown()}
