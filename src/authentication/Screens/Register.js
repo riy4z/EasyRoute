@@ -7,7 +7,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import convertToBase64 from '../helper/convert';
 import { registerValidation } from '../helper/validate';
 import { registerUser, generateOTPbyEmail, verifyOTPbyEmail} from '../helper/helper';
-
+import { getCompanyById } from '../../components/getCompanyById';
+import roleLabels from '../../components/roleLabels';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -17,13 +18,16 @@ export default function Register() {
   const [isRegisterVisible, setRegisterVisible] = useState(false);
   const [enteredOTP, setEnteredOTP] = useState('');
   const [isEmailVerified, setIsEmailVerified] = useState(false);
-  
 
   const formik = useFormik({
     initialValues: {
       email: '',
       username: '',
       password: '',
+      role: '',
+      companyId: '',
+      location: '',
+      companyName: '',
     },
     validate: registerValidation,
     validateOnBlur: false,
@@ -31,7 +35,7 @@ export default function Register() {
     onSubmit: async (values) => {
       values = await Object.assign(values, { profile: file || '' });
       // const { roleFromUrl, companyIdFromUrl } = formik.values;
-      // values = { ...values, roleFromUrl, companyIdFromUrl };
+      // values = { ...values, roleFromUrl, companyIdFromUrl };     
       console.log(values)
       let registerPromise = registerUser(values);
       toast.promise(
@@ -91,7 +95,6 @@ export default function Register() {
     setShowPassword(!showPassword);
   };
 
-  
   useEffect(() => {
     if (isVerificationVisible) {
       generateOTPbyEmail(formik.values.email).then((OTP) => {
@@ -111,24 +114,35 @@ export default function Register() {
     const locationFromUrl = urlParams.get('location');
     const roleFromUrl = urlParams.get('role');
     const companyIdFromUrl = urlParams.get('companyid');
+    
   
     console.log('Email from URL:', emailFromUrl);
     console.log('Location from URL:', locationFromUrl);
     console.log('Role from URL:', roleFromUrl);
     console.log('Company ID from URL:', companyIdFromUrl);
-  
+    getCompanyById(companyIdFromUrl)
+      .then((company) => {
+        if (company) {
+
     formik.setValues({
       email: emailFromUrl || '',
       username: '',
       password: '',
       role: roleFromUrl || '', // Set roleFromUrl in formik.values
       companyId: companyIdFromUrl || '',
-      location: locationFromUrl || '' // Set companyIdFromUrl in formik.values
+      location: locationFromUrl || '' ,
+      companyId: company._id, // Assuming the company document has an _id field
+      companyName: company.CompanyName,// Set companyIdFromUrl in formik.values
     });
-  
+  } else {
+    console.error('Company not found for companyId:', companyIdFromUrl);
+  }
+})
+.catch((error) => {
+  console.error('Error fetching company details:', error);
+});
     formik.setFieldTouched('email');
     formik.setFieldError('email', 'Email locked from URL parameter.');
-  
     // Set other state values if needed
     // ...
   
@@ -160,8 +174,9 @@ export default function Register() {
         <div className="title flex flex-col items-center">
                 <h4 className='text-5xl font-bold'>Register</h4>
                 <span className='py-4 text-xl w-2/3 text-center text-gray-500'>
-                Happy to join you!
+                    Happy to join you as <b>{roleLabels[formik.values.role]}</b> at <b>{formik.values.companyName}</b>!
                 </span>
+
               </div>
           <form className="py-1" onSubmit={formik.handleSubmit}>
             <div className="profile flex justify-center py-4">
@@ -175,7 +190,6 @@ export default function Register() {
               <input {...formik.getFieldProps('username')} className={styles.textbox} type="text" placeholder="Username*" />
               <input {...formik.getFieldProps('password')} className={styles.textbox} type={showPassword? 'text' : 'password'} placeholder="Password*" />
               <input {...formik.getFieldProps('email')} className={`${styles.textbox}`} type="email" placeholder="Email*" disabled={isEmailVerified || formik.values.email !== ''}  />
-              
               <i
                 onClick={handleTogglePassword}
                 className={`fixed mt-[105px] right-7 text-gray-300 cursor-pointer text-2xl ${
