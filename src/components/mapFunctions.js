@@ -3,7 +3,6 @@ import axios from 'axios';
 
 export const sendAddressDataToBackend = async (addressData) => {
   try {
-    // console.log(addressData)
     const response = await axios.post('http://localhost:4000/api/store-address-data', addressData, {
       headers: { 'Content-Type': 'application/json' },
     });
@@ -85,6 +84,53 @@ export const createPinsFromAddresses = (addresses, google, setMarkers) => {
   });
 };
 
+export const createRoutesBetweenMarkers = async (markers, google, setPolylines) => {
+  const newPolylines = [];
+
+  if (markers.length < 2) {
+    setPolylines(newPolylines);
+    return;
+  }
+
+  const requests = markers.map((marker, i) => {
+    if (i < markers.length - 1) {
+      const origin = markers[i].position;
+      const destination = markers[i + 1].position;
+
+      const directionsService = new google.maps.DirectionsService();
+
+      return new Promise((resolve) => {
+        directionsService.route(
+          {
+            origin,
+            destination,
+            travelMode: google.maps.TravelMode.DRIVING,
+          },
+          (result, status) => {
+            if (status === google.maps.DirectionsStatus.OK) {
+              const polyline = new google.maps.Polyline({
+                path: result.routes[0].overview_path,
+                strokeColor: "#0096FF",
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+              });
+              newPolylines.push(polyline);
+              resolve();
+            } else {
+              console.error(`Directions request failed for route ${i + 1} due to ${status}`);
+              resolve();
+            }
+          }
+        );
+      });
+    }
+  });
+
+  await Promise.all(requests);
+
+  setPolylines(newPolylines);
+};
+
 export const getAddressesFromDatabase = async (createPinsFromAddresses) => {
   try {
     const response = await axios.get('http://localhost:4000/api/get-address-data');
@@ -92,6 +138,6 @@ export const getAddressesFromDatabase = async (createPinsFromAddresses) => {
 
     createPinsFromAddresses(addresses);
   } catch (error) {
-    console.error('Error retrieving addresses from the database:', error);
-  }
+    console.error('Error retrieving addresses from the database:', error);
+  }
 };

@@ -1,84 +1,75 @@
 // GMap.js
-import React, { Component } from "react";
-import { Map, GoogleApiWrapper, Marker } from "google-maps-react";
+import React, { useState, useEffect } from "react";
+import { Map, GoogleApiWrapper, Marker, Polyline } from "google-maps-react";
 import * as MapFunctions from "./mapFunctions";
 
-class GMap extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      markers: [],
-      initialCenter: null,
-    };
-  }
+const GMap = (props) => {
+  const [markers, setMarkers] = useState([]);
+  const [initialCenter, setInitialCenter] = useState(null);
+  const [polylines, setPolylines] = useState([]);
 
-  componentDidMount() {
+  useEffect(() => {
     MapFunctions.getUserLocation(
       (position) => {
         const { coords } = position;
-        this.setState({
-          initialCenter: {
-            lat: coords.latitude,
-            lng: coords.longitude,
-          },
+        setInitialCenter({
+          lat: coords.latitude,
+          lng: coords.longitude,
         });
       },
       () => {
-        this.setState({
-          initialCenter: {
-            lat: 41.977226,
-            lng: -87.836723,
-          },
+        setInitialCenter({
+          lat: 41.977226,
+          lng: -87.836723,
         });
       }
     );
-    this.createPinsFromAddresses(this.props.addresses); 
-    // MapFunctions.getAddressesFromDatabase(this.createPinsFromAddresses);
-  }
+    MapFunctions.createPinsFromAddresses(props.addresses, props.google, setMarkers);
+  }, [props.addresses, props.google]);
 
-  componentDidUpdate(prevProps) {
-    // Check if addresses prop has changed
-    if (prevProps.addresses !== this.props.addresses) {
-      console.log("Addresses changed:", this.props.addresses);
-      this.createPinsFromAddresses(this.props.addresses);
-    }
-  }
-  createPinsFromAddresses = (addresses) => {
-    MapFunctions.createPinsFromAddresses(addresses, this.props.google, this.setMarkers);
-  };
+  useEffect(() => {
+    MapFunctions.createRoutesBetweenMarkers(markers, props.google, setPolylines);
+  }, [markers, props.google]);
 
-  setMarkers = (markers) => {
-    this.setState({ markers });
-  };
+  return (
+    <>
+      {initialCenter && (
+        <Map
+          google={props.google}
+          style={{ width: "100%", height: "100%", position: "fixed" }}
+          containerElement={<div style={{ height: "100%" }} />}
+          mapElement={<div style={{ height: "100%" }} />}
+          mapTypeControl={false}
+          streetViewControl={false}
+          zoomControl={false}
+          initialCenter={initialCenter}
+          zoom={12}
+          disableDoubleClickZoom={true}
+          fullscreenControl={false}
+        >
+          {markers.map((marker, index) => (
+            <Marker key={index} position={marker.position} name={`Marker ${index}`} />
+          ))}
 
-  render() {
-    const { markers, initialCenter } = this.state;
-
-    return (
-      <>
-        {initialCenter && (
-          <Map
-            google={this.props.google}
-            style={{ width: "100%", height: "100%", position: "fixed" }}
-            containerElement={<div style={{ height: "100%" }} />}
-            mapElement={<div style={{ height: "100%" }} />}
-            mapTypeControl={false}
-            streetViewControl={false}
-            zoomControl={false}
-            initialCenter={initialCenter}
-            zoom={12}
-            disableDoubleClickZoom={true}
-            fullscreenControl={false}
-          >
-            {markers.map((marker, index) => (
-              <Marker key={index} position={marker.position} name={`Marker ${index}`} />
+          {polylines.length > 0 &&
+            polylines.map((polyline, index) => (
+              <Polyline
+                key={index}
+                path={polyline.getPath().getArray()}
+                options={{
+                  strokeColor: "#0096FF",
+                  strokeOpacity: 0.8,
+                  strokeWeight: 2,
+                }}
+              />
             ))}
-          </Map>
-        )}
-      </>
-    );
-  }
-}
+        </Map>
+      )}
+    </>
+  );
+};
+
+
 export default GoogleApiWrapper({
   apiKey: "AIzaSyAEBs7HmfIN_AB-Anpl2YP4jIOewJBgt_U",
 })(GMap);
