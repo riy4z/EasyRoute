@@ -33,6 +33,12 @@ function Sidebar(props) {
     }
   }, [isExpanded]);
 
+  const handleLassoToggle = (isActive) => {
+    // Pass isActive to the parent component
+    props.setLassoActivate(isActive);
+  };
+  
+
   const renderContent = () => {
     switch (selectedOption) {
       case 'Admin':
@@ -40,7 +46,7 @@ function Sidebar(props) {
       case 'Account':
         return <Account setAddresses={props.setAddresses} />;
       case 'Route':
-        return <Routes setAddresses={props.setAddresses}/>;
+        return <Routes setAddresses={props.setAddresses} setLassoActivate={handleLassoToggle}/>;
       case 'Tools':
         return <Tools />;
       case 'HelpSupport':

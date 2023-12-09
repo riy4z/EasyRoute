@@ -1,6 +1,7 @@
 // mapFunctions.js
 import axios from 'axios';
 
+
 export const sendAddressDataToBackend = async (addressData) => {
   try {
     const response = await axios.post('http://localhost:4000/api/store-address-data', addressData, {
@@ -141,3 +142,4 @@ export const getAddressesFromDatabase = async (createPinsFromAddresses) => {
     console.error('Error retrieving addresses from the database:', error);
   }
 };
+
