@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) => {
 
-
+  console.log(addressData)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -48,16 +48,16 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
   
   const buttonStyle="border-2 border-red-600 mt-6 w-full py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
 
-  const buttonStyle1 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium absolute text-xl cursor-pointer bottom-64 left-2"
-  const buttonStyle2 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium absolute text-xl cursor-pointer bottom-64 right-2.5"
+  const buttonStyle1 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer bottom-64 left-2"
+  const buttonStyle2 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer bottom-64 right-2.5"
  
   return (
-    <div class={`${
+    <div className={`${
       isExpanded ? 'opacity-100' : 'opacity-0'
     } fixed top-0 right-0 bg-white text-black w-[300px] h-full p-0 z-0 transition-opacity ease-out duration-700 `}
   >
-      <div style={{ backgroundColor: "#282c34", padding:4}}>
-        <h3 style={{ color: "white", marginLeft:7}}>
+      <div className='bg-customColor p-1.5'>
+        <h3 className='text-white ml-1.5'>
           Account Details
           <RxCrossCircled
             size={25}
@@ -67,8 +67,8 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
         </h3>
       </div>
 
-      <div style={{ display: isExpanded ? 'block' : 'none' }}>
-        <div style={{ margin: '10px' }}>
+      <div className={`${ isExpanded ? 'display-block' : 'display-none' }`}>
+        <div className='m-2'>
           {/* Display account details */}
           <p style={{ fontSize: "14px" }}>
             <strong style={{fontSize:20}}> {addressData['First Name']} {addressData['Last Name']}</strong> <i className="fas fa-thin fa-pencil" style={{ marginRight: 25, cursor:'pointer' }} /><br></br>
@@ -81,7 +81,8 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                type="number"
+                type="tel"
+                pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
                 className="w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"   
               />
           </div>

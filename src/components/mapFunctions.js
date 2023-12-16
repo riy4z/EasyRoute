@@ -1,5 +1,6 @@
 // mapFunctions.js
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 
 
 export const sendAddressDataToBackend = async (addressData) => {
@@ -27,10 +28,9 @@ export const createPinsFromAddresses = (addresses, google, setMarkers) => {
 
   const markers = [];
 
-  const createMarker = (latitude, longitude) => {
-    markers.push({ position: { lat: latitude, lng: longitude } });
+  const createMarker = (latitude, longitude, markerId) => {
+  markers.push({ position: { lat: latitude, lng: longitude }, markerId });
   };
-
   const geocoder = new google.maps.Geocoder();
 
   const logGeocodingError = (status, address) => {
@@ -44,17 +44,17 @@ export const createPinsFromAddresses = (addresses, google, setMarkers) => {
   const geocodeAddress = async (addressData) => {
     if (addressData.longitude && addressData.latitude) {
       // If longitude and latitude are already present, use them to create a marker
-      createMarker(addressData.latitude, addressData.longitude);
+      createMarker(addressData.latitude, addressData.longitude, addressData.markerId);
       return;
     }
-
+  
     if (!addressData["Street Address"] || !addressData["City"] || !addressData["ZIP Code"]) {
       console.error('Invalid address data:', addressData);
       return;
     }
-
+  
     const fullAddress = `${addressData["Street Address"]}, ${addressData["City"]}, ${addressData["ZIP Code"]}`;
-
+  
     try {
       const geo = await new Promise((resolve) =>
         geocoder.geocode({ address: fullAddress }, (results, status) => {
@@ -62,11 +62,14 @@ export const createPinsFromAddresses = (addresses, google, setMarkers) => {
             const location = results[0].geometry.location;
             const longitude = location.lng();
             const latitude = location.lat();
-
+  
+            const markerId = uuidv4(); // Generate a unique ID
+  
             addressData.longitude = longitude;
             addressData.latitude = latitude;
+            addressData.markerId = markerId;
+            createMarker(latitude, longitude, markerId);
             sendAddressDataToBackend(addressData);
-            createMarker(latitude, longitude);
           } else {
             logGeocodingError(status, fullAddress);
           }
