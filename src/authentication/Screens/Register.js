@@ -8,7 +8,8 @@ import convertToBase64 from '../helper/convert';
 import { registerValidation } from '../helper/validate';
 import { registerUser, generateOTPbyEmail, verifyOTPbyEmail} from '../helper/helper';
 import { getCompanyById } from '../../components/getCompanyById';
-import roleLabels from '../../components/roleLabels';
+import { getRolesFromHierarchy } from '../../components/getRolesFromHierarchy';
+
 
 export default function Register() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function Register() {
   const [isRegisterVisible, setRegisterVisible] = useState(false);
   const [enteredOTP, setEnteredOTP] = useState('');
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [roles, setRoles] = useState([]);
 
   const formik = useFormik({
     initialValues: {
@@ -28,14 +30,13 @@ export default function Register() {
       companyId: '',
       location: '',
       companyName: '',
+      roleName:'',
     },
     validate: registerValidation,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (values) => {
-      values = await Object.assign(values, { profile: file || '' });
-      // const { roleFromUrl, companyIdFromUrl } = formik.values;
-      // values = { ...values, roleFromUrl, companyIdFromUrl };     
+      values = await Object.assign(values, { profile: file || '',});    
       console.log(values)
       let registerPromise = registerUser(values);
       toast.promise(
@@ -64,7 +65,6 @@ export default function Register() {
     });
   
     if (emailError && emailError.includes('email')) {
-      // Email already exists, show an error message
       toast.error('Email already exists. Please use a different email.');
       return false;
     }
@@ -80,8 +80,7 @@ export default function Register() {
     const isEmailValid = await checkEmailExistence();
 
     if (isEmailValid) {
-      setVerificationVisible(true); // Show the verification popup
-      // The useEffect will handle OTP generation
+      setVerificationVisible(true); 
     }
   };
 
@@ -128,11 +127,11 @@ export default function Register() {
       email: emailFromUrl || '',
       username: '',
       password: '',
-      role: roleFromUrl || '', // Set roleFromUrl in formik.values
+      role: roleFromUrl || '', 
       companyId: companyIdFromUrl || '',
       location: locationFromUrl || '' ,
-      companyId: company._id, // Assuming the company document has an _id field
-      companyName: company.CompanyName,// Set companyIdFromUrl in formik.values
+      companyId: company._id, 
+      companyName: company.CompanyName,
     });
   } else {
     console.error('Company not found for companyId:', companyIdFromUrl);
@@ -141,10 +140,20 @@ export default function Register() {
 .catch((error) => {
   console.error('Error fetching company details:', error);
 });
+getRolesFromHierarchy(roleFromUrl)
+.then((fetchedRoles) => {
+  if (fetchedRoles && fetchedRoles.length > 0) {
+    setRoles(fetchedRoles);
+    const firstRole = fetchedRoles[0];
+    formik.setFieldValue('roleName', firstRole.Role);
+  }
+})
+.catch((error) => {
+  console.error('Error fetching roles:', error);
+});
+   
     formik.setFieldTouched('email');
     formik.setFieldError('email', 'Email locked from URL parameter.');
-    // Set other state values if needed
-    // ...
   
   }, []);
 
@@ -174,7 +183,7 @@ export default function Register() {
         <div className="title flex flex-col items-center">
                 <h4 className='text-5xl font-bold'>Register</h4>
                 <span className='py-4 text-xl w-2/3 text-center text-gray-500'>
-                    Happy to join you as <b>{roleLabels[formik.values.role]}</b> at <b>{formik.values.companyName}</b>!
+                    Happy to join you as <b>{formik.values.roleName}</b> at <b>{formik.values.companyName}</b>!
                 </span>
 
               </div>

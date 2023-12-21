@@ -120,12 +120,12 @@ function LocationPopup({ closePopup }) {
           {showInput && (
             <>
               <form onSubmit={handleSubmit}>
-                <input type="text" value={newLocation} onChange={handleLocationChange} placeholder='Location' className="w-full p-1 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500" />
+                <input type="text" value={newLocation} onChange={handleLocationChange} placeholder='Enter Location' className="w-full p-1 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500" />
                 <input type="text" value={newStreetAddress} onChange={handleStreetAddressChange}  placeholder='Street Address' className='border border-gray-300 w-full rounded-md p-1 mb-2'/>
                 <input type="text" value={newCity} onChange={handleCityChange}  placeholder='City' className='border border-gray-300 w-full rounded-md p-1 mb-2'/>
                 <input type="text" value={newState} onChange={handleStateChange}  placeholder='State' className='border border-gray-300 w-full rounded-md p-1 mb-2'/>
                 <input type="text" value={newZipCode} onChange={handleZipCodeChange} placeholder='Zip Code' className='border border-gray-300 w-full rounded-md p-1 mb-2'/>
-                <button type="button" onClick={handleAddLocation} className="border border-black text-black bg-blue-500 hover:bg-blue-500 hover:text-white hover:border-none font-bold py-2 px-4 rounded-md transition duration-300 text-sm">
+                <button type="button" onClick={handleAddLocation} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm">
                   Add Location
                 </button>
               </form>
