@@ -4,18 +4,11 @@ import axios from 'axios';
 
 const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) => {
 
-  console.log(addressData)
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
     streetAddress: '',
     city: '',
   });
-
   
-
-
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -50,7 +43,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
 
   const buttonStyle1 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer bottom-64 left-2"
   const buttonStyle2 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer bottom-64 right-2.5"
- 
+
   return (
     <div className={`${
       isExpanded ? 'opacity-100' : 'opacity-0'

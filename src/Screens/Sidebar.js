@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import ExtendedScreen from '../components/ExtendedScreen';
 import Account from './Account'; 
 import Routes from './Routes';
-import Tools from './Tools';
 import HelpSupport from './HelpSupport';
 import Settings from './Settings';
 import About from './About';
@@ -26,17 +25,19 @@ function Sidebar(props) {
   const handleToggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
-
+  
   useEffect(() => {
     if (!isExpanded) {
       setSelectedOption(null); 
     }
   }, [isExpanded]);
-
+  
   const handleLassoToggle = (isActive) => {
     // Pass isActive to the parent component
     props.setLassoActivate(isActive);
   };
+  
+
   
 
   const renderContent = () => {
@@ -46,9 +47,7 @@ function Sidebar(props) {
       case 'Account':
         return <Account setAddresses={props.setAddresses} />;
       case 'Route':
-        return <Routes setAddresses={props.setAddresses} setLassoActivate={handleLassoToggle}/>;
-      case 'Tools':
-        return <Tools />;
+        return <Routes setAddresses={props.setAddresses} setLassoActivate={handleLassoToggle} onSelectedAddresses={props.onSelectedAddresses}/>;
       case 'HelpSupport':
         return <HelpSupport />;
       case 'Settings':
@@ -102,13 +101,6 @@ function Sidebar(props) {
       >
         <i className="fas fa-map-marked-alt" style={{ marginRight: 25 }} />
         Route
-      </p>
-      <p
-        className={selectedOption === 'Tools' ? selectedOptionStyle : optionStyle}
-        onClick={() => handleOptionClick('Tools')}
-      >
-        <i className="fas fa-tools" style={{ marginRight: 25 }} />
-        Tools
       </p>
       <p
         className={selectedOption === 'HelpSupport' ? selectedOptionStyle : optionStyle}

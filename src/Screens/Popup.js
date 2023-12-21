@@ -16,6 +16,7 @@ class Popup extends Component {
       longitude: null,
       latitude: null,
       isHovered: false,
+      markerId: "",
     };
   }
 
