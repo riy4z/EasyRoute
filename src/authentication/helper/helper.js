@@ -23,26 +23,26 @@ export async function authenticate(username){
 export async function getUser({username}){
     try {
         const {data} = await axios.get(`api/user/${username}`)
-        const userData = {
-            ...data,
-            isAdmin: data.isAdmin || false,
-          };
-      
-          return { data: userData };
+        return {data};
     } catch (error) {
         return {error : "Password doesn't match..!"}
     }
 }
 
 
-export async function registerUser(credentials) {
+export async function registerUser(credentials ) {
     try {
-        const { data: { msg, error }, status } = await axios.post(`/api/register`, credentials);
+        console.log(credentials);
+        const { data: { msg, error }, status } = await axios.post(`/api/register`, credentials );
         
-        let { username, email } = credentials;
+        let { username, email, location } = credentials;
+        console.log(credentials)
 
         if (status === 201) {
             await axios.post('/api/registerMail', { username, userEmail: email });
+            const userID = await axios.get(`/api/user/${username}`)
+            console.log(userID)
+            await axios.post('/api/addUserLocation', {userId:userID.data._id, locationId:location})
         }
 
         return { msg, error };

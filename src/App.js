@@ -1,32 +1,32 @@
-//App.js
-import React, { Component } from "react";
+// App.js
+import React, { useState } from "react";
 import GMap from "./components/GMap";
 import Sidebar from "./Screens/Sidebar";
 
+const App = () => {
+  const [addresses, setAddresses] = useState([]);
+  const [lassoactivate, setLassoActivate] = useState(false);
+  const [selectAddress,setSelectAddress] =useState([]);
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      addresses: [],
-    };
-  }
-
-  setAddresses = (addresses) => {
-    this.setState({ addresses });
+  const handleSetAddresses = (newAddresses) => {
+    setAddresses(newAddresses);
   };
 
-  
-  render() {
-    const { addresses } = this.state;
-    console.log(addresses)
-    return (
-      <div>
-        <Sidebar setAddresses={this.setAddresses} />  
-        <GMap addresses={addresses} />
-      </div>
-    );
+  const handleLassoActivate = (lassostate) => {
+    setLassoActivate(lassostate);
   }
-}
+
+  const handleSelectedAddresses = (selectedAddresses) => {
+    setSelectAddress(selectedAddresses)
+    console.log('Selected Addresses in App:', selectedAddresses);
+  };
+
+  return (
+    <div>
+      <Sidebar setAddresses={handleSetAddresses} setLassoActivate={handleLassoActivate} onSelectedAddresses={handleSelectedAddresses}/>
+      <GMap addresses={addresses} LassoActive={lassoactivate} selectAddress={selectAddress} />
+    </div>
+  );
+};
 
 export default App;

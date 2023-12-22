@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import ExtendedScreen from '../components/ExtendedScreen';
 import Account from './Account'; 
 import Routes from './Routes';
-import Tools from './Tools';
 import HelpSupport from './HelpSupport';
 import Settings from './Settings';
 import About from './About';
@@ -26,14 +25,20 @@ function Sidebar(props) {
   const handleToggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
-
+  
   useEffect(() => {
     if (!isExpanded) {
       setSelectedOption(null); 
     }
   }, [isExpanded]);
+  
+  const handleLassoToggle = (isActive) => {
+    // Pass isActive to the parent component
+    props.setLassoActivate(isActive);
+  };
+  
 
-
+  
 
   const renderContent = () => {
     switch (selectedOption) {
@@ -42,9 +47,7 @@ function Sidebar(props) {
       case 'Account':
         return <Account setAddresses={props.setAddresses} />;
       case 'Route':
-        return <Routes />;
-      case 'Tools':
-        return <Tools />;
+        return <Routes setAddresses={props.setAddresses} setLassoActivate={handleLassoToggle} onSelectedAddresses={props.onSelectedAddresses}/>;
       case 'HelpSupport':
         return <HelpSupport />;
       case 'Settings':
@@ -59,44 +62,24 @@ function Sidebar(props) {
   };
 
   const optionStyle = "p-3 cursor-pointer"
-  // {
-  //   padding: 10,
-  //   cursor: 'pointer',
-  // };
+
 
   const selectedOptionStyle = "p-3 cursor-pointer bg-gray-100 bg-opacity-25 rounded-lg"
-  // {
-  //   padding: '10px 18px',
-  //   cursor: 'pointer',
-  //   backgroundColor: 'rgba(255,255,255,0.1)',
-  //   borderRadius: 10,
-  // };
 
-  const isAdmin = apiData?.isAdmin || false;
-  
+
+  const isAdmin = apiData?.RoleHierarchy;
+ 
 
   // Constant to determine whether to display the Admin option
   const shouldDisplayAdmin = isAdmin;
   return (
     <div
       className="fixed w-[275px] h-full z-40 p-2 bg-customColor text-blue-200 leading-loose text-2xl"
-      // {{
-      //   width: 275,
-      //   height: '100%',
-      //   backgroundColor: '#282c34',
-      //   fontFamily: '',
-      //   fontSize: 23,
-      //   color: 'lightblue',
-      //   position: 'fixed',
-      //   top: 0,
-      //   left: 0,
-      //   padding: 10,
-      //   zIndex: 1,
-      // }}
+
     >
       <h2 className="text-white text-5xl font-bold leading-loose">EasyRoute</h2>
 
-      {shouldDisplayAdmin && (
+      {(shouldDisplayAdmin === 0 || shouldDisplayAdmin === 1) && (
         <p
           className={selectedOption === 'Admin' ? selectedOptionStyle : optionStyle}
           onClick={() => handleOptionClick('Admin')}
@@ -118,13 +101,6 @@ function Sidebar(props) {
       >
         <i className="fas fa-map-marked-alt" style={{ marginRight: 25 }} />
         Route
-      </p>
-      <p
-        className={selectedOption === 'Tools' ? selectedOptionStyle : optionStyle}
-        onClick={() => handleOptionClick('Tools')}
-      >
-        <i className="fas fa-tools" style={{ marginRight: 25 }} />
-        Tools
       </p>
       <p
         className={selectedOption === 'HelpSupport' ? selectedOptionStyle : optionStyle}

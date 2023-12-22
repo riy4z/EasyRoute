@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from 'axios';
+import {RxCrossCircled} from "react-icons/rx";
 
 class Popup extends Component {
   constructor(props) {
@@ -15,6 +16,7 @@ class Popup extends Component {
       longitude: null,
       latitude: null,
       isHovered: false,
+      markerId: "",
     };
   }
 
@@ -29,7 +31,7 @@ class Popup extends Component {
     axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
       params: {
         address: addressString,
-        key: 'YOUR_GOOGLE_MAPS_API_KEY',
+        key: 'AIzaSyAEBs7HmfIN_AB-Anpl2YP4jIOewJBgt_U',
       }
     })
       .then(response => {
@@ -50,7 +52,14 @@ class Popup extends Component {
 
   saveAddressData = () => {
     const { firstName, lastName, phoneNumber, address, state, city, zipcode, longitude, latitude } = this.state;
-
+    const { selectedLocation } = this.props;
+    if (!selectedLocation) {
+      console.error('No location selected for the account.');
+      // Handle the error or inform the user as needed
+      return;
+    }
+    const {companyId} = this.props
+    
     const accountData = {
       "First Name": firstName,
       "Last Name": lastName,
@@ -61,6 +70,8 @@ class Popup extends Component {
       "ZIP Code": zipcode,
       "longitude": longitude,
       "latitude": latitude,
+      "CompanyID": companyId,
+      "LocationID": selectedLocation,
     };
 
     axios.post('http://localhost:4000/api/store-address-data', accountData)
@@ -85,9 +96,10 @@ class Popup extends Component {
     const { onClose } = this.props;
 
     return (
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-lg shadow-lg z-50 w-11/12 max-w-md font-sans">
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-opacity-50 backdrop-filter backdrop-blur-md flex items-center justify-center">
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-lg shadow-lg z-50 w-11/12 max-w-md font-sans ">
         <div className="absolute top-4 right-4 cursor-pointer" onClick={onClose}>
-          <span role="img" aria-label="close" className="text-3xl">&#9447;</span>
+          <RxCrossCircled/>
         </div>
         <h2 className="text-3xl font-bold text-center mb-4">Add New Account</h2>
         <hr className="my-4" />
@@ -106,11 +118,12 @@ class Popup extends Component {
             borderRadius: '0.375rem', // Add some border radius
           }}
         />
-        <label className="block mb-1 text-gray-700 text-sm">Second Name:</label>
+
+        <label className="block mb-1 text-gray-700 text-sm">Last Name:</label>
         <input
           type="text"
-          name="lastname"
-          placeholder="Enter Second Name"
+          name="lastName"
+          placeholder="Enter Last Name"
           value={lastName}
           onChange={this.handleInputChange}
           style={{
@@ -121,10 +134,11 @@ class Popup extends Component {
             borderRadius: '0.375rem', // Add some border radius
           }}
         />
+        
         <label className="block mb-1 text-gray-700 text-sm">Phone Number:</label>
         <input
           type="text"
-          name="phoneNumer"
+          name="phoneNumber"
           placeholder="Enter Phone Number"
           value={phoneNumber}
           onChange={this.handleInputChange}
@@ -151,6 +165,23 @@ class Popup extends Component {
             borderRadius: '0.375rem', // Add some border radius
           }}
         />
+        
+        <label className="block mb-1 text-gray-700 text-sm">City:</label>
+        <input
+          type="text"
+          name="city"
+          placeholder="Enter City"
+          value={city}
+          onChange={this.handleInputChange}
+          style={{
+            padding: '8px', // Adjust the padding as needed
+            fontSize: '1rem', // Equivalent to text-sm in Tailwind CSS
+            width: '100%', // Make it full width
+            border: '1px solid #ccc', // Add a border
+            borderRadius: '0.375rem', // Add some border radius
+          }}
+        />
+
         <label className="block mb-1 text-gray-700 text-sm">State:</label>
         <input
           type="text"
@@ -166,21 +197,7 @@ class Popup extends Component {
             borderRadius: '0.375rem', // Add some border radius
           }}
         />
-        <label className="block mb-1 text-gray-700 text-sm">City:</label>
-        <input
-          type="text"
-          name="City"
-          placeholder="Enter City"
-          value={city}
-          onChange={this.handleInputChange}
-          style={{
-            padding: '8px', // Adjust the padding as needed
-            fontSize: '1rem', // Equivalent to text-sm in Tailwind CSS
-            width: '100%', // Make it full width
-            border: '1px solid #ccc', // Add a border
-            borderRadius: '0.375rem', // Add some border radius
-          }}
-        />
+
         <label className="block mb-1 text-gray-700 text-sm">Zipcode:</label>
         <input
           type="text"
@@ -205,6 +222,7 @@ class Popup extends Component {
         >
           Save
         </button>
+      </div>
       </div>
     );
   }

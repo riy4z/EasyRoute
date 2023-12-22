@@ -1,98 +1,147 @@
-// RolePopup.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import getCompanyID from '../components/getCompany';
+import fetchRoles from '../components/fetchRoles';
+import { RxCrossCircled } from 'react-icons/rx';
+import toast, { Toaster } from 'react-hot-toast';
 
-function RolePopup({ closePopup }) {
-  const [role, setRole] = useState('');
+function RolePopup(props) {
+  const [roles, setRoles] = useState([]);
+  const [showInput, setShowInput] = useState(false);
+  const [newRole, setNewRole] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false); 
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      try {
+        const rolesFromServer = await fetchRoles();
+        setRoles(rolesFromServer);
+      } catch (error) {
+        // Handle the error as needed
+      }
+    };
+
+    fetchRole();
+  }, []);
+
+  const handleCheckboxChange = (e) => {
+    setIsAdmin(e.target.checked);
+    console.log(isAdmin);
+  };
+
+  const handleAddRoleClick = () => {
+    setShowInput(true);
+  };
 
   const handleRoleChange = (e) => {
-    setRole(e.target.value);
-  }
+    setNewRole(e.target.value);
+  };
+
+  const handleAddRole = async () => {
+    const companyid = getCompanyID();
+    const roleHierarchy = isAdmin ? 1 : 2;
+    if (!newRole.trim()) {
+      alert('Please enter a valid role.');
+      return;
+    }
+
+    
+
+    try {
+      const response = await fetch('http://localhost:4000/api/addRoles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Role: newRole, CompanyID: companyid,RoleHierarchy:roleHierarchy}),
+      });
+
+      const result = await response.json();
+
+      if (result.message) {
+        setRoles([...roles, result.role]);
+        setNewRole('');
+        setShowInput(false);
+        // Show a success toast notification
+        toast.success('Role added successfully');
+      } else {
+        alert(result.error || 'Error adding role');
+      }
+    } catch (error) {
+      console.error('Error adding role:', error);
+      alert('Error adding role');
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!role.trim()) {
-      alert('Please select a Role.');
+    if (roles.length === 0) {
+      alert('Please add at least one role.');
       return;
     }
 
-    alert(`Role submitted: ${role}`);
-    // You can perform any necessary actions with the location value here
-    // For example, you might want to send it to a server or update state
-    closePopup();
-  }
-
-  const popupStyle = {
-    position: "fixed",
-    top: "35%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    backgroundColor: "#fff",
-    padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2)",
-    zIndex: 999,
-  };
-
-  const labelStyle = {
-    display: "block",
-    marginBottom: "5px",
-  };
-
-  const inputStyle = {
-    marginBottom: "10px",
-  };
-
-  const buttonStyle1 = {
-    margin: "5px",
-    marginTop: '30px',
-    marginLeft: "50px",
-    width: "50%",
-    padding: '8px 20px',
-    fontSize: '16px',
-    backgroundColor: "white",
-    fontWeight: '600',
-    color: '#394359',
-    borderRadius: '10px',
-    cursor: 'pointer',
-  };
-
-  const buttonStyle2 = {
-    margin: "5px",
-    marginTop: '30px',
-    marginLeft: "26%",
-    width: "50%",
-    padding: '8px 20px',
-    fontSize: '16px',
-    backgroundColor: "white",
-    fontWeight: '600',
-    color: '#394359',
-    borderRadius: '10px',
-    cursor: 'pointer',
-  };
-
-  const buttonContainerStyle = {
-    display: "flex",
-    justifyContent: "flex-end",
+    alert(`Roles submitted: ${roles.map((role) => role.Role).join(', ')}`);
+    props.closePopup();
   };
 
   return (
     <div>
-      <div style={popupStyle}>
-        <h2 style={labelStyle}>Enter Role:</h2>
-        <form onSubmit={handleSubmit}>
-          <input type="text" value={role} onChange={handleRoleChange} style={inputStyle} />
-          <div style={buttonContainerStyle}>
-            <button type="submit" style={buttonStyle1}>
-              Submit
+      <Toaster position="top-center" reverseOrder={false}></Toaster>
+    <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
+    <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto">
+    <div className="absolute top-4 right-4 cursor-pointer">
+          <button onClick={props.closePopup} className="text-gray-500 hover:text-gray-700">
+            <RxCrossCircled />
+          </button>
+        </div>
+        <h2 className="text-3xl font-bold text-center mb-4">Roles</h2>
+        <hr className="my-4" />
+        <ul>
+          {roles.map((role, index) => (
+            <li key={index} className="text-gray-800">{role.Role}</li>
+          ))}
+        </ul>
+        <div>
+          {showInput && (
+            <form onSubmit={handleSubmit} className="mb-4">
+              <input
+                type="text"
+                value={newRole}
+                onChange={handleRoleChange}
+                className="w-full p-1 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
+              />    
+                <input
+            type="checkbox"
+            id="isAdmin"
+            name="isAdmin"
+            checked={isAdmin}
+            onChange={handleCheckboxChange}
+          />
+              <label htmlFor="isAdmin">Admin</label>
+
+              <div>
+              <button
+                type="button"
+                onClick={handleAddRole}
+                className="border border-black text-black bg-blue-500 hover:bg-blue-500 hover:text-white hover:border-none font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+              >
+                Add Role
+              </button>
+                </div>
+            </form>
+          )}
+          {!showInput && (
+            <button
+              onClick={handleAddRoleClick}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+            >
+              Add Role
             </button>
-            <button onClick={closePopup} style={buttonStyle2}>
-              Cancel
-            </button>
-          </div>
-        </form>
+          )}
+        </div>
       </div>
     </div>
+   </div>
   );
 }
 

@@ -2,9 +2,11 @@ import React from "react";
 import handleFileUpload from "../components/handleFileUpload";
 import Popup from "./Popup";
 import AccountDetails from "./AccountDetails";
-import '../styles/popup.css';
-import {useAuthStore} from '../authentication/store/store';
-
+import fetchLocations from '../components/fetchLocations';
+import fetchUserLocations from '../components/fetchUserLocations';
+import getCompanyID from "../components/getCompany";
+import getUserID from "../components/getUser";
+import toast, { Toaster } from 'react-hot-toast';
 
 class Account extends React.Component {
   constructor(props) {
@@ -12,10 +14,15 @@ class Account extends React.Component {
     this.state = {
       isPopupOpen: false,
       isOverlayVisible: false,
-      savedaddress: [],
-      searchInput: "", // State variable to store the search input
       selectedAddress: null, 
+      locations: [],
+      userLocations: [],
+      savedaddress: [],
+      companyId:'',
+      userId:'',
+      searchInput: "", // State variable to store the search input
       isAccountDetailsExpanded: false,
+      selectedLocation: '',
     };
   }
 
@@ -28,6 +35,8 @@ class Account extends React.Component {
       }
     }, 20000); // Fetch every 10 seconds
   };
+
+  
   fetchAndUpdateAddressData = () => {
     fetch('http://localhost:4000/api/get-address-data')
       .then((res) => {
@@ -61,50 +70,116 @@ class Account extends React.Component {
 
   // Automatically fetch address data when the component mounts
   componentDidMount() {
+    this.fetchLocationData();
+    this.fetchCompanyID();
     this.fetchAddressData();
+    this.fetchUserID();
   }
 
+  fetchCompanyID = async () => {
+    try {
+      const companyIDData = await getCompanyID();
+      this.setState({
+        companyId : companyIDData
+      })
+    } catch (error) {
+      console.error("Error fetching companyID:", error)
+      
+    }
+  };
+
+  fetchUserID = async () => {
+    try {
+      const userIDData = await getUserID();
+      this.setState({
+        userId : userIDData
+      })
+    } catch (error) {
+      console.error("Error fetching userID:", error)
+    }
+  }
+
+  fetchLocationData = async () => {
+    try {
+      const locationsData = await fetchLocations();
+      const userLocationsData = await fetchUserLocations();
+      this.setState({
+        locations: locationsData,
+        userLocations: userLocationsData,
+
+      });
+    } catch (error) {
+      console.error('Error fetching location data:', error);
+      // Handle error as needed
+    }
+  };
+
   handleFileSelect = () => {
-    this.fileInput.click();
+    if (this.state.selectedLocation) {
+      this.fileInput.click();
+    } else {
+      // Show a message or take any action to prompt the user to select a location
+      alert("Please select a location before importing accounts.");
+    }
   };
 
   handleFileChange = (e) => {
     const file = e.target.files[0];
+  // Check if a location is selected before processing the file
+  if (!this.state.selectedLocation) {
+    alert("Please select a location before importing accounts.");
+    return;
+  }
   
     handleFileUpload(file, (data) => {
-      // Get the username from your Zustand authentication store
-      const { setUsername, auth } = useAuthStore.getState();
-      const username = auth.username;
-  
+      // Get the userId from session storage
+      const userID = this.state.userId;
+      const username = userID;
+      for (let i = 0; i < data.length; i++) {
+        data[i].CompanyID = this.state.companyId;
+        data[i].LocationID = this.state.selectedLocation;
+      }
       this.props.setAddresses(data); // Pass the parsed data to the parent component
   
-      fetch('http://localhost:4000/api/process-csv', {
+      fetch('http://localhost:4000/api/processCSV', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ csvData: data, fileName: file.name, username }), // Include the username in the request
+        body: JSON.stringify({ csvData: data, fileName: file.name, userId: username }), // Include the username in the request
       })
         .then((res) => res.json())
         .then((response) => {
           if (response.success) {
-            console.log('CSV file processed successfully:', response.details);
+            console.log('CSV file processed successfully');
+            toast.success('Accounts imported successfully');
           } else {
             console.error('Error processing CSV file:', response.error);
+            toast.error('Error processing CSV file');
           }
         })
         .catch((error) => {
           console.error('Error sending CSV data to the server:', error);
+          toast.error('Error sending CSV data to the server');
         });
     });
   };
 
+
   openPopup = () => {
-    this.setState({ isPopupOpen: true,isOverlayVisible: true });
+    const { selectedLocation } = this.state;
+
+    if (!selectedLocation) {
+      // Show a message or take any action to prompt the user to select a location
+      alert("Please select a location before adding an account.");
+      return;
+    }
+
+    this.setState({ isPopupOpen: true, isOverlayVisible: true });
   };
 
   closePopup = () => {
-    this.setState({ isPopupOpen: false,isOverlayVisible: false });
+    this.setState({ isPopupOpen: false, isOverlayVisible: false });
   };
 
 handleListItemHover = (index) => {
@@ -120,6 +195,7 @@ handleListItemLeave = (index) => {
 };
 
 searchTimeout;
+
 
 handleSearchInputChange = (e) => {
   const value = e.target.value;
@@ -170,6 +246,7 @@ searchAddresses = () => {
   this.setSavedAddresses(filteredAddresses);
 };
 
+
 handleListItemClick = (selectedAddress) => {
   this.setState({
     selectedAddress,
@@ -177,84 +254,76 @@ handleListItemClick = (selectedAddress) => {
   });
 };
 
+
+renderLocationDropdown() {
+  const { locations, userLocations, selectedLocation } = this.state;
+  const locationdropdownstyle = "mt-20"
+  return (
+    <select
+      id="locationDropdown"
+      value={selectedLocation}
+      onChange={(e) => this.setState({ selectedLocation: e.target.value })}
+      className = {locationdropdownstyle}
+    >
+      <option value="">Select a location</option>
+      {Array.isArray(userLocations) && userLocations.length > 0 ? (
+        userLocations.map((userLocation) => {
+          const location = locations.find(loc => loc._id === userLocation.LocationID);
+          return (
+            <option key={userLocation._id} value={userLocation.LocationID}>
+              {location ? location.Location : 'Unknown Location'}
+            </option>
+          );
+        })
+      ) : (
+        <option value="" disabled>
+          No locations available
+        </option>
+      )}
+    </select>
+  );
+}
+
+
   render() {
-    const { savedaddress, searchInput, selectedAddress, isAccountDetailsExpanded } = this.state;
+    const { savedaddress, searchInput, selectedAddress, isAccountDetailsExpanded, selectedLocation } = this.state;
    
       // Sort the addresses based on the 'First Name' in ascending order
-    const sortedAddresses = [...savedaddress].sort((a, b) => {
-      const nameA = a['First Name'] ? a['First Name'].toLowerCase() : '';
-      const nameB = b['First Name'] ? b['First Name'].toLowerCase() : '';
-    if (nameA < nameB) {
-      return -1;
-    }
-    if (nameA > nameB) {
-      return 1;
-    }
-    return 0;
-  });
+      const filteredAddresses = savedaddress.filter(
+        (address) => address.LocationID === selectedLocation
+      );
+    
+      // Sort the filtered addresses based on the 'First Name' in ascending order
+      const sortedAddresses = filteredAddresses.sort((a, b) => {
+        const nameA = a['First Name'] ? a['First Name'].toLowerCase() : '';
+        const nameB = b['First Name'] ? b['First Name'].toLowerCase() : '';
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        return 0;
+      });
+
+   
 
     // console.log(savedaddress)
-    const buttonStyle = "cursor-pointer bg-blue-600 rounded-lg px-14 py-1.5 text-white font-medium absolute top-32 text-xl"
-    // {
-    //   backgroundColor: '#0066ff',
-    //   border: "none",
-    //   borderRadius: 10,
-    //   color: "white",
-    //   padding: "10px 80px",
-    //   textAlign: "center",
-    //   textDecoration: "none",
-    //   display: "inline-block",
-    //   fontWeight: 600,
-    //   position: "absolute",
-    //   fontSize: "16px",
-    //   cursor: "pointer",
-    //   top:"160px"
-    // };
+    const buttonStyle = "cursor-pointer bg-blue-600 rounded-lg px-14 py-1.5 text-white font-medium absolute text-xl top-32"
+
 
     const buttonStyle1 = "cursor-pointer bg-customColor1 rounded-lg p-2 text-white font-medium absolute bottom-4 left-16 text-xl"
-    // {
-    //   bottom:70,
-    //   backgroundColor: '#394359',
-    //   border: "none",
-    //   borderRadius: 10,
-    //   color: "white",
-    //   padding: "10px 10px",
-    //   textAlign: "center",
-    //   textDecoration: "none",
-    //   display: "inline-block",
-    //   fontWeight: 600,
-    //   position: "absolute",
-    //   fontSize: "16px",
-    //   cursor: "pointer",
-    //   justifyContent:"center",
-    //   left:"85px",
-    // };
 
-    // const style="text-5xl font-medium text-customColor1 text-left"
-    // // {
-    // //   fontSize: 50,
-    // //   fontWeight:600,
-    // //   color: "#282c34",
-    // //   textAlign:"left",
-    // // }
     
     const listContainerStyle =  `absolute ${
-      savedaddress && savedaddress.length > 0 ? 'overflow-y-scroll h-3/5 mt-48' : 'overflow-hidden'
+      savedaddress && savedaddress.length > 0 ? 'overflow-y-scroll h-3/5 mt-20' : 'overflow-hidden'
     }`;
-    // {
-    //   position:"absolute",
-    //   height: "600px", // Set a fixed height for the container
-    //   overflow: "auto", // Enable vertical scrolling
-    //   marginTop:"110px",
-    //   marginRight:"10px"
-    // };
 
-    //List Content
     let listContent;
-    if (savedaddress && savedaddress.length > 0) {
-      const visibleAddresses = sortedAddresses.filter(address => !address.isHidden);
+    if (sortedAddresses && sortedAddresses.length > 0) {
+      // const visibleAddresses = sortedAddresses.filter(address => !address.isHidden);
     
-      listContent = visibleAddresses.map((address, index) => (
+      listContent = sortedAddresses.map((address, index) => (
         <li 
           key={address._id}
           onClick={() => this.handleListItemClick(address)}
@@ -274,14 +343,19 @@ handleListItemClick = (selectedAddress) => {
         </li>
       ));
     } else {
-      listContent = <h5 className='mt-48'>No accounts found</h5>
+      listContent = <h5 className='mt-40 text-center'>No accounts found for the selected location</h5>
       
     }
 
     return (
+      
       <div >
+        <Toaster position="top-center" reverseOrder={false}></Toaster>
         <h1 className="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
-
+        <div>
+        {this.renderLocationDropdown()}
+        </div>
+        <div>
         <button className={buttonStyle} onClick={this.handleFileSelect}>
           Import Accounts
         </button>
@@ -292,32 +366,30 @@ handleListItemClick = (selectedAddress) => {
           ref={(fileInput) => (this.fileInput = fileInput)}
           style={{ display: "none" }}
         />
+       
+       </div>
+        
+        
+        
+        <div>
         <div>
           <input
           type="text"
           placeholder="Search Accounts"
           value={searchInput}
           onChange={this.handleSearchInputChange}
-          className="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-28 text-xl"
-          // {{
-          
-          //   padding: "10px",
-          //   width: "85%",
-          //   border: "1px solid #ccc",
-          //   borderRadius: "15px",
-          //   marginTop:"50px",
-          //   position:"absolute"
-          // }}
+          className="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-6 text-xl"
+
         />
-        <i className="absolute top-[226px] right-7 text-gray-300 fas fa-solid fa-magnifying-glass"/>   
+        </div>
+        <i className="absolute mt-8 right-7 text-gray-300 fas fa-solid fa-magnifying-glass"/>   
         </div>
         <button className={buttonStyle1} onClick={this.openPopup}>
         <i className="fas fa-plus-circle" style={{ marginRight: 10}}></i>
           Add Account
         </button>
-        <div className={`overlay ${this.state.isOverlayVisible ? 'active' : ''}`} onClick={this.closePopup}></div>
-        <div className={listContainerStyle}> 
-      
+        <div className={listContainerStyle}>
+         
       <ul  style={{ listStyleType: "none", padding: 0 }}>
       {listContent}
 
@@ -334,7 +406,7 @@ handleListItemClick = (selectedAddress) => {
             />
             )}
 
-{this.state.isPopupOpen && <Popup onClose={this.closePopup} />
+{this.state.isPopupOpen && <Popup onClose={this.closePopup} selectedLocation={this.state.selectedLocation} companyId={this.state.companyId} />
   }
     
       </div>
