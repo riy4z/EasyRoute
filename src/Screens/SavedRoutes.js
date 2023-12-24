@@ -61,6 +61,35 @@ function SavedRoutes() {
     }
   };
 
+  const handleUpdateRoute = async (routeId, RouteName) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/updateRoute/${routeId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add any other headers needed, such as authorization headers
+        },
+        body: JSON.stringify({ RouteName }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Update failed with status ${response.status}`);
+      }
+  
+      const updatedRoute = await response.json();
+  
+      setUserRoutes((prevRoutes) =>
+        prevRoutes.map((route) =>
+          route.route._id === routeId ? { ...route, route: updatedRoute.route } : route
+        )
+      );
+  
+      console.log('Route updated successfully:', updatedRoute);
+    } catch (error) {
+      console.error('Error updating route name:', error.message);
+    }
+  };
+  
 
   return (
     <div>
@@ -69,9 +98,19 @@ function SavedRoutes() {
           <li key={route.route._id}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>{route.route.RouteName}</span>
-              <button className="fa-solid fa-xmark" style={buttonStyle} onClick={() => handleDeleteRoute(route.route._id)}></button>
+              <div>
+                <button className="fa-solid fa-xmark" onClick={() => handleDeleteRoute(route.route._id)}></button>
+                <button
+                  className="fa-solid fa-pencil"
+                  onClick={() => {
+                    const newRouteName = prompt('Enter new route name:', route.route.RouteName);
+                    if (newRouteName !== null) {
+                      handleUpdateRoute(route.route._id, newRouteName);
+                    }
+                  }}
+                ></button>
+              </div>
             </div>
-            {/* Display other route details as needed */}
           </li>
         ))}
       </ul>
