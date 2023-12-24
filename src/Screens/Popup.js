@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from 'axios';
 import {RxCrossCircled} from "react-icons/rx";
+import { v4 as uuidv4 } from 'uuid';
 
 class Popup extends Component {
   constructor(props) {
@@ -59,8 +60,9 @@ class Popup extends Component {
       return;
     }
     const {companyId} = this.props
-    
+    const markerId = uuidv4();
     const accountData = {
+      
       "First Name": firstName,
       "Last Name": lastName,
       "Phone Number": phoneNumber,
@@ -72,6 +74,7 @@ class Popup extends Component {
       "latitude": latitude,
       "CompanyID": companyId,
       "LocationID": selectedLocation,
+      "markerId": markerId
     };
 
     axios.post('http://localhost:4000/api/store-address-data', accountData)

@@ -13,13 +13,12 @@ import "./index.css";
 import { AuthorizeUser, ProtectRoute } from './authentication/middleware/auth';
 import AdminRequest from  "./Screens/AdminRequest";
 
-
 const Root = () => (
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<LoginPage />} />
       <Route path="/password" element={<div><ProtectRoute><Password/></ProtectRoute></div>}/>
-      <Route path="/register" element={<Register/>}/>
+      <Route path="/register/:params" element={<Register />} />
       <Route path="/recovery" element={<Recovery/>}/>
       <Route path="/reset" element={<Reset/>}/>
       <Route path="/app" element={<div><AuthorizeUser><App /></AuthorizeUser></div>} />
@@ -31,4 +30,3 @@ const Root = () => (
 ReactDOM.render(<Root />, document.getElementById('root'));
 
 reportWebVitals();
-// Hi there
