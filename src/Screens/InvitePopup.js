@@ -5,6 +5,7 @@ import { RxCrossCircled } from 'react-icons/rx';
 import fetchLocations from '../components/fetchLocations';
 import fetchRoles from '../components/fetchRoles';
 import getRoleHierarchy from '../components/getRoleHierarchy';
+import CryptoJS from 'crypto-js';
 
 function InvitePopup(props) {
   const [email, setEmail] = useState('');
@@ -31,6 +32,12 @@ function InvitePopup(props) {
   }, []);
 
   console.log(rolesFromServer);
+
+  const encrypt = (text) => {
+    const key = 'ab2d644573a6637ab728f1e6399cb7c0afd557396a07108150da98d0828cec10'; 
+    const encrypted = CryptoJS.AES.encrypt(text, key);
+    return encrypted.toString();
+  };
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -61,6 +68,8 @@ function InvitePopup(props) {
     const isLocalAdmin = getRoleHierarchy();
 
     const uniqueLink = generateUniqueLink(email, location, role, companyId);
+
+
 
     try {
       await axios.post('/api/registerMail', { userEmail: email, text: `<!DOCTYPE html>
@@ -415,9 +424,9 @@ function InvitePopup(props) {
     props.closePopup();
   };
   // Function to generate a unique link
-  const generateUniqueLink = (email,location,role,companyid) => {
-    // Implement your logic to generate a unique link based on the email
-    return `http://${window.location.hostname}:3000/register?email=${encodeURIComponent(email)}&location=${encodeURIComponent(location)}&role=${encodeURIComponent(role)}&companyid=${(companyid)}`;
+  const generateUniqueLink = (email, location, role, companyId) => {
+    const encryptedParams = encrypt(`${email}:${location}:${role}:${companyId}`);
+    return `http://${window.location.hostname}:3000/register/${encodeURIComponent(encryptedParams)}`;
   };
 
   return (

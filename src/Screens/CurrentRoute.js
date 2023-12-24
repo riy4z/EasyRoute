@@ -8,9 +8,13 @@ import fetchLocations from '../components/fetchLocations';
 import fetchUserLocations from '../components/fetchUserLocations';
 import getUserID from "../components/getUser";
 import * as MapFunctions from "../components/mapFunctions";
+import getCompanyID from '../components/getCompany';
+import axios from 'axios';
+
 
 const DraggableAddress = ({ children, index, selectedAddresses, setSelectedAddresses, onReorder }) => {
   const [routeDetails, setRouteDetails] = useState({ distance: "", duration: "" });
+ 
 
   useEffect(() => {
     const calculateRouteDetails = async () => {
@@ -85,7 +89,10 @@ const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses }) => {
   const [userLocations, setUserLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [Locations, setLocations] = useState([]);
-  
+  const companyid = getCompanyID();
+  const userid=getUserID();
+  const [routeid , setRouteId]= useState();
+  const markers = [];
   
   useEffect(() => {
     const fetchData = async () => {
@@ -157,6 +164,31 @@ const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses }) => {
     onSelectedAddresses(selectedAddresses);
   }, [selectedAddresses]);
 
+  const handleSave = () => {
+    try{
+      const data = {
+        Route: markers.map(marker => marker.position),
+        CompanyID: companyid,
+        RouteNumber: 1,
+      };
+      axios.post('http://localhost:4000/api/saveRoute', data)
+      .then(response => {
+        // Handle the response from the backend if needed
+        setRouteId(response.data.route._id);
+        axios.post('http://localhost:4000/api/addUserRoute', {userId:userid, routeId:routeid})
+      })
+      .catch(error => {
+        // Handle errors during the request
+        console.error('Error during Axios request:', error);
+      });
+      
+  } catch (error) {
+    // Handle errors that occur within the try block
+    console.error('Error:', error);
+  }
+};
+
+
   
 
   return (
@@ -217,12 +249,16 @@ const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses }) => {
           ) : (
             <img src={NullAddress1} className="mt-10" />
           )}
+             <div>
+<button  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Save</button>
+</div>
         </div>
 
         {selectedAddresses && selectedAddresses.length > 0 && (
-          <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none">
+          <button  onClick={handleSave} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none">
             Optimize
           </button>
+       
         )}
       </div>
     </DndProvider>

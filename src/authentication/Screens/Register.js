@@ -9,6 +9,7 @@ import { registerValidation } from '../helper/validate';
 import { registerUser, generateOTPbyEmail, verifyOTPbyEmail} from '../helper/helper';
 import { getCompanyById } from '../../components/getCompanyById';
 import { getRolesFromHierarchy } from '../../components/getRolesFromHierarchy';
+import CryptoJS from 'crypto-js';
 
 
 export default function Register() {
@@ -85,6 +86,15 @@ export default function Register() {
   };
 
 
+
+const decrypt = (encryptedText) => {
+  const key = 'ab2d644573a6637ab728f1e6399cb7c0afd557396a07108150da98d0828cec10'; // Replace with your secret key
+  const decrypted = CryptoJS.AES.decrypt(encryptedText, key);
+  return decrypted.toString(CryptoJS.enc.Utf8);
+};
+  
+
+
   const onUpload = async (e) => {
     const base64 = await convertToBase64(e.target.files[0]);
     setFile(base64);
@@ -108,12 +118,12 @@ export default function Register() {
 
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const emailFromUrl = urlParams.get('email');
-    const locationFromUrl = urlParams.get('location');
-    const roleFromUrl = urlParams.get('role');
-    const companyIdFromUrl = urlParams.get('companyid');
-    
+    const urlParams = window.location.pathname.split('/').filter(Boolean);
+    const encryptedParams = urlParams[1];
+  const decryptedParams = decrypt(decodeURIComponent(encryptedParams));
+
+  const [emailFromUrl, locationFromUrl, roleFromUrl, companyIdFromUrl] = decryptedParams.split(':');
+
   
     console.log('Email from URL:', emailFromUrl);
     console.log('Location from URL:', locationFromUrl);
