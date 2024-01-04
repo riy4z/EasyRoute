@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { GoogleMap, DrawingManager, Marker, Polygon, Circle, Rectangle, Polyline, useJsApiLoader } from '@react-google-maps/api';
 import * as MapFunctions from '../components/mapFunctions';
 import AccountDetails from '../Screens/AccountDetails';
+import config from '../config/config';
 
 const libraries = ['places', 'drawing'];
 
@@ -18,7 +19,7 @@ const GMap = (props) => {
     const [polylines, setPolylines] = useState([]);
 
     const { isLoaded } = useJsApiLoader({
-        googleMapsApiKey: 'AIzaSyCHb570UK21VsQtayMgy3X8sOFzUclZHlo',
+        googleMapsApiKey: config.googleMapsApiKey,
         libraries
     });
 

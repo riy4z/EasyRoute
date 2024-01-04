@@ -1,8 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { getUsername } from '../helper/helper';
-
-axios.defaults.baseURL = process.env.REACT_APP_SERVER_DOMAIN || 'http://localhost:4000/';
+import api from "../../config/api";
 
 /** custom hook */
 export default function useFetch(query) {
@@ -32,8 +31,8 @@ export default function useFetch(query) {
         const username = !query ? (await getUsername()).username : '';
 
         const { data, status } = !query
-          ? await axios.get(`/api/user/${username}`)
-          : await axios.get(`/api/${query}`);
+          ? await api.get(`/user/${username}`)
+          : await api.get(`/${query}`);
 
         
           if (window.location.pathname === '/app') {

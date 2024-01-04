@@ -7,6 +7,7 @@ import fetchUserLocations from '../components/fetchUserLocations';
 import getCompanyID from "../components/getCompany";
 import getUserID from "../components/getUser";
 import toast, { Toaster } from 'react-hot-toast';
+import api from "../config/api";
 
 class Account extends React.Component {
   constructor(props) {
@@ -37,15 +38,11 @@ class Account extends React.Component {
   };
 
   
+
   fetchAndUpdateAddressData = () => {
-    fetch('http://localhost:4000/api/get-address-data')
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return res.json();
-      })
-      .then((data) => {
+    api.get('/get-address-data')
+      .then((response) => {
+        const data = response.data;
         if (typeof data !== 'object') {
           console.error('Client: Error - Response is not an object:', data);
           throw new Error('Response is not a valid JSON object');
@@ -130,39 +127,42 @@ class Account extends React.Component {
     alert("Please select a location before importing accounts.");
     return;
   }
+
   
-    handleFileUpload(file, (data) => {
-      // Get the userId from session storage
-      const userID = this.state.userId;
-      const username = userID;
-      for (let i = 0; i < data.length; i++) {
-        data[i].CompanyID = this.state.companyId;
-        data[i].LocationID = this.state.selectedLocation;
+  handleFileUpload(file, (data) => {
+    // Get the userId from session storage
+    const userID = this.state.userId;
+    const username = userID;
+    for (let i = 0; i < data.length; i++) {
+      data[i].CompanyID = this.state.companyId;
+      data[i].LocationID = this.state.selectedLocation;
+    }
+    this.props.setAddresses(data); // Pass the parsed data to the parent component
+  
+    api.post('/processCSV', {
+      csvData: data,
+      fileName: file.name,
+      userId: username,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((response) => {
+      if (response.data.success) {
+        console.log('CSV file processed successfully');
+        toast.success('Accounts imported successfully');
+      } else {
+        console.error('Error processing CSV file:', response.data.error);
+        toast.error('Error processing CSV file');
       }
-      this.props.setAddresses(data); // Pass the parsed data to the parent component
-  
-      fetch('http://localhost:4000/api/processCSV', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ csvData: data, fileName: file.name, userId: username }), // Include the username in the request
-      })
-        .then((res) => res.json())
-        .then((response) => {
-          if (response.success) {
-            console.log('CSV file processed successfully');
-            toast.success('Accounts imported successfully');
-          } else {
-            console.error('Error processing CSV file:', response.error);
-            toast.error('Error processing CSV file');
-          }
-        })
-        .catch((error) => {
-          console.error('Error sending CSV data to the server:', error);
-          toast.error('Error sending CSV data to the server');
-        });
+    })
+    .catch((error) => {
+      console.error('Error sending CSV data to the server:', error);
+      toast.error('Error sending CSV data to the server');
     });
+  });
+  
   };
 
 

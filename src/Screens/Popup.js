@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import axios from 'axios';
+import api from "../config/api";
 import {RxCrossCircled} from "react-icons/rx";
 import { v4 as uuidv4 } from 'uuid';
+import config from "../config/config";
 
 class Popup extends Component {
   constructor(props) {
@@ -32,7 +34,7 @@ class Popup extends Component {
     axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
       params: {
         address: addressString,
-        key: 'AIzaSyAEBs7HmfIN_AB-Anpl2YP4jIOewJBgt_U',
+        key: config.googleMapsApiKey,
       }
     })
       .then(response => {
@@ -77,7 +79,7 @@ class Popup extends Component {
       "markerId": markerId
     };
 
-    axios.post('http://localhost:4000/api/store-address-data', accountData)
+    api.post('/store-address-data', accountData)
       .then(response => {
         console.log('Account data saved');
         this.onClose();

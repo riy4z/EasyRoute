@@ -45,7 +45,7 @@ const Root = () => {
           path="/password"
           element={<div><ProtectRoute><Password/></ProtectRoute></div>}
         />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register/:params" element={<Register />} />
         <Route path="/recovery" element={<Recovery />} />
         <Route path="/reset" element={<Reset />} />
         <Route

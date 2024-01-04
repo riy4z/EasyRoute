@@ -10,7 +10,7 @@ import { registerUser, generateOTPbyEmail, verifyOTPbyEmail} from '../helper/hel
 import { getCompanyById } from '../../components/getCompanyById';
 import { getRolesFromHierarchy } from '../../components/getRolesFromHierarchy';
 import CryptoJS from 'crypto-js';
-
+import config from '../../config/config';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -88,7 +88,7 @@ export default function Register() {
 
 
 const decrypt = (encryptedText) => {
-  const key = 'ab2d644573a6637ab728f1e6399cb7c0afd557396a07108150da98d0828cec10'; // Replace with your secret key
+  const key = config.secretkey; // Replace with your secret key
   const decrypted = CryptoJS.AES.decrypt(encryptedText, key);
   return decrypted.toString(CryptoJS.enc.Utf8);
 };

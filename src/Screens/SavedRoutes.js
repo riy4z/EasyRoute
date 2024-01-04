@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import fetchUserRoute from "../components/fetchUserRoute";
 import { getRouteId } from "../components/fetchRoute";
+import api from "../config/api";
 
 function SavedRoutes() {
   const [userRoutes, setUserRoutes] = useState([]);
@@ -25,11 +26,7 @@ function SavedRoutes() {
     fetchData();
   }, []);
 
-  // const handleDeleteRoute = async (routeId) => {
-  //   // Implement the logic to delete the route with the given routeId
-  //   // You can make an API call or update the state accordingly
-  //   console.log("Deleting route with ID:", routeId);
-  // };
+
  
   const buttonStyle = {
     marginLeft: '10px', // Add margin for spacing
@@ -39,52 +36,48 @@ function SavedRoutes() {
   
   const handleDeleteRoute = async (routeId) => {
     try {
-      // Assuming you have an API endpoint like `/api/routes/:routeId` for deleting routes
-      const response = await fetch(`http://localhost:4000/api/deleteRoute/${routeId}`, {
-        method: 'DELETE',
+      const response = await api.delete(`/deleteRoute/${routeId}`, {
         headers: {
           'Content-Type': 'application/json',
           // Add any other headers needed, such as authorization headers
         },
       });
       console.log('Delete Response:', response);
-      if (response.ok) {
-        // Route successfully deleted, update the state or refetch the data
+      if (response.status === 200) {
         setUserRoutes((prevRoutes) => prevRoutes.filter((route) => route.route._id !== routeId));
       } else {
-        // Handle the case where the deletion was not successful
         console.error('Failed to delete route:', response.statusText);
       }
     } catch (error) {
-      // Handle network or other errors
       console.error('Error deleting route:', error);
     }
   };
 
+
   const handleUpdateRoute = async (routeId, RouteName) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/updateRoute/${routeId}`, {
-        method: 'PATCH',
+      const response = await api.patch(`/updateRoute/${routeId}`, {
+        RouteName,
+      }, {
         headers: {
           'Content-Type': 'application/json',
           // Add any other headers needed, such as authorization headers
         },
-        body: JSON.stringify({ RouteName }),
       });
-  
-      if (!response.ok) {
+
+      if (response.status === 200) {
+        const updatedRoute = response.data;
+
+        setUserRoutes((prevRoutes) =>
+          prevRoutes.map((route) =>
+            route.route._id === routeId ? { ...route, route: updatedRoute.route } : route
+          )
+        );
+
+        console.log('Route updated successfully:', updatedRoute);
+      } else {
         throw new Error(`Update failed with status ${response.status}`);
       }
-  
-      const updatedRoute = await response.json();
-  
-      setUserRoutes((prevRoutes) =>
-        prevRoutes.map((route) =>
-          route.route._id === routeId ? { ...route, route: updatedRoute.route } : route
-        )
-      );
-  
-      console.log('Route updated successfully:', updatedRoute);
     } catch (error) {
       console.error('Error updating route name:', error.message);
     }

@@ -1,12 +1,18 @@
-// getUserLocationsByUserId.js
+import api from "../config/api";
+
 export async function getUserLocationsByUserId(userId) {
-    try {
-      const response = await fetch(`http://localhost:4000/api/getUserLocations?userId=${userId}`);
-      const { userLocations } = await response.json();
-      return Array.isArray(userLocations) ? userLocations : [];
-    } catch (error) {
-      console.error('Error fetching user locations by user ID:', error);
-      throw error;
-    }
+  try {
+    // Use Axios to make the request
+    const response = await api.get(`/getUserLocations?userId=${userId}`);
+    
+    // Destructure the data property from the response
+    const { userLocations } = response.data;
+
+    // Check if userLocations is an array, if not, return an empty array
+    return Array.isArray(userLocations) ? userLocations : [];
+  } catch (error) {
+    // Handle errors
+    console.error('Error fetching user locations by user ID:', error);
+    throw error;
   }
-  
+}

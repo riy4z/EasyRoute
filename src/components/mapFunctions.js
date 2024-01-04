@@ -1,13 +1,10 @@
 // mapFunctions.js
-import axios from 'axios';
-
-
 import { v4 as uuidv4 } from 'uuid';
-import { useEffect } from 'react';
+import api from "../config/api"
 
 export const sendAddressDataToBackend = async (addressData) => {
   try {
-    const response = await axios.post('http://localhost:4000/api/store-address-data', addressData, {
+    const response = await api.post('/store-address-data', addressData, {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
@@ -95,57 +92,104 @@ export const createRoutesBetweenMarkers = async (markers, setPolylines) => {
   const newPolylines = [];
 
   if (markers.length < 2) {
-      setPolylines(newPolylines);
-      return;
+    setPolylines(newPolylines);
+    return;
   }
- 
+
   const origin = markers[0].position || markers[0];
   const destination = markers[markers.length - 1].position || markers[markers.length - 1];
   const waypoints = markers.slice(1, markers.length - 1).map(marker => ({
-      location: marker.position || marker
+    location: marker.position || marker
   }));
 
   const directionsService = new window.google.maps.DirectionsService();
 
   directionsService.route(
-      {
-          origin,
-          destination,
-          waypoints,
-          travelMode: window.google.maps.TravelMode.DRIVING,
-          // Optimize the order of waypoints
-      },
-      (result, status) => {
-          if (status === window.google.maps.DirectionsStatus.OK) {
-              const route = result.routes[0];
-              const legs = route.legs;
+    {
+      origin,
+      destination,
+      waypoints,
+      travelMode: window.google.maps.TravelMode.DRIVING,
+      // Optimize the order of waypoints
+    },
+    (result, status) => {
+      if (status === window.google.maps.DirectionsStatus.OK) {
+        const route = result.routes[0];
+        const legs = route.legs;
 
-              for (let i = 0; i < legs.length; i++) {
-                  const leg = legs[i];
-                  const polyline = new window.google.maps.Polyline({
-                      path: leg.steps.reduce((path, step) => path.concat(step.path), []),
-                      strokeColor: "#0096FF",
-                      strokeOpacity: 0.8,
-                      strokeWeight: 2,
-                  });
+        for (let i = 0; i < legs.length; i++) {
+          const leg = legs[i];
+          const polyline = new window.google.maps.Polyline({
+            path: leg.steps.reduce((path, step) => path.concat(step.path), []),
+            strokeColor: "#0096FF",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+          });
 
-                  // Extract distance and duration information from the leg
-                  const distance = leg.distance.text;
-                  const duration = leg.duration.text;
+          // Extract distance and duration information from the leg
+          const distance = leg.distance.text;
+          const duration = leg.duration.text;
 
-                  // Add distance and duration to the polyline object
-                  polyline.set("distance", distance);
-                  polyline.set("duration", duration);
+          // Add distance and duration to the polyline object
+          polyline.set("distance", distance);
+          polyline.set("duration", duration);
 
-                  newPolylines.push(polyline);
-              }
+          newPolylines.push(polyline);
+        }
 
-              setPolylines(newPolylines);
-          } else {
-              console.error(`Directions request failed due to ${status}`);
-          }
+        setPolylines(newPolylines);
+      } else {
+        console.error(`Directions request failed due to ${status}`);
       }
+    }
   );
+};
+
+
+
+export const getRoutesDetailsBetweenMarkers = async (markers) => {
+  const routesDetails = [];
+
+  if (markers.length < 2) {
+    return routesDetails;
+  }
+
+  const requests = markers.map((marker, i) => {
+    if (i < markers.length - 1) {
+      const origin = markers[i].position || markers[i];
+      const destination = markers[i + 1].position || markers[i + 1];
+
+      const directionsService = new window.google.maps.DirectionsService();
+
+      return new Promise((resolve) => {
+        directionsService.route(
+          {
+            origin,
+            destination,
+            travelMode: window.google.maps.TravelMode.DRIVING,
+          },
+          (result, status) => {
+            if (status === window.google.maps.DirectionsStatus.OK) {
+              const routeDetails = {
+                index: i + 1,
+                duration: result.routes[0].legs[0].duration.text,
+                distance: result.routes[0].legs[0].distance.text,
+              };
+              routesDetails.push(routeDetails);
+              resolve();
+            } else {
+              console.error(`Directions request failed for route ${i + 1} due to ${status}`);
+              resolve();
+            }
+          }
+        );
+      });
+    }
+  });
+
+  await Promise.all(requests);
+  return routesDetails;
+
 };
 
 // Rest of the code remains the same
@@ -193,9 +237,10 @@ export const getAddressData = async (markerId) => {
   }
 };
 
-export const getAddressesFromDatabase = async (createPinsFromAddresses) => {
-  try {
-      const response = await axios.get('http://localhost:4000/api/get-address-data');
+  
+  export const getAddressesFromDatabase = async (createPinsFromAddresses) => {
+    try {
+      const response = await api.get('/get-address-data');
       const addresses = await response.data;
       createPinsFromAddresses(addresses);
     } catch (error) {

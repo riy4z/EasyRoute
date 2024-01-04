@@ -3,6 +3,7 @@ import getCompanyID from '../components/getCompany';
 import fetchRoles from '../components/fetchRoles';
 import { RxCrossCircled } from 'react-icons/rx';
 import toast, { Toaster } from 'react-hot-toast';
+import api from '../config/api';
 
 function RolePopup(props) {
   const [roles, setRoles] = useState([]);
@@ -43,20 +44,20 @@ function RolePopup(props) {
       alert('Please enter a valid role.');
       return;
     }
-
-    
-
+  
     try {
-      const response = await fetch('http://localhost:4000/api/addRoles', {
-        method: 'POST',
+      const response = await api.post('/addRoles', {
+        Role: newRole,
+        CompanyID: companyid,
+        RoleHierarchy: roleHierarchy,
+      }, {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Role: newRole, CompanyID: companyid,RoleHierarchy:roleHierarchy}),
       });
-
-      const result = await response.json();
-
+  
+      const result = response.data;
+  
       if (result.message) {
         setRoles([...roles, result.role]);
         setNewRole('');

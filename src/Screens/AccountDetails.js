@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RxCrossCircled } from 'react-icons/rx';
-import axios from 'axios';
+import api from '../config/api';
 
 const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddress, children }) => {
 
@@ -25,7 +25,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
     if (confirmed) {
       const updatedData = { ...addressData, isHidden: true };
       
-      axios.patch(`http://localhost:4000/api/update-address-data/:${addressData._id}`, updatedData)
+      api.patch(`/update-address-data/:${addressData._id}`, updatedData)
         .then(response => {
           // Handle success, update UI or show success message
           console.log('Document marked as isHidden:');
@@ -47,7 +47,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
   
     if (newFirstName !== null && newLastName !== null) {
       const updatedData = { ...addressData, 'First Name': newFirstName, 'Last Name': newLastName };
-      axios.patch(`http://localhost:4000/api/update-address-data/${addressData._id}`, updatedData)
+      api.patch(`/update-address-data/${addressData._id}`, updatedData)
         .then(response => {
           console.log('Name updated successfully:', newFirstName, newLastName);
           // Perform additional actions as needed after successful update
@@ -85,7 +85,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
         'ZIP Code': newZIPCode,
       };
   
-      axios.patch(`http://localhost:4000/api/update-address-data/${addressData._id}`, updatedData)
+      api.patch(`/update-address-data/${addressData._id}`, updatedData)
         .then(response => {
           console.log('Address updated successfully:', updatedData);
           // Perform additional actions as needed after successful update

@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../config/api";
 import getUserID from "./getUser";
 
 const fetchUserRoute = async () => {
@@ -6,7 +6,7 @@ const fetchUserRoute = async () => {
   console.log(userid);
 
   try {
-    const response = await axios.get(`http://localhost:4000/api/getUserRoutes?userId=${userid}`);
+    const response = await api.get(`/getUserRoutes?userId=${userid}`);
     const { data } = response;
 
     console.log('Response:', data);

@@ -3,6 +3,7 @@ import getCompanyID from '../components/getCompany';
 import { RxCrossCircled } from 'react-icons/rx';
 import fetchLocations from '../components/fetchLocations';
 import toast, { Toaster } from 'react-hot-toast';
+import api from '../config/api';
 
 function LocationPopup({ closePopup }) {
   const [locations, setLocations] = useState([]);
@@ -54,19 +55,24 @@ function LocationPopup({ closePopup }) {
       alert('Please enter a valid location.');
       return;
     }
-
+  
     try {
       // Send the new location to the server to be saved
-      const response = await fetch('http://localhost:4000/api/addLocations', {
-        method: 'POST',
+      const response = await api.post('/addLocations', {
+        Location: newLocation,
+        CompanyID: companyid,
+        StreetAddress: newStreetAddress,
+        City: newCity,
+        State: newState,
+        ZipCode: newZipCode,
+      }, {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Location: newLocation, CompanyID: companyid, StreetAddress: newStreetAddress, City: newCity, State: newState, ZipCode: newZipCode }),
       });
-
-      const result = await response.json();
-
+  
+      const result = response.data;
+  
       if (result.message) {
         // If the role is added successfully, update the roles state
         setLocations([...locations, result.location]);

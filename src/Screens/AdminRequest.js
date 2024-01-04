@@ -1,6 +1,6 @@
 // src/AdminRequest.js
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../config/api';
 
 const AdminRequest = () => {
   const [formData, setFormData] = useState({
@@ -20,7 +20,7 @@ const AdminRequest = () => {
 
     try {
       // Using a relative path due to the proxy setup in package.json
-      const response = await axios.post('/api/submitForm', formData);
+      const response = await api.post('/submitForm', formData);
 
       if (response.status === 200) {
         console.log('Form data submitted successfully');

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';  
+import api from '../config/api';
 import getCompanyID from "../components/getCompany"
 import { RxCrossCircled } from 'react-icons/rx';
 import fetchLocations from '../components/fetchLocations';
 import fetchRoles from '../components/fetchRoles';
 import getRoleHierarchy from '../components/getRoleHierarchy';
 import CryptoJS from 'crypto-js';
+import config from '../config/config';
 
 function InvitePopup(props) {
   const [email, setEmail] = useState('');
@@ -34,7 +35,7 @@ function InvitePopup(props) {
   console.log(rolesFromServer);
 
   const encrypt = (text) => {
-    const key = 'ab2d644573a6637ab728f1e6399cb7c0afd557396a07108150da98d0828cec10'; 
+    const key = config.secretkey; 
     const encrypted = CryptoJS.AES.encrypt(text, key);
     return encrypted.toString();
   };
@@ -72,7 +73,7 @@ function InvitePopup(props) {
 
 
     try {
-      await axios.post('/api/registerMail', { userEmail: email, text: `<!DOCTYPE html>
+      await api.post('/registerMail', { userEmail: email, text: `<!DOCTYPE html>
       <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
   
   <head>

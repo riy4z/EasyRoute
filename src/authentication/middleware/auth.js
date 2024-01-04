@@ -1,51 +1,32 @@
+import React, { useEffect } from 'react';
+import { Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { useAuthStore } from '../store/store';
 
-import {useState,useEffect} from 'react';
-import { Navigate, useNavigate, useLocation} from "react-router-dom";
-import { useAuthStore } from "../store/store";
-import useFetch from "../hooks/fetch.hook";
+const checkAuthentication = (location, navigate) => {
+  try {
+    const isLoginPage = location.pathname === '/';
+    const hasSessionStorage = sessionStorage.getItem('userData');
 
-export const AuthorizeUser = ({children}) => {
-    const token = localStorage.getItem('token')
-
-    if(!token){
-        return <Navigate to={'/'} replace={true}></Navigate>
+    if (hasSessionStorage == null && isLoginPage) {
+      navigate('/', { replace: true });
+    } else {
+      navigate('/app');
     }
-
-    return children;
-}
-
-export const ProtectRoute = ({children}) => {
-    const username = useAuthStore.getState().auth.username;
-    if(!username){
-        return <Navigate to={'/'} replace={true}></Navigate>
-    }
-    return children;
-}
+  } catch (error) {
+    console.error('Error checking authentication:', error);
+    // Handle the error, e.g., redirect to an error page
+    navigate('/error', { replace: true });
+  }
+};
 
 export const SessionHandler = ({ children }) => {
-    const navigate = useNavigate();
-    const location = useLocation();
-  
-    useEffect(() => {
-      const checkAuthentication = () => {
-        try {
-          const isLoginPage = location.pathname === '/';
-          const hasSessionStorage = sessionStorage.getItem('userData');
-  
-          if (hasSessionStorage == null && isLoginPage) {
-            navigate('/', { replace: true });
-          } else{
-            navigate('/app')
-          }
-        } catch (error) {
-          console.error('Error checking authentication:', error);
-        }
-      };
-  
-      checkAuthentication();
-    }, [location, navigate]);
-  
-    // Render the children
-    return <>{children}</>;
-  };
-  
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    checkAuthentication(location, navigate);
+  }, [location, navigate]);
+
+  // Render the children
+  return <>{children}</>;
+};
