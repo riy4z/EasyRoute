@@ -140,7 +140,7 @@ const GMap = (props) => {
         // Update routing for all shapes
         MapFunctions.createRoutesBetweenMarkers(selectedMarkers, setPolylines);
     };
-
+console.log("m",selectedMarkers)
     const onDeleteShape = () => {
         // Remove the deleted shape and its associated polyline from the state
         setShapes((prevShapes) => prevShapes.filter((shape, index) => index !== activeShapeIndex.current));

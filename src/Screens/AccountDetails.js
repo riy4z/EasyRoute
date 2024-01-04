@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RxCrossCircled } from 'react-icons/rx';
 import axios from 'axios';
 
-const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) => {
+const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddress, children }) => {
 
   const [formData, setFormData] = useState({
     streetAddress: '',
     city: '',
   });
+
+  
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +40,65 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
         });
     }
   };
+
+  const onEditName = () => {
+    const newFirstName = prompt('Enter the new first name:');
+    const newLastName = prompt('Enter the new last name:');
+  
+    if (newFirstName !== null && newLastName !== null) {
+      const updatedData = { ...addressData, 'First Name': newFirstName, 'Last Name': newLastName };
+      axios.patch(`http://localhost:4000/api/update-address-data/${addressData._id}`, updatedData)
+        .then(response => {
+          console.log('Name updated successfully:', newFirstName, newLastName);
+          // Perform additional actions as needed after successful update
+          onUpdateAddress(updatedData);
+        })
+        .catch(error => {
+          console.error('Error updating name:', error);
+          alert('Failed to update name.');
+        });
+    }
+  };
+  
+  const onEditAddress = () => {
+    const newStreetAddress = prompt('Enter the new street address:');
+  
+    // If user cancels the prompt for newStreetAddress, exit the function
+    if (newStreetAddress === null) {
+      return;
+    }
+  
+    const newCity = prompt('Enter the new city:');
+    const newState = prompt('Enter the new state:');
+    const newZIPCode = prompt('Enter the new ZIP code:');
+  
+    if (
+      newCity !== null &&
+      newState !== null &&
+      newZIPCode !== null
+    ) {
+      const updatedData = {
+        ...addressData,
+        'Street Address': newStreetAddress,
+        'City': newCity,
+        'State': newState,
+        'ZIP Code': newZIPCode,
+      };
+  
+      axios.patch(`http://localhost:4000/api/update-address-data/${addressData._id}`, updatedData)
+        .then(response => {
+          console.log('Address updated successfully:', updatedData);
+          // Perform additional actions as needed after successful update
+          onUpdateAddress(updatedData);
+        })
+        .catch(error => {
+          console.error('Error updating address:', error);
+          alert('Failed to update address.');
+        });
+    }
+  };
+  
+  
   
   const buttonStyle="border-2 border-red-600 mt-6 w-full py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
 
@@ -64,8 +125,10 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand, children }) =
         <div className='m-2'>
           {/* Display account details */}
           <p style={{ fontSize: "14px" }}>
-            <strong style={{fontSize:20}}> {addressData['First Name']} {addressData['Last Name']}</strong> <i className="fas fa-thin fa-pencil" style={{ marginRight: 25, cursor:'pointer' }} /><br></br>
-            {addressData['Street Address']},{addressData['City']},{addressData['State'] },{addressData['ZIP Code']}</p>
+            <strong style={{fontSize:20}}> {addressData['First Name']} {addressData['Last Name']}</strong>
+            <i className="fas fa-thin fa-pencil" style={{ marginRight: 25, cursor:'pointer' }}  onClick={() => onEditName(addressData._id)}/><br></br>
+            {addressData['Street Address']}, {addressData['City']}, {addressData['State'] }-{addressData['ZIP Code']}</p>
+            <i className="fas fa-thin fa-pencil" style={{ marginRight: 25, cursor:'pointer' }}  onClick={() => onEditAddress(addressData._id)}/><br></br>
 
           
           <div>

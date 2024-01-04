@@ -254,6 +254,12 @@ handleListItemClick = (selectedAddress) => {
   });
 };
 
+updateSavedAddress = (updatedAddress) => {
+  const updatedAddresses = this.state.savedaddress.map(address => 
+    address._id === updatedAddress._id ? updatedAddress : address
+  );
+  this.setSavedAddresses(updatedAddresses);
+};
 
 renderLocationDropdown() {
   const { locations, userLocations, selectedLocation } = this.state;
@@ -403,6 +409,10 @@ renderLocationDropdown() {
             isExpanded={isAccountDetailsExpanded}
             onToggleExpand={() => this.setState({ isAccountDetailsExpanded: !isAccountDetailsExpanded })
             }
+            onUpdateAddress={(updatedAddress) => {
+              this.updateSavedAddress(updatedAddress);
+              this.setState({ selectedAddress: updatedAddress });
+            }} // Pass the callback function
             />
             )}
 
