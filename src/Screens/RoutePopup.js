@@ -19,10 +19,11 @@ function RoutePopup(props) {
   }, [props.addresses, selectedLocation]);
 
   const filteredAddresses = listAddress.filter((address) =>
-    `${address["First Name"]} ${address["Last Name"]}`
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+  address.LocationID === selectedLocation &&
+  `${address["First Name"]} ${address["Last Name"]}`
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase())
+);
 
   useEffect(() => {
     if (props.selectedAddresses && props.selectedAddresses.length > 0) {

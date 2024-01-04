@@ -4,7 +4,7 @@ import CurrentRoute from './CurrentRoute';
 import SavedRoutes from './SavedRoutes';
 import * as MapFunctions from '../components/mapFunctions';
 
-function Routes({ setAddresses, setLassoActivate, onSelectedAddresses}) {
+function Routes({ setAddresses, setLassoActivate, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation}) {
   const [addresses, setAddressess] = useState([]);
   // const [selectedAddresses, setSelectedAddresses] = useState([]);
   const [activeTab, setActiveTab] = useState('current'); // 'current' or 'saved'
@@ -19,6 +19,8 @@ function Routes({ setAddresses, setLassoActivate, onSelectedAddresses}) {
       });
     }
   }, [addresses, setAddresses]);
+
+
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -46,7 +48,13 @@ function Routes({ setAddresses, setLassoActivate, onSelectedAddresses}) {
         </li>
       </ul>
       {activeTab === 'current' ? (
-        <CurrentRoute setLassoActivate={setLassoActivate} addresses={addresses} onSelectedAddresses={handleSelectedAddresses}/>
+        <CurrentRoute 
+        setLassoActivate={setLassoActivate} 
+        addresses={addresses} 
+        onSelectedAddresses={handleSelectedAddresses} 
+        polylines={polylines}
+        onUpdateStartLocation={onUpdateStartLocation}
+        onUpdateEndLocation={onUpdateEndLocation} />
       ) : (
         <SavedRoutes />
       )}

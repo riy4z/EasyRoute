@@ -15,6 +15,8 @@ function Sidebar(props) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [{apiData}] = useFetch('');
 
+  const { polylines, onUpdateEndLocation, onUpdateStartLocation } = props
+
   const handleOptionClick = (option, addresses) => {
     setSelectedOption(option);
     setIsExpanded(true); // Expand the ExtendedScreen on option click
@@ -38,8 +40,6 @@ function Sidebar(props) {
   };
   
 
-  
-
   const renderContent = () => {
     switch (selectedOption) {
       case 'Admin':
@@ -47,7 +47,13 @@ function Sidebar(props) {
       case 'Account':
         return <Account setAddresses={props.setAddresses} />;
       case 'Route':
-        return <Routes setAddresses={props.setAddresses} setLassoActivate={handleLassoToggle} onSelectedAddresses={props.onSelectedAddresses}/>;
+        return <Routes 
+        setAddresses={props.setAddresses} 
+        setLassoActivate={handleLassoToggle} 
+        onSelectedAddresses={props.onSelectedAddresses} 
+        polylines={polylines} 
+        onUpdateStartLocation={onUpdateStartLocation}
+        onUpdateEndLocation={onUpdateEndLocation}/>;
       case 'HelpSupport':
         return <HelpSupport />;
       case 'Settings':

@@ -39,7 +39,7 @@ export default function useFetch(query) {
           if (window.location.pathname === '/app') {
             sessionStorage.setItem(storageKey, JSON.stringify(data));
           }
-
+        console.log(sessionStorage)
         setData((prev) => ({ ...prev, apiData: data, status, isLoading: false }));
       } catch (error) {
         console.error('An error occurred during data fetch:', error);

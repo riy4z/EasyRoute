@@ -18,10 +18,23 @@ const GMap = (props) => {
     const [polylines, setPolylines] = useState([]);
 
     const { isLoaded } = useJsApiLoader({
-        googleMapsApiKey: 'AIzaSyDpPEeB0tvNrcHp7IKJrFCXO1xBKqCjD_U',
+        googleMapsApiKey: 'AIzaSyCHb570UK21VsQtayMgy3X8sOFzUclZHlo',
         libraries
     });
 
+    const { onPolylinesUpdate } = props;
+
+    useEffect(() => {
+        console.log("Start Location in GMap:", props.startLocation);
+        console.log("End Location in GMap:", props.endLocation);
+        // Handle start and end location data as needed in your GMap component
+      }, [props.startLocation, props.endLocation]);
+
+    useEffect(() => {
+      onPolylinesUpdate && onPolylinesUpdate(polylines);
+    }, [polylines, onPolylinesUpdate]);
+
+    console.log(polylines)
     useEffect(() => {
         MapFunctions.getUserLocation(
             (position) => {
@@ -41,9 +54,18 @@ const GMap = (props) => {
     }, []);
 
     useEffect(() => {
-        MapFunctions.createPinsFromAddresses(props.addresses, setMarkers);
-    }, [props.addresses]);
+        if (props.startLocation) {
+            MapFunctions.createMarkerFromAddress(props.startLocation, 'startLocation', setMarkers);
+        }
 
+        if (props.endLocation) {
+            MapFunctions.createMarkerFromAddress(props.endLocation, 'endLocation', setMarkers);
+        }
+
+        MapFunctions.createPinsFromAddresses(props.addresses, setMarkers);
+    }, [props.addresses, props.startLocation, props.endLocation]);
+
+    
     const containerStyle = {
         width: '100vw',
         height: '100vh',
@@ -102,7 +124,7 @@ const GMap = (props) => {
         // Find markers inside the shape
         const markersInsideShape = markers.filter(marker => {
             let isInsideShape = false;
-
+    
             if (marker.position && marker.position.lat !== undefined && marker.position.lng !== undefined) {
                 switch (newShape.type) {
                     case 'rectangle':
@@ -111,36 +133,46 @@ const GMap = (props) => {
                             new window.google.maps.Polygon({ paths: newShape.coordinates })
                         );
                         break;
-
+    
                     case 'circle':
                         isInsideShape = window.google.maps.geometry.spherical.computeDistanceBetween(
                             new window.google.maps.LatLng(marker.position.lat, marker.position.lng),
                             new window.google.maps.LatLng(newShape.center.lat, newShape.center.lng)
                         ) <= newShape.radius;
                         break;
-
+    
                     case 'polygon':
                         isInsideShape = window.google.maps.geometry.poly.containsLocation(
                             new window.google.maps.LatLng(marker.position.lat, marker.position.lng),
                             new window.google.maps.Polygon({ paths: newShape.coordinates })
                         );
                         break;
-
+    
                     default:
                         break;
                 }
             }
-
+    
             return isInsideShape;
         });
-
+    
+        // Extract details of markers inside the lasso shape
+        const markersDetailsInLasso = markersInsideShape.map(marker => {
+            return {
+                markerId: marker.markerId,
+                position: marker.position,
+                addressData: MapFunctions.getAddressData(marker.markerId), // Implement a function to get address data based on markerId
+            };
+        });
+    
         // Update selectedMarkers state
-        setSelectedMarkers([...selectedMarkers, ...markersInsideShape]);
-
-        // Update routing for all shapes
+        setSelectedMarkers(markersDetailsInLasso);
+    
+        props.onLassoComplete(markersDetailsInLasso);
+    
         MapFunctions.createRoutesBetweenMarkers(selectedMarkers, setPolylines);
     };
-console.log("m",selectedMarkers)
+    console.log(selectedMarkers)
     const onDeleteShape = () => {
         // Remove the deleted shape and its associated polyline from the state
         setShapes((prevShapes) => prevShapes.filter((shape, index) => index !== activeShapeIndex.current));
@@ -230,11 +262,12 @@ console.log("m",selectedMarkers)
 
             // Update selectedMarkers state
             setSelectedMarkers([...selectedMarkers, ...markersInsideEditedShape]);
-
+            
             // Update routing for all shapes
             MapFunctions.createRoutesBetweenMarkers(selectedMarkers, setPolylines);
         }
     };
+    console.log(selectedMarkers)
     const handleMarkerClick = (index) => {
         fetch(`http://localhost:4000/api/get-address-data-marker?markerId=${index}`, {
           method: 'GET',
@@ -268,15 +301,34 @@ console.log("m",selectedMarkers)
         MapFunctions.createRoutesBetweenMarkers(selectedMarkers, setPolylines);
     }, [selectedMarkers]);
 
-    useEffect(() => {
-        const coordinates = props.selectAddress.map(marker => ({
-            lat: marker.latitude,
-            lng: marker.longitude
-        }));
-        console.log("HI")
-        MapFunctions.createRoutesBetweenCoordinates(coordinates, setPolylines);
-    }, [props.selectAddress]);
 
+    useEffect(() => {
+        if (props.startLocation && props.endLocation) {
+            // Extract coordinates from start and end locations
+            const origin = props.startLocation.position || {
+                lat: props.startLocation.latitude,
+                lng: props.startLocation.longitude
+            };
+    
+            const destination = props.endLocation.position || {
+                lat: props.endLocation.latitude,
+                lng: props.endLocation.longitude
+            };
+    
+            // Extract coordinates from selectAddress (waypoints)
+            const waypoints = props.selectAddress.map(address => ({
+                lat: address.latitude,
+                lng: address.longitude
+            }));
+    
+            // Create routes between markers (origin, waypoints, destination)
+            MapFunctions.createRoutesBetweenMarkers(
+                [origin, ...waypoints, destination],
+                setPolylines
+            );
+        }
+    }, [props.selectAddress, props.startLocation, props.endLocation]);
+   
     return (
         isLoaded ? (
             <div className='map-container' style={{ position: 'relative', display: "block" }}>
@@ -376,6 +428,7 @@ console.log("m",selectedMarkers)
                                 }}
                             />
                         ))}
+
                 </GoogleMap>
                 {clickedMarkers && (
           <div>

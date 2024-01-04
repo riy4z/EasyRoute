@@ -1,109 +1,78 @@
 import React, { useState, useEffect } from "react";
-import { useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { DndProvider } from 'react-dnd';
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import RoutePopup from './RoutePopup';
 import NullAddress1 from '../assets/images/NullAddress1.jpg';
 import fetchLocations from '../components/fetchLocations';
 import fetchUserLocations from '../components/fetchUserLocations';
 import getUserID from "../components/getUser";
-import * as MapFunctions from "../components/mapFunctions";
-import getCompanyID from '../components/getCompany';
-import axios from 'axios';
+import axios from "axios";
+import getCompanyID from "../components/getCompany";
 
-
-const DraggableAddress = ({ children, index, selectedAddresses, setSelectedAddresses, onReorder }) => {
+const DraggableAddress = ({ address, index, polylines }) => {
   const [routeDetails, setRouteDetails] = useState({ distance: "", duration: "" });
- 
 
   useEffect(() => {
-    const calculateRouteDetails = async () => {
-      if (index < selectedAddresses.length - 1) {
-        const origin = selectedAddresses[index];
-
-        const destination = selectedAddresses[index + 1];
-        // Exclude additional properties like _id
-        const originMarker = { position: { lat: origin.latitude, lng: origin.longitude } };
-        const destinationMarker = { position: { lat: destination.latitude, lng: destination.longitude } };
-  
-        const markers = [originMarker, destinationMarker];
-  
-        const details = await MapFunctions.getRoutesDetailsBetweenMarkers(markers);
-  
-        setRouteDetails(details[0]);
-      }
-    };
-  
-    calculateRouteDetails();
-  }, [selectedAddresses, index]);
-
-  const [{ isDragging }, drag] = useDrag({
-    type: 'ADDRESS',
-    item: { index },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  const [, drop] = useDrop({
-    accept: 'ADDRESS',
-    hover: (draggedItem) => {
-      const dragIndex = draggedItem.index;
-      const hoverIndex = index;
-
-      if (dragIndex === hoverIndex) {
-        return;
-      }
-
-      const newAddresses = [...selectedAddresses];
-      [newAddresses[dragIndex], newAddresses[hoverIndex]] = [newAddresses[hoverIndex], newAddresses[dragIndex]];
-
-      setSelectedAddresses(newAddresses);
-      onReorder(dragIndex, hoverIndex);
-    },
-  });
+    if (index < polylines.length && polylines[index]) {
+      const { distance, duration } = polylines[index];
+      setRouteDetails({ distance, duration });
+    }
+  }, [index, polylines]);
 
   return (
-    <div className={`border${isDragging ? ' opacity-50' : ''} transition-opacity duration-200 ease-in-out p-2 relative`}>
-      <div ref={(node) => drag(drop(node))} className="cursor-pointer absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <i className="fa-solid fa-grip-lines ml-52"></i>
-      </div>
-      {children}
-      <div className="mt-2 text-sm text-gray-600">
-        {index < selectedAddresses.length - 1 && (
-          <>
-            <div>Distance: {routeDetails.distance}</div>
-            <div>Duration: {routeDetails.duration}</div>
-          </>
-        )}
-      </div>
-      <hr className="my-0 border-t border-gray-300" />
-    </div>
+    <Draggable draggableId={address._id.toString()} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          className={`border${snapshot.isDragging ? ' opacity-50' : ''} transition-opacity duration-200 ease-in-out p-1 relative`}
+        >
+          {address["First Name"]} {address["Last Name"]}
+          <div className="text-sm text-gray-600">
+            {index < polylines.length && (
+              <>
+                <div>Distance: {routeDetails.distance}</div>
+                <div>Duration: {routeDetails.duration}</div>
+              </>
+            )}
+          </div>
+          <hr className="my-0 border-t border-gray-300" />
+        </div>
+      )}
+    </Draggable>
   );
 };
 
-const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses }) => {
+
+const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation}) => {
   const [isLassoActive, setIsLassoActive] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedAddresses, setSelectedAddresses] = useState([]);
   const [userLocations, setUserLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [Locations, setLocations] = useState([]);
+  const [startLocation, setStartLocation] = useState({
+    address: "",
+    city: "",
+    state: "",
+    zipCode: ""
+  });
+  const [endLocation, setEndLocation] = useState({
+    address: "",
+    city: "",
+    state: "",
+    zipCode: ""
+  });
   const companyid = getCompanyID();
-  const userid=getUserID();
-  const [routeid , setRouteId]= useState();
-  const markers = [];
+  const userid = getUserID();
   
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userId = getUserID(); // Replace with your logic to get the user ID
-
-        // Fetch user-specific locations
+        const userId = getUserID();
         const userLocationsData = await fetchUserLocations(userId);
         setUserLocations(userLocationsData);
-
-        // Fetch all locations
         const allLocations = await fetchLocations();
         setLocations(allLocations);
       } catch (error) {
@@ -114,6 +83,8 @@ const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses }) => {
     fetchData();
   }, []);
 
+  console.log(polylines)
+
   const handleLassoClick = () => {
     setIsLassoActive(!isLassoActive);
     setLassoActivate(!isLassoActive);
@@ -121,11 +92,10 @@ const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses }) => {
 
   const handleOpenPopup = () => {
     if (!selectedLocation) {
-      // Show a message or take any action to prompt the user to select a location
       alert("Please select a location before adding an account.");
       return;
     }
-  
+
     setIsPopupOpen(true);
   };
 
@@ -134,17 +104,14 @@ const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses }) => {
   };
 
   const handlePopupDone = (newlySelectedAddresses) => {
-    // Filter out duplicates based on a unique identifier (e.g., _id)
     const uniqueNewAddresses = newlySelectedAddresses.filter(
       (newAddress) => !selectedAddresses.some((existingAddress) => existingAddress._id === newAddress._id)
     );
 
-    // Remove addresses that are unchecked in the popup
     const updatedAddresses = selectedAddresses.filter(
       (existingAddress) => newlySelectedAddresses.some((newAddress) => newAddress._id === existingAddress._id)
     );
 
-    // Add newly selected addresses to the reordered list
     updatedAddresses.push(...uniqueNewAddresses);
 
     setSelectedAddresses(updatedAddresses);
@@ -152,118 +119,208 @@ const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses }) => {
     handleClosePopup();
   };
 
-  const handleAddressReorder = (dragIndex, hoverIndex) => {
+  const handleAddressReorder = (result) => {
+    if (!result.destination) return;
+
     const newAddresses = [...selectedAddresses];
-    const [draggedItem] = newAddresses.splice(dragIndex, 1);
-    newAddresses.splice(hoverIndex, 0, draggedItem);
+    const [reorderedItem] = newAddresses.splice(result.source.index, 1);
+    newAddresses.splice(result.destination.index, 0, reorderedItem);
     setSelectedAddresses(newAddresses);
   };
-
 
   useEffect(() => {
     onSelectedAddresses(selectedAddresses);
   }, [selectedAddresses]);
 
-  const handleSave = () => {
-    try{
-      const data = {
-        Route: markers.map(marker => marker.position),
-        CompanyID: companyid,
-        RouteNumber: 1,
-      };
-      axios.post('http://localhost:4000/api/saveRoute', data)
-      .then(response => {
-        // Handle the response from the backend if needed
-        setRouteId(response.data.route._id);
-        axios.post('http://localhost:4000/api/addUserRoute', {userId:userid, routeId:routeid})
-      })
-      .catch(error => {
-        // Handle errors during the request
-        console.error('Error during Axios request:', error);
-      });
-      
-  } catch (error) {
-    // Handle errors that occur within the try block
-    console.error('Error:', error);
-  }
-};
+  const promptForLocationDetails = async (type) => {
+    const userInput = await window.prompt(`Enter ${type}:`);
 
+    if (userInput !== null) {
+      // User clicked OK in the prompt
+      return userInput.trim();
+    }
 
+    // User clicked Cancel in the prompt
+    return null;
+  };
   
+ const geocode = async (location) => {
+    const { address, city, state, zipCode } = location;
+    const addressString = `${address}, ${city}, ${state}, ${zipCode}`;
 
+    try {
+      const response = await axios.get("https://maps.googleapis.com/maps/api/geocode/json", {
+        params: {
+          address: addressString,
+          key: "AIzaSyCHb570UK21VsQtayMgy3X8sOFzUclZHlo",
+        },
+      });
+
+      const { results } = response.data;
+      if (results && results.length > 0) {
+        const { lat, lng } = results[0].geometry.location;
+        return {
+          ...location,
+          latitude: lat,
+          longitude: lng,
+        };
+      } else {
+        console.error("No results found for the address.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching geocoding data:", error);
+      return null;
+    }
+  };
+
+  const handleGeocodeStartLocation = async () => {
+    const address = await promptForLocationDetails("Address");
+    const city = address !== null ? await promptForLocationDetails("City") : null;
+    const state = city !== null ? await promptForLocationDetails("State") : null;
+    const zipCode = state !== null ? await promptForLocationDetails("Zip Code") : null;
+
+    if (zipCode !== null) {
+      const newStartLocation = {
+        address: address || "",
+        city: city || "",
+        state: state || "",
+        zipCode: zipCode || "",
+        latitude: null,
+        longitude: null,
+      };
+
+      const geocodedStartLocation = await geocode(newStartLocation);
+      setStartLocation(geocodedStartLocation);
+      onUpdateStartLocation(geocodedStartLocation);
+      // setStartLocation(newStartLocation);
+      // onUpdateStartLocation(newStartLocation) // Pass the updated start location to the parent component
+    }
+  };
+
+  const handleGeocodeEndLocation = async () => {
+    const address = await promptForLocationDetails("Address");
+    const city = address !== null ? await promptForLocationDetails("City") : null;
+    const state = city !== null ? await promptForLocationDetails("State") : null;
+    const zipCode = state !== null ? await promptForLocationDetails("Zip Code") : null;
+
+    if (zipCode !== null) {
+      const newEndLocation = {
+        address: address || "",
+        city: city || "",
+        state: state || "",
+        zipCode: zipCode || "",
+        latitude: null,
+        longitude: null,
+      };
+
+      const geocodedEndLocation = await geocode(newEndLocation);
+      setEndLocation(geocodedEndLocation);
+      onUpdateEndLocation(geocodedEndLocation); // Pass the updated end location to the parent component
+      // setEndLocation(newEndLocation);
+      // onUpdateEndLocation(newEndLocation)
+    }
+  };
+ console.log(startLocation)
+ console.log(endLocation)
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div>
-        <br />
-        <select
-          id="locationDropdown"
-          onChange={(e) => setSelectedLocation(e.target.value)}
-          value={selectedLocation}
-          className="mt-2"
-        >
-          <option value="">Select a location</option>
-          {userLocations.map((userLocation) => {
-            const location = Locations.find((loc) => loc._id === userLocation.LocationID);
-            return (
-              <option key={userLocation._id} value={userLocation.LocationID}>
-                {location ? location.Location : 'Unknown Location'}
-              </option>
-            );
-          })}
-        </select>
+    <DragDropContext onDragEnd={handleAddressReorder}>
+      <Droppable droppableId="selectedAddresses">
+        {(provided) => (
+          <div {...provided.droppableProps} ref={provided.innerRef}>
+            <div>
+              <br />
+              <select
+                id="locationDropdown"
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                value={selectedLocation}
+                className="mt-2"
+              >
+                <option value="">Select a location</option>
+                {userLocations.map((userLocation) => {
+                  const location = Locations.find((loc) => loc._id === userLocation.LocationID);
+                  return (
+                    <option key={userLocation._id} value={userLocation.LocationID}>
+                      {location ? location.Location : "Unknown Location"}
+                    </option>
+                  );
+                })}
+              </select>
 
-        <button
-          onClick={handleLassoClick}
-          className={`text-white ${
-            isLassoActive ? "bg-red-500 hover:bg-red-600 focus:ring-4 focus:ring-red-300" : "bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
-          } font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none`}
-        >
-          {isLassoActive ? "Deactivate Lasso" : "Activate Lasso"}
-        </button>
+              <button
+                onClick={handleLassoClick}
+                className={`text-white ${
+                  isLassoActive
+                    ? "bg-red-500 hover:bg-red-600 focus:ring-4 focus:ring-red-300"
+                    : "bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
+                } font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none`}
+              >
+                {isLassoActive ? "Deactivate Lasso" : "Activate Lasso"}
+              </button>
 
-        <button
-          onClick={handleOpenPopup}
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-        >
-          Add Account to Route
-        </button>
+              <button
+                onClick={handleOpenPopup}
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              >
+                Add Account to Route
+              </button>
 
-        {isPopupOpen && <RoutePopup onClose={handleClosePopup} onDone={handlePopupDone} selectedAddresses={selectedAddresses} addresses={addresses} selectedLocation={selectedLocation} />}
-
-        <div className=" mt-10 no-scrollbar overflow-auto max-h-96">
-          {selectedAddresses && selectedAddresses.length > 0 ? (
-            <ul>
-              {selectedAddresses.map((address, index) => (
-                <DraggableAddress
-                  key={address._id}
-                  index={index}
+              {isPopupOpen && (
+                <RoutePopup
+                  onClose={handleClosePopup}
+                  onDone={handlePopupDone}
                   selectedAddresses={selectedAddresses}
-                  setSelectedAddresses={setSelectedAddresses}
-                  onReorder={handleAddressReorder}
-                  
-                >
-                  {address["First Name"]} {address["Last Name"]}
-                </DraggableAddress>
-              ))}
-            </ul>
-          ) : (
-            <img src={NullAddress1} className="mt-10" />
-          )}
-             <div>
-              
-<button  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-  Save</button>
-</div>
-        </div>
+                  addresses={addresses}
+                  selectedLocation={selectedLocation}
+                />
+              )}
 
-        {selectedAddresses && selectedAddresses.length > 0 && (
-          <button  onClick={handleSave} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none">
-            Optimize
-          </button>
-       
+              {/* Start Location Input */}
+              <div>
+              <label htmlFor="startLocation" className="block text-sm font-medium text-gray-700">
+                Start Location
+              </label>
+                <input 
+                placeholder="Start Location" 
+                className="mt-2 px-1 py-1 border rounded-md focus:outline-none" 
+                value={`${startLocation.address}, ${startLocation.city}, ${startLocation.state}, ${startLocation.zipCode}`} 
+                onClick={handleGeocodeStartLocation}/>
+              </div>
+
+              <div className=" mt-2 no-scrollbar overflow-auto max-h-96">
+                {selectedAddresses && selectedAddresses.length > 0 ? (
+                  <ul>
+                    {selectedAddresses.map((address, index) => (
+                      <DraggableAddress key={address._id} address={address} index={index} polylines={polylines} />
+                    ))}
+                  </ul>
+                ) : (
+                  <img src={NullAddress1} className="" />
+                )}
+              </div>
+              {/* End Location Input */}
+              <div>
+              <label htmlFor="endLocation" className=" mt-2 block text-sm font-medium text-gray-700">
+                End Location
+              </label>
+                <input 
+                placeholder="End Location" 
+                className="mt-2 px-1 py-1 border rounded-md focus:outline-none"
+                value={`${endLocation.address}, ${endLocation.city}, ${endLocation.state}, ${endLocation.zipCode}`}  
+                onClick={handleGeocodeEndLocation}/>
+              </div>
+              {polylines.length > 0 && (
+                <div className="text-sm text-gray-600 mt-2">
+                  <div>End Location Distance: {polylines[polylines.length - 1].distance}</div>
+                  <div>End Location Duration: {polylines[polylines.length - 1].duration}</div>
+                </div>
+              )}
+            </div>
+            {provided.placeholder}
+          </div>
         )}
-      </div>
-    </DndProvider>
+      </Droppable>
+    </DragDropContext>
   );
 };
 
