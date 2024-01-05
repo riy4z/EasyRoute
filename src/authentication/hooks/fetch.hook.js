@@ -1,7 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { getUsername } from '../helper/helper';
-import api from "../../config/api";
+
+axios.defaults.baseURL = process.env.REACT_APP_SERVER_DOMAIN || 'http://localhost:4000/';
 
 /** custom hook */
 export default function useFetch(query) {
@@ -11,48 +12,47 @@ export default function useFetch(query) {
     apiData: undefined,
     status: null,
     serverError: null,
-  });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setData((prev) => ({ ...prev, isLoading: true }));
+});
 
-        
-        const storedData = sessionStorage.getItem(storageKey);
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setData((prev) => ({ ...prev, isLoading: true }));
 
-        if (storedData) {
-          console.log(storageKey)
-          const parsedData = JSON.parse(storedData);
-          setData((prev) => ({ ...prev, apiData: parsedData, isLoading: false }));
-          return;
-        }
+      
+      const storedData = sessionStorage.getItem(storageKey);
 
-        const username = !query ? (await getUsername()).username : '';
-
-        const { data, status } = !query
-          ? await api.get(`/user/${username}`)
-          : await api.get(`/${query}`);
-
-        
-          if (window.location.pathname === '/app') {
-            sessionStorage.setItem(storageKey, JSON.stringify(data));
-          }
-        console.log(sessionStorage)
-        setData((prev) => ({ ...prev, apiData: data, status, isLoading: false }));
-      } catch (error) {
-        console.error('An error occurred during data fetch:', error);
-        setData((prev) => ({ ...prev, isLoading: false, serverError: error }));
+      if (storedData) {
+        console.log(storageKey)
+        const parsedData = JSON.parse(storedData);
+        setData((prev) => ({ ...prev, apiData: parsedData, isLoading: false }));
+        return;
       }
-    };
 
-    fetchData();
-  }, [query, storageKey]);
+      const username = !query ? (await getUsername()).username : '';
 
-  const clearSessionStorage = () => {
- 
-    sessionStorage.removeItem(storageKey);
+      const { data, status } = !query
+        ? await axios.get(`/api/user/${username}`)
+        : await axios.get(`/api/${query}`);
+
+      
+      sessionStorage.setItem(storageKey, JSON.stringify(data));
+
+      setData((prev) => ({ ...prev, apiData: data, status, isLoading: false }));
+    } catch (error) {
+      console.error('An error occurred during data fetch:', error);
+      setData((prev) => ({ ...prev, isLoading: false, serverError: error }));
+    }
   };
 
-  return [getData, setData, clearSessionStorage];
+  fetchData();
+}, [query, storageKey]);
+
+const clearSessionStorage = () => {
+
+  sessionStorage.removeItem(storageKey);
+};
+
+return [getData, setData, clearSessionStorage];
 }

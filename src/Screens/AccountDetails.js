@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { RxCrossCircled } from 'react-icons/rx';
 import api from '../config/api';
+import config from "../config/config";
+import axios from 'axios';
 
 const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddress, children }) => {
 
@@ -47,6 +49,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
   
     if (newFirstName !== null && newLastName !== null) {
       const updatedData = { ...addressData, 'First Name': newFirstName, 'Last Name': newLastName };
+      console.log(updatedData)
       api.patch(`/update-address-data/${addressData._id}`, updatedData)
         .then(response => {
           console.log('Name updated successfully:', newFirstName, newLastName);
@@ -60,10 +63,10 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
     }
   };
   
-  const onEditAddress = () => {
+  const onEditAddress = async () => {
     const newStreetAddress = prompt('Enter the new street address:');
   
-    // If user cancels the prompt for newStreetAddress, exit the function
+    // If the user cancels the prompt for newStreetAddress, exit the function
     if (newStreetAddress === null) {
       return;
     }
@@ -72,31 +75,55 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
     const newState = prompt('Enter the new state:');
     const newZIPCode = prompt('Enter the new ZIP code:');
   
-    if (
-      newCity !== null &&
-      newState !== null &&
-      newZIPCode !== null
-    ) {
-      const updatedData = {
-        ...addressData,
-        'Street Address': newStreetAddress,
-        'City': newCity,
-        'State': newState,
-        'ZIP Code': newZIPCode,
-      };
+    if (newCity !== null && newState !== null && newZIPCode !== null) {
+      const addressToGeocode = `${newStreetAddress}, ${newCity}, ${newState} ${newZIPCode}`;
   
-      api.patch(`/update-address-data/${addressData._id}`, updatedData)
-        .then(response => {
-          console.log('Address updated successfully:', updatedData);
-          // Perform additional actions as needed after successful update
-          onUpdateAddress(updatedData);
-        })
-        .catch(error => {
-          console.error('Error updating address:', error);
-          alert('Failed to update address.');
-        });
+      try {
+        // Use Axios for making the HTTP request
+        const response = await axios.get(
+          'https://maps.googleapis.com/maps/api/geocode/json',
+          {
+            params: {
+              address: addressToGeocode,
+              key: config.googleMapsApiKey,
+            },
+          }
+        );
+  
+        const data = response.data;
+  
+        if (data.results && data.results.length > 0) {
+          const location = data.results[0].geometry.location;
+          const updatedData = {
+            ...addressData,
+            'Street Address': newStreetAddress,
+            'City': newCity,
+            'State': newState,
+            'ZIP Code': newZIPCode,
+            'Latitude': location.lat,
+            'Longitude': location.lng,
+          };
+  
+          api.patch(`/update-address-data/${addressData._id}`, updatedData)
+            .then(response => {
+              console.log('Address updated successfully:', updatedData);
+              // Perform additional actions as needed after successful update
+              onUpdateAddress(updatedData);
+            })
+            .catch(error => {
+              console.error('Error updating address:', error);
+              alert('Failed to update address.');
+            });
+        } else {
+          alert('Geocoding failed. Please check the entered address.');
+        }
+      } catch (error) {
+        console.error('Error during geocoding:', error);
+        alert('Failed to geocode address.');
+      }
     }
   };
+  
   
   
   
