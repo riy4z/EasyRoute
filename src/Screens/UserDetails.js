@@ -1,182 +1,258 @@
-// UserDetails.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { RxCrossCircled } from 'react-icons/rx';
-import { getUsersByCompany } from '../components/getUsersByCompany';
-import getCompanyID from '../components/getCompany';
 import { getCompanyById } from '../components/getCompanyById';
-import { getRolesFromHierarchy } from '../components/getRolesFromHierarchy';
-import { getUserLocationsByUserId } from '../components/getUserLocationsByUserId';
-import fetchLocations from '../components/fetchLocations'; 
-import { MdEdit } from 'react-icons/md'; 
+import { getUserLocationsByUserId, deleteUserLocation, addUserLocation } from '../components/getUserLocationsByUserId';
+import fetchLocations from '../components/fetchLocations';
+import api from '../config/api';
 
-function UserDetails({ userName, closePopup }) {
-  const [userDetails, setUserDetails] = useState(null);
-  const [companyDetails, setCompanyDetails] = useState(null);
-  const [roleHierarchy, setRoleHierarchy] = useState(null);
-  const [role, setRole] = useState(null);
-  const [userId, setUserId] = useState(null);
-  const [userLocations, setUserLocations] = useState([]);
-  const [locationName, setLocationName] = useState(null);
-  const [companyLocations, setCompanyLocations] = useState([]);
-  const [isLocationEditMode, setLocationEditMode] = useState(false);
-  const [isRoleEditMode, setRoleEditMode] = useState(false);
-  const [roles, setRoles] = useState([]); 
+function UserDetails({ UserDetails, closePopup }) {
+  const [Roles, setRoles] = useState("");
+  const [Company, setCompany] = useState("");
+  const [Location, setLocation] = useState([]);
+  const [newLocation, setNewLocation] = useState("");
+  const [showAddLocationDropdown, setShowAddLocationDropdown] = useState(false);
+  const [availableLocations, setAvailableLocations] = useState([]);
+
+  console.log(UserDetails);
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
+    const fetchUser = async () => {
       try {
-        const companyId = getCompanyID();
-        const usersData = await getUsersByCompany(companyId);
-        const user = usersData.find((userData) => userData.firstName === userName);
+        const response = await api.get(`/getRoles?companyid=${UserDetails.CompanyID}`);
+        console.log(response.data);
 
-        if (user) {
-          const fetchedCompanyDetails = await getCompanyById(companyId);
-          setUserDetails(user);
-          setCompanyDetails(fetchedCompanyDetails);
-          setRoleHierarchy(user.RoleHierarchy);
+        const userRoleHierarchy = UserDetails.RoleHierarchy;
+        const userRole = response.data.find(role => role.RoleHierarchy === userRoleHierarchy);
 
-          const rolesFromHierarchy = await getRolesFromHierarchy(user.RoleHierarchy);
-          if (rolesFromHierarchy && rolesFromHierarchy.length > 0) {
-            setRole(rolesFromHierarchy[0].Role);
-            setRoles(rolesFromHierarchy.map((r) => r.Role)); 
-          }
-
-          setUserId(user._id);
-
-          const locations = await getUserLocationsByUserId(user._id);
-          setUserLocations(locations);
-
-          const companyLocations = await fetchLocations();
-          setCompanyLocations(companyLocations);
-
-          const userLocation = locations.length > 0 ? locations[0].LocationID : null;
-          const location = companyLocations.find((loc) => loc._id === userLocation);
-          setLocationName(location ? location.Location : 'No location found');
+        if (userRole) {
+          console.log(`User Role: ${userRole.Role}`);
+          setRoles(userRole.Role);
+        } else {
+          console.warn('User role not found in response data');
         }
       } catch (error) {
-        console.error('Error fetching user details:', error);
+        console.error('Error fetching data:', error);
+      }
+
+      const company = await getCompanyById(UserDetails.CompanyID);
+      console.log(company.CompanyName);
+      setCompany(company.CompanyName);
+
+      try {
+        const userLocations = await getUserLocationsByUserId(UserDetails._id);
+        console.log(userLocations);
+
+        if (userLocations.length > 0) {
+          const allLocations = await fetchLocations();
+          const fetchedLocations = [];
+
+          for (const userLocation of userLocations) {
+            const locationID = userLocation.LocationID;
+            const location = allLocations.find(loc => loc._id === locationID);
+
+            if (location) {
+              console.log(`Location for ${locationID}:`, location);
+              fetchedLocations.push(location);
+            } else {
+              console.warn(`Location not found for ${locationID}`);
+            }
+          }
+
+          console.log('All fetched locations:', fetchedLocations);
+          setLocation(fetchedLocations);
+        } else {
+          console.warn('User has no locations');
+        }
+      } catch (error) {
+        console.error('Error fetching user locations:', error);
       }
     };
 
-    fetchUserDetails();
-  }, [userName]);
+    fetchUser();
+  }, [UserDetails]);
+
+  useEffect(() => {
+    const fetchDropdown = async () => {
+      try {
+        const allLocations = await fetchLocations();
+        const availableLocs = allLocations.filter(loc => !Location.find(selectedLoc => selectedLoc._id === loc._id));
+        setAvailableLocations(availableLocs);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchDropdown();
+  }, [Location]);
+
+  const toggleDropdown = useCallback(() => {
+    setShowAddLocationDropdown(prevState => !prevState);
+  }, []);
+
+  const handleDropDownChange = async(value, key) => {
+    console.log('Dropdown value changed:', value);
+    await handleAddLocation(key, value);
+  };
+
+  const handleAddLocation = async (id, value) => {
+    console.log('handleAddLocation called');
+    try {
+      if (newLocation !== "" && Array.isArray(availableLocations) && availableLocations.length > 0) {
+        // Use the addUserLocation function to add the location
+        const response = await addUserLocation(UserDetails._id, id);
+        console.log('addUserLocation response:', response);
+  
+        // Update the state to reflect the addition
+        setLocation(prevLocation => [...prevLocation, { _id: id, Location: value }]);
+        setNewLocation("");
+      } else {
+        console.error(`Error: id or availableLocations is invalid.`);
+      }
+    } catch (error) {
+      console.error('Error adding location:', error);
+    }
+  };
+  
+ 
+  const handleDeleteLocation = useCallback(async (locationId) => {
+    try {
+      await deleteUserLocation(UserDetails._id, locationId);
+      const updatedLocations = Location.filter((location) => location._id !== locationId);
+      setLocation(updatedLocations);
+    } catch (error) {
+      console.error('Error deleting location:', error);
+    }
+  }, [Location, UserDetails._id]);
+
+  const buttonStyle = {
+    marginLeft: '10px',
+    cursor: 'pointer',
+  };
 
   const labelStyle = { marginBottom: '5px' };
-
-  const updateButtonClass =
-    'absolute mt-6 left-2 border-2 border-indigo-500 px-[84px] py-2 rounded-lg text-indigo-500 text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white';
 
   const deleteButtonClass =
     'absolute mt-24 left-2 border-2 border-red-500 px-[88px] py-2 rounded-lg text-red-500 text-xl shadow-sm text-center hover:bg-red-500 hover:text-white';
 
-    const handleEdit = (field) => {
-      // Only allow editing for the specified field (role or location) when roleHierarchy is 0
-      if (roleHierarchy === 0) {
-        // Implement logic to handle editing for the specified field (role or location)
-        console.log(`Editing ${field}`);
-        if (field === 'location') {
-          setLocationEditMode(true); // Enable edit mode for location
-          setRoleEditMode(false); // Disable role edit mode
-        } else if (field === 'role') {
-          setRoleEditMode(true); // Enable role edit mode
-          setLocationEditMode(false); // Disable location edit mode
-        }
+    return (
+      <div>
+        <div className="fixed top-0 right-0 bg-white text-black w-[300px] h-full p-0 z-0 transition-opacity ease-out duration-700">
+          <div style={{ backgroundColor: '#282c34', padding: 4 }}>
+            <h3 style={{ color: 'white', marginLeft: 7 }}>
+              User Details
+              <RxCrossCircled
+                size={25}
+                onClick={closePopup}
+                style={{ cursor: 'pointer', position: 'absolute', right: 12, top: 16 }}
+              />
+            </h3>
+          </div>
+          <div className="ml-2">
+            {UserDetails ? (
+              <>
+                <label style={labelStyle}>
+                  <strong>Name:</strong>
+                  <input
+                    className="border border-gray-300 p-1 rounded"
+                    type="text"
+                    value={`${UserDetails.firstName} ${UserDetails.lastName}`}
+                    readOnly
+                  />
+                </label>
+    
+                <label style={labelStyle}>
+                  <strong>Email:</strong>
+                  <input
+                    className="border border-gray-300 p-1 rounded"
+                    type="text"
+                    value={`${UserDetails.email}`}
+                    readOnly
+                  />
+                </label>
+    
+                <label style={labelStyle}>
+                  <strong>Mobile Number:</strong>
+                  <input
+                    className="border border-gray-300 p-1 rounded"
+                    type="text"
+                    value={`${UserDetails.mobile}`}
+                    readOnly
+                  />
+                </label>
+    
+                <label style={labelStyle}>
+                  <strong>Location: {' '}
+                    <button className="fa-solid fa-plus" size={15} style={{ cursor: 'pointer' }} onClick={toggleDropdown} />
+                  </strong>
+                  <div className="input-container">
+                    <ul>
+                      {Location.map(location => (
+                        <li key={location._id}>{location.Location}
+                          <button className="fa-solid fa-xmark" style={buttonStyle}
+                            onClick={() => handleDeleteLocation(location._id)}></button>
+                        </li>
+                      ))}
+                    </ul>
+                    {showAddLocationDropdown && (
+  <select
+    value={newLocation}
+    onChange={(e) => {
+      const selectedLocationValue = e.target.value;
+      const selectedLocationOption = Array.from(e.target.options).find(option => option.value === selectedLocationValue);
+
+      if (selectedLocationOption) {
+        const selectedLocationId = selectedLocationOption.getAttribute('data-id');
+        setNewLocation(selectedLocationValue); // Update the state first
+        handleDropDownChange(selectedLocationValue, selectedLocationId); // Then call the function
       } else {
-        console.log(`User with roleHierarchy ${roleHierarchy} is not allowed to edit`);
+        console.error("Error: Selected location not found.");
       }
-    };
-
-  const handleLocationChange = (event) => {
-    console.log('Selected location:', event.target.value);
-    setLocationEditMode(false);
-  };
-
-  const handleRoleChange = (event) => {
-    console.log('Selected role:', event.target.value);
-    setRoleEditMode(false);
-  };
-
-  return (
-    <div>
-      <div className="fixed top-0 right-0 bg-white text-black w-[300px] h-full p-0 z-0 transition-opacity ease-out duration-700">
-        <div style={{ backgroundColor: '#282c34', padding: 4 }}>
-          <h3 style={{ color: 'white', marginLeft: 7 }}>
-            User Details
-            <RxCrossCircled
-              size={25}
-              onClick={closePopup}
-              style={{ cursor: 'pointer', position: 'absolute', right: 12, top: 16 }}
-            />
-          </h3>
+    }}
+  >
+                        <option value="">Select a location</option>
+                        {availableLocations.map(location => (
+      <option key={location._id} value={location.Location} data-id={location._id}>
+        {location.Location}
+      </option>
+    ))}
+  </select>
+)}
+                    
+                  </div>
+                </label>
+    
+                <label style={labelStyle}>
+                  <strong>Role:</strong>
+                  <div className="input-container">
+                    <input
+                      className="border border-gray-300 p-1 rounded"
+                      type="text"
+                      value={Roles}
+                      readOnly
+                    />
+                  </div>
+                </label>
+    
+                <label style={labelStyle}>
+                  <strong>Company Name:</strong>
+                  <input
+                    className="border border-gray-300 p-1 rounded"
+                    type="text"
+                    value={Company}
+                    readOnly
+                  />
+                </label>
+    
+              </>
+            ) : (
+              <p>Loading user details...</p>
+            )}
+          </div>
+    
+          <button className={deleteButtonClass}>Delete User</button>
         </div>
-        <div className="ml-2">
-          {userDetails && companyDetails ? (
-            <>
-              <label style={labelStyle}>
-                <strong>Name:</strong>
-                <input
-                  className="border border-gray-300 p-1 rounded"
-                  type="text"
-                  value={`${userDetails.firstName} ${userDetails.lastName}`}
-                  readOnly
-                />
-              </label>
-              <label style={labelStyle}>
-  <strong>Location:</strong>
-  <div className="input-container">
-    <select
-      value={locationName || 'No location found'}
-      onChange={handleLocationChange}
-      className="border border-gray-300 p-1 rounded"
-    >
-      <option value="">{locationName || 'No location found'}</option>
-      {companyLocations.map((loc) => (
-        <option key={loc._id} value={loc.Location}>
-          {loc.Location}
-        </option>
-      ))}
-    </select>
-    <MdEdit size={20} className="edit-icon" onClick={() => handleEdit('location')} />
-  </div>
-</label>
-
-<label style={labelStyle}>
-  <strong>Role:</strong>
-  <div className="input-container">
-    <select
-      value={role || 'No role found'}
-      onChange={handleRoleChange}
-      className="border border-gray-300 p-1 rounded"
-    >
-      {roles.map((r) => (
-        <option key={r} value={r}>
-          {r}
-        </option>
-      ))}
-    </select>
-    <MdEdit size={20} className="edit-icon" onClick={() => handleEdit('role')} />
-  </div>
-</label>
-
-              <label style={labelStyle}>
-                <strong>Company Name:</strong>
-                <input
-                  className="border border-gray-300 p-1 rounded"
-                  type="text"
-                  value={companyDetails.CompanyName}
-                  readOnly
-                />
-              </label>
-            </>
-          ) : (
-            <p>Loading user details...</p>
-          )}
-        </div>
-        <button className={updateButtonClass}>Update User</button>
-        <button className={deleteButtonClass}>Delete User</button>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-export default UserDetails;
+  export default UserDetails; 

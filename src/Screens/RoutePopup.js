@@ -4,7 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { FaSearch } from 'react-icons/fa';
 
 function RoutePopup(props) {
-  const { selectedLocation } = props;
+  const { selectedLocation, lassoAddresses } = props;
   const [listAddress, setListAddress] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
@@ -40,11 +40,17 @@ function RoutePopup(props) {
   }, [props.selectedAddresses]);
 
   const handleCheckboxChange = (_id) => {
-    setSelectedAddress((prevSelected) => {
-      const updatedSelected = { ...prevSelected };
-      updatedSelected[_id] = !prevSelected[_id] || false;
-      return updatedSelected;
-    });
+    if (lassoAddresses.some(lassoAddress => lassoAddress._id === _id)) {
+      // If the address is in lassoAddresses, show an alert
+      alert("The Account is already added to the route");
+    } else {
+      // Otherwise, proceed with handling the checkbox change
+      setSelectedAddress((prevSelected) => {
+        const updatedSelected = { ...prevSelected };
+        updatedSelected[_id] = !prevSelected[_id] || false;
+        return updatedSelected;
+      });
+    }
   };
 
   const handleSelectAllChange = () => {

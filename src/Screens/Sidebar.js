@@ -15,7 +15,7 @@ function Sidebar(props) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [{apiData}] = useFetch('');
 
-  const { polylines, onUpdateEndLocation, onUpdateStartLocation } = props
+  const { polylines,handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick } = props
 
   const handleOptionClick = (option, addresses) => {
     setSelectedOption(option);
@@ -50,10 +50,14 @@ function Sidebar(props) {
         return <Routes 
         setAddresses={props.setAddresses} 
         setLassoActivate={handleLassoToggle} 
-        onSelectedAddresses={props.onSelectedAddresses} 
+        onSelectedAddresses={props.onSelectedAddresses}
         polylines={polylines} 
         onUpdateStartLocation={onUpdateStartLocation}
-        onUpdateEndLocation={onUpdateEndLocation}/>;
+        onUpdateEndLocation={onUpdateEndLocation}
+        onOptimizeClick={onOptimizeClick}
+        onCustomRouteClick={onCustomRouteClick}
+        handlePolylinesUpdate={handlePolylinesUpdate}
+        lassoComplete = {lassoComplete}/>;
       case 'HelpSupport':
         return <HelpSupport />;
       case 'Settings':

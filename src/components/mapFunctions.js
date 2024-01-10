@@ -90,35 +90,38 @@ export const createPinsFromAddresses = (addresses, setMarkers) => {
 // In mapFunctions.js
 export const createRoutesBetweenMarkers = async (markers, setPolylines) => {
   const newPolylines = [];
-
   if (markers.length < 2) {
     setPolylines(newPolylines);
     return;
   }
 
-  const origin = markers[0].position || markers[0];
-  const destination = markers[markers.length - 1].position || markers[markers.length - 1];
-  const waypoints = markers.slice(1, markers.length - 1).map(marker => ({
-    location: marker.position || marker
-  }));
+  const origin = markers[0];
+  const destination = markers[markers.length - 1];
+  const waypoints = markers.slice(1, markers.length - 1);
 
   const directionsService = new window.google.maps.DirectionsService();
 
+  // Extract coordinates from the data object
+  const extractCoordinates = (marker) => ({ lat: marker.latitude, lng: marker.longitude });
+
   directionsService.route(
     {
-      origin,
-      destination,
-      waypoints,
+      origin: extractCoordinates(origin),
+      destination: extractCoordinates(destination),
+      waypoints: waypoints.map(marker => ({ location: extractCoordinates(marker) })),
+      optimizeWaypoints: true,
       travelMode: window.google.maps.TravelMode.DRIVING,
-      // Optimize the order of waypoints
     },
     (result, status) => {
       if (status === window.google.maps.DirectionsStatus.OK) {
         const route = result.routes[0];
-        const legs = route.legs;
+        const waypointOrder = route.waypoint_order || [];
 
-        for (let i = 0; i < legs.length; i++) {
-          const leg = legs[i];
+        // Rearrange markers based on optimized waypoint order
+        const orderedMarkers = [origin, ...waypointOrder.map(index => waypoints[index]), destination];
+
+        for (let i = 0; i < route.legs.length; i++) {
+          const leg = route.legs[i];
           const polyline = new window.google.maps.Polyline({
             path: leg.steps.reduce((path, step) => path.concat(step.path), []),
             strokeColor: "#0096FF",
@@ -130,9 +133,67 @@ export const createRoutesBetweenMarkers = async (markers, setPolylines) => {
           const distance = leg.distance.text;
           const duration = leg.duration.text;
 
-          // Add distance and duration to the polyline object
+          // Add distance, duration, and position to the polyline object
           polyline.set("distance", distance);
           polyline.set("duration", duration);
+          polyline.set("addressdata", orderedMarkers[i]);
+           // Use orderedMarkers to get the corresponding marker details
+
+          newPolylines.push(polyline);
+        }
+
+        setPolylines(newPolylines);
+      } else {
+        console.error(`Directions request failed due to ${status}`);
+      }
+    }
+  );
+};
+
+export const createRoutesBetweenMarkersWithoutOptimization = async (markers, setPolylines) => {
+  const newPolylines = [];
+  if (markers.length < 2) {
+    setPolylines(newPolylines);
+    return;
+  }
+
+  const origin = markers[0];
+  const destination = markers[markers.length - 1];
+  const waypoints = markers.slice(1, markers.length - 1);
+
+  const directionsService = new window.google.maps.DirectionsService();
+
+  // Extract coordinates from the data object
+  const extractCoordinates = (marker) => ({ lat: marker.latitude, lng: marker.longitude });
+
+  directionsService.route(
+    {
+      origin: extractCoordinates(origin),
+      destination: extractCoordinates(destination),
+      waypoints: waypoints.map(marker => ({ location: extractCoordinates(marker) })),
+      travelMode: window.google.maps.TravelMode.DRIVING,
+    },
+    (result, status) => {
+      if (status === window.google.maps.DirectionsStatus.OK) {
+        const route = result.routes[0];
+
+        for (let i = 0; i < route.legs.length; i++) {
+          const leg = route.legs[i];
+          const polyline = new window.google.maps.Polyline({
+            path: leg.steps.reduce((path, step) => path.concat(step.path), []),
+            strokeColor: "#0096FF",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+          });
+
+          // Extract distance and duration information from the leg
+          const distance = leg.distance.text;
+          const duration = leg.duration.text;
+
+          // Add distance, duration, and position to the polyline object
+          polyline.set("distance", distance);
+          polyline.set("duration", duration);
+          polyline.set("addressdata", markers[i]); // Use markers directly without reordering
 
           newPolylines.push(polyline);
         }
@@ -146,53 +207,6 @@ export const createRoutesBetweenMarkers = async (markers, setPolylines) => {
 };
 
 
-
-export const getRoutesDetailsBetweenMarkers = async (markers) => {
-  const routesDetails = [];
-
-  if (markers.length < 2) {
-    return routesDetails;
-  }
-
-  const requests = markers.map((marker, i) => {
-    if (i < markers.length - 1) {
-      const origin = markers[i].position || markers[i];
-      const destination = markers[i + 1].position || markers[i + 1];
-
-      const directionsService = new window.google.maps.DirectionsService();
-
-      return new Promise((resolve) => {
-        directionsService.route(
-          {
-            origin,
-            destination,
-            travelMode: window.google.maps.TravelMode.DRIVING,
-          },
-          (result, status) => {
-            if (status === window.google.maps.DirectionsStatus.OK) {
-              const routeDetails = {
-                index: i + 1,
-                duration: result.routes[0].legs[0].duration.text,
-                distance: result.routes[0].legs[0].distance.text,
-              };
-              routesDetails.push(routeDetails);
-              resolve();
-            } else {
-              console.error(`Directions request failed for route ${i + 1} due to ${status}`);
-              resolve();
-            }
-          }
-        );
-      });
-    }
-  });
-
-  await Promise.all(requests);
-  return routesDetails;
-
-};
-
-// Rest of the code remains the same
 
 // New function that accepts an array of coordinates
 export const createRoutesBetweenCoordinates = async (coordinates, setPolylines) => {
@@ -216,26 +230,28 @@ export const createCirclePolygon = (circle) => {
 };
 
 
-export const getAddressData = async (markerId) => {
+export const getAddressDatabyMarker = async (markerId) => {
   try {
-      const response = await fetch(`http://localhost:4000/api/get-address-data?markerId=${markerId}`, {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-      });
+    const response = await fetch(`http://localhost:4000/api/get-address-data-marker?markerId=${markerId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-      if (!response.ok) {
-          throw new Error('Network response was not ok');
-      }
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
 
-      const data = await response.json();
-      return data && data.length > 0 ? data[0] : null;
+    const data = await response.json();
+
+    return data && data.length > 0 ? data[0] : null;
   } catch (error) {
-      console.error('Error fetching address data:', error);
-      return null;
+    console.error('Error fetching address data:', error);
+    return null;
   }
 };
+
 
   
   export const getAddressesFromDatabase = async (createPinsFromAddresses) => {
@@ -247,6 +263,30 @@ export const getAddressData = async (markerId) => {
       console.error('Error retrieving addresses from the database:', error);
     }
   }
+
+  export const getAddressDataByLocationID = async (locationId) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/get-address-data-locationid?LocationID=${locationId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json(); // Use response.json() instead of response.data
+  
+      console.log('Fetched address data:', data); // Log the fetched data to the console
+  
+      return data; // Return the fetched data
+    } catch (error) {
+      console.error('Error fetching address data:', error);
+      return null;
+    }
+  };
 
 
   export const createMarkerFromAddress = async (addressData, markerId, setMarkers) => {

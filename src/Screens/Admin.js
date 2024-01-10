@@ -154,7 +154,19 @@ function Admin() {
       {isInvitePopupOpen && <InvitePopup closePopup={closeInvitePopup} />}
   
       {selectedUserName && (
-        <UserDetails userName={selectedUserName} closePopup={() => setSelectedUserName(null)} />
+        <UserDetails userName={selectedUserName} 
+        UserDetails={{
+          _id:"65643d525b99a474bd4713ba",
+          username:"riy4z",
+          password:"$2b$10$6vm1h3mR6OIUXIySUI2Y6OPvKApzcGPy6wBQ5mtEIdyNI4Dt0GdTe",
+          email:"jriyazamd@gmail.com",
+          address:"haha",
+          firstName:"Riyaz",
+          lastName:"Eruma",
+          mobile:null,
+          CompanyID:"65644b1071ffc1cf2bcee6cf",
+          RoleHierarchy:0}}  
+        closePopup={() => setSelectedUserName(null)} />
       )}
     </div>
   );

@@ -4,7 +4,7 @@ import CurrentRoute from './CurrentRoute';
 import SavedRoutes from './SavedRoutes';
 import * as MapFunctions from '../components/mapFunctions';
 
-function Routes({ setAddresses, setLassoActivate, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation}) {
+function Routes({ setAddresses,handlePolylinesUpdate, setLassoActivate, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation, lassoComplete, onOptimizeClick, onCustomRouteClick}) {
   const [addresses, setAddressess] = useState([]);
   // const [selectedAddresses, setSelectedAddresses] = useState([]);
   const [activeTab, setActiveTab] = useState('current'); // 'current' or 'saved'
@@ -34,12 +34,11 @@ function Routes({ setAddresses, setLassoActivate, onSelectedAddresses, polylines
     onSelectedAddresses(selectedAddresses);
   };
 
-  
 
   return (
     <div>
       <h1 className="text-5xl font-medium text-customColor1 text-left">Route</h1>
-      <ul className="hidden text-sm font-medium text-center text-gray-500 rounded-lg shadow sm:flex dark:divide-gray-700 dark:text-gray-400 mt-4">
+      <ul className="hidden text-sm font-medium text-center text-gray-500 rounded-lg shadow sm:flex dark:divide-gray-700 dark:text-gray-400">
         <li className={`w-full ${activeTab === 'current' ? 'bg-customColor rounded-s-lg text-white' : 'hover:text-gray-700 hover:bg-gray-50 text-customColor'}`}>
           <a onClick={() => handleTabClick('current')} className="inline-block w-full p-4 border-r border-gray-200 dark:border-gray-700 rounded-s-lg focus:outline-none cursor-pointer " >Current Route</a>
         </li>
@@ -54,9 +53,15 @@ function Routes({ setAddresses, setLassoActivate, onSelectedAddresses, polylines
         onSelectedAddresses={handleSelectedAddresses} 
         polylines={polylines}
         onUpdateStartLocation={onUpdateStartLocation}
-        onUpdateEndLocation={onUpdateEndLocation} />
+        onUpdateEndLocation={onUpdateEndLocation}
+        lassoComplete={lassoComplete}
+        onOptimizeClick={onOptimizeClick}
+        onCustomRouteClick={onCustomRouteClick}
+         />
       ) : (
-        <SavedRoutes />
+        <SavedRoutes 
+        handlePolylinesUpdate={handlePolylinesUpdate}
+        />
       )}
     </div>
   );
