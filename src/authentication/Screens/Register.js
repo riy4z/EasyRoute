@@ -7,8 +7,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import convertToBase64 from '../helper/convert';
 import { registerValidation } from '../helper/validate';
 import { registerUser, generateOTPbyEmail, verifyOTPbyEmail} from '../helper/helper';
-import { getCompanyById } from '../../components/getCompanyById';
-import { getRolesFromHierarchy } from '../../components/getRolesFromHierarchy';
+import { getCompanyById } from '../../components/fetch/getCompanyById';
+import { getRolesFromHierarchy } from '../../components/fetch/getRolesFromHierarchy';
 import CryptoJS from 'crypto-js';
 import config from '../../config/config';
 
@@ -38,7 +38,6 @@ export default function Register() {
     validateOnChange: false,
     onSubmit: async (values) => {
       values = await Object.assign(values, { profile: file || '',});    
-      console.log(values)
       let registerPromise = registerUser(values);
       toast.promise(
         registerPromise.then((response) => {
@@ -125,10 +124,10 @@ const decrypt = (encryptedText) => {
   const [emailFromUrl, locationFromUrl, roleFromUrl, companyIdFromUrl] = decryptedParams.split(':');
 
   
-    console.log('Email from URL:', emailFromUrl);
-    console.log('Location from URL:', locationFromUrl);
-    console.log('Role from URL:', roleFromUrl);
-    console.log('Company ID from URL:', companyIdFromUrl);
+    // console.log('Email from URL:', emailFromUrl);
+    // console.log('Location from URL:', locationFromUrl);
+    // console.log('Role from URL:', roleFromUrl);
+    // console.log('Company ID from URL:', companyIdFromUrl);
     getCompanyById(companyIdFromUrl)
       .then((company) => {
         if (company) {
@@ -140,7 +139,6 @@ const decrypt = (encryptedText) => {
       role: roleFromUrl || '', 
       companyId: companyIdFromUrl || '',
       location: locationFromUrl || '' ,
-      companyId: company._id, 
       companyName: company.CompanyName,
     });
   } else {

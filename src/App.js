@@ -1,7 +1,7 @@
 // App.js
-import React, { useEffect, useState } from "react";
-import GMap from "./components/GMap";
-import Sidebar from "./Screens/Sidebar";
+import React, { useState } from "react";
+import GMap from "./components/map/GMap";
+import Sidebar from "./components/sidebar/Sidebar";
 
 const App = () => {
   const [addresses, setAddresses] = useState([]);
@@ -30,12 +30,11 @@ const App = () => {
 
   const handlePolylinesUpdate = (updatedPolylines) => {
     // Do whatever you need with the updated polylines data
-    // console.log(updatedPolylines)
+
     setPolylines(updatedPolylines);
   };
   const handlePolylinesSaved = (updatedPolylines) => {
     // Do whatever you need with the updated polylines data
-    // console.log(updatedPolylines)
     setSavedPolylines(updatedPolylines);
   };
 

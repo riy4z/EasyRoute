@@ -30,16 +30,13 @@ export async function getUser({username}){
 
 export async function registerUser(credentials ) {
     try {
-        console.log(credentials);
         const { data: { msg, error }, status } = await api.post(`/register`, credentials );
         
         let { username, email, location } = credentials;
-        console.log(credentials)
 
         if (status === 201) {
             await api.post('/registerMail', { username, userEmail: email });
             const userID = await api.get(`/user/${username}`)
-            console.log(userID)
             await api.post('/addUserLocation', {userId:userID.data._id, locationId:location})
         }
 

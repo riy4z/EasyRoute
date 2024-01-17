@@ -24,7 +24,6 @@ useEffect(() => {
       const storedData = sessionStorage.getItem(storageKey);
 
       if (storedData) {
-        console.log(storageKey)
         const parsedData = JSON.parse(storedData);
         setData((prev) => ({ ...prev, apiData: parsedData, isLoading: false }));
         return;
