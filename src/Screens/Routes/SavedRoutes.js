@@ -5,7 +5,7 @@ import api from "../../config/api";
 
 function SavedRoutes(props) {
   const [userRoutes, setUserRoutes] = useState([]);
-  const {handlePolylinesUpdate}=props;
+  const {handlePolylinesUpdate,onSavedRouteClick}=props;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,6 +31,7 @@ function SavedRoutes(props) {
   
     // Update the polylines state using the prop function
     handlePolylinesUpdate(route.Route);
+    onSavedRouteClick(true)
   };
   
   

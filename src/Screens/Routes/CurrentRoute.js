@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import RoutePopup from './RoutePopup';
 import NullAddress1 from '../../assets/images/NullAddress1.jpg';
@@ -14,23 +14,68 @@ import api from "../../config/api";
 
 
 const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation, lassoComplete, // New prop
-onOptimizeClick, onCustomRouteClick}) => {
+onOptimizeClick, onCustomRouteClick, onClearClick, savedRouteClick}) => {
   const [isLassoActive, setIsLassoActive] = useState(false);
   const [isOptimized,setIsOptimized] = useState(false);
   const [combinedAddresses,setCombinedAddresses] = useState([]);
   const [isOptimizeSwitchOn, setIsOptimizeSwitchOn] = useState(true);
   const [firstLatLng, setFirstLatLng] = useState({});
   const [lastLatLng, setLastLatLng] = useState({});
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedAddresses, setSelectedAddresses] = useState([]);
+  const [userLocations, setUserLocations] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [Locations, setLocations] = useState([]);
+  const [lassoAddresses, setLassoAddresses] = useState([]);
+  const [startLocation, setStartLocation] = useState({});
+  const [endLocation, setEndLocation] = useState({});
+  const companyid = getCompanyID();
+  const userid = getUserID();
 
-
+  const DraggableAddress = ({ address, index, polylines }) => {
+    const [routeDetails, setRouteDetails] = useState({ distance: "", duration: "" });
+  
+    useEffect(() => {
+      if (index < polylines.length && polylines[index]) {
+        const { distance, duration } = polylines[index];
+        setRouteDetails({ distance, duration });
+      }
+    }, [index, polylines]);
+  
+    return (
+      <Draggable draggableId={address._id ? address._id.toString() : `address-${index}`} index={index}>
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            className={`border${snapshot.isDragging ? ' opacity-50' : ''} transition-opacity duration-200 ease-in-out p-0.5 relative`}
+          >
+            {address["First Name"]} {address["Last Name"]}
+            <div className="text-sm text-gray-600">
+              {index < polylines.length && (
+                <>
+                  <div>Distance: {routeDetails.distance}</div>
+                  <div>Duration: {routeDetails.duration}</div>
+                </>
+              )}
+            </div>
+            <hr className="my-0 border-t border-gray-300" />
+          </div>
+        )}
+      </Draggable>
+    );
+  };
+  
+  
   //UseEffect to extract lat , lng from first and last item
   useEffect(() => {
   
-  if (polylines.length > 0) {
+  if (polylines.length > 0 && savedRouteClick) {
    
     const firstItemLat = polylines[0].latLngs.Ig[0].Ig[0].lat;
     const firstItemLng = polylines[0].latLngs.Ig[0].Ig[0].lng;
-    setFirstLatLng({ lat: firstItemLat, lng: firstItemLng });
+    setFirstLatLng({ lat: firstItemLat, lng: firstItemLng || {} });
 
     
     const lastItem = polylines[polylines.length - 1].latLngs.Ig[0].Ig;
@@ -38,10 +83,10 @@ onOptimizeClick, onCustomRouteClick}) => {
       const lastItemIndex = lastItem.length - 1;
       const lastItemLat = lastItem[lastItemIndex].lat;
       const lastItemLng = lastItem[lastItemIndex].lng;
-      setLastLatLng({ lat: lastItemLat, lng: lastItemLng });
+      setLastLatLng({ lat: lastItemLat, lng: lastItemLng || {} });
     }
   }
-}, [polylines]);
+}, [polylines, savedRouteClick]);
 
 //Reverse Geocoding
 useEffect(() => {
@@ -96,10 +141,14 @@ useEffect(() => {
         console.error('Error fetching address:', error);
       });
   }
-}, [firstLatLng, lastLatLng, polylines]);
+}, [firstLatLng, lastLatLng, polylines, savedRouteClick]);
 
 
   const handleOptimizeDown = () => {
+    if (!startLocation.address || !endLocation.address) {
+      alert("Enter your start and end location for directions");
+      return;
+    }
     if (isOptimizeSwitchOn) {
       // Set onOptimizeClick to true when the button is pressed only if the toggle switch is on
       onOptimizeClick(true);
@@ -127,67 +176,8 @@ useEffect(() => {
   };
 
 
-
-
-
-  const DraggableAddress = ({ address, index, polylines }) => {
-    const [routeDetails, setRouteDetails] = useState({ distance: "", duration: "" });
-  
-    useEffect(() => {
-      if (index < polylines.length && polylines[index]) {
-        const { distance, duration } = polylines[index];
-        setRouteDetails({ distance, duration });
-      }
-    }, [index, polylines]);
-  
-    return (
-      <Draggable draggableId={address._id ? address._id.toString() : `address-${index}`} index={index}>
-        {(provided, snapshot) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            className={`border${snapshot.isDragging ? ' opacity-50' : ''} transition-opacity duration-200 ease-in-out p-0.5 relative`}
-          >
-            {address["First Name"]} {address["Last Name"]}
-            <div className="text-sm text-gray-600">
-              {index < polylines.length && (
-                <>
-                  <div>Distance: {routeDetails.distance}</div>
-                  <div>Duration: {routeDetails.duration}</div>
-                </>
-              )}
-            </div>
-            <hr className="my-0 border-t border-gray-300" />
-          </div>
-        )}
-      </Draggable>
-    );
-  };
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selectedAddresses, setSelectedAddresses] = useState([]);
-  const [userLocations, setUserLocations] = useState([]);
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [Locations, setLocations] = useState([]);
-  const [lassoAddresses, setLassoAddresses] = useState([]);
-  const [startLocation, setStartLocation] = useState({
-    address: "",
-    city: "",
-    state: "",
-    zipCode: ""
-  });
-  const [endLocation, setEndLocation] = useState({
-    address: "",
-    city: "",
-    state: "",
-    zipCode: ""
-  });
-  const companyid = getCompanyID();
-  const userid = getUserID();
-  
-  
   useEffect(() => {
-    if (isOptimized) {
+    if (isOptimized && polylines) {
       const fetchAddressData = async () => {
         try {
           const slicedPolylines = await Promise.all(
@@ -220,11 +210,11 @@ useEffect(() => {
       
       fetchAddressData();
     }
-  }, [isOptimized,polylines]);
+  }, [isOptimized, polylines]);
 
 
   useEffect(() => {
-    if (polylines) {
+    if (polylines && savedRouteClick) {
       const fetchAddressData = async () => {
         try {
           const slicedPolylines = await Promise.all(
@@ -257,51 +247,33 @@ useEffect(() => {
       
       fetchAddressData();
     }
-  }, [polylines]);
+  }, [polylines, savedRouteClick, setCombinedAddresses]);
   
-
 
 // Fetch LassoAddresses by Marker
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (lassoComplete) {
-          const addresses = await Promise.all(
-            lassoComplete.map(async (item) => {
-              const addressData  = await MapFunctions.getAddressDatabyMarker(item.markerId);
-              
-              // Create a new object with the desired structure
-              return {
-                City: addressData.City,
-                CompanyID: addressData.CompanyID,
-                "First Name": addressData["First Name"],
-                "Last Name": addressData["Last Name"],
-                LocationID: addressData.LocationID,
-                State: addressData.State,
-                "Street Address": addressData["Street Address"],
-                "ZIP Code": addressData["ZIP Code"],
-                isHidden: addressData.isHidden,
-                latitude: addressData.latitude,
-                longitude: addressData.longitude,
-                markerId: item.markerId,
-                __v: addressData.__v,
-                _id: addressData._id,
-              };
-            })
-          );
-  
-          setLassoAddresses(addresses)
-          // Now you can setLassoAddresses or perform other actions with the addresses
-        } else {
-          console.log("lassoComplete is null or undefined");
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-  
-    fetchData();
-  }, [lassoComplete]);
+useEffect(() => {
+  try {
+    if (lassoComplete) {
+      Promise.all(
+        lassoComplete.map(async (item) => {
+          return {
+            ...await MapFunctions.getAddressDatabyMarker(item.markerId),
+            markerId: item.markerId,
+          };
+        })
+      ).then((addresses) => {
+        setLassoAddresses(addresses);
+        onSelectedAddresses(addresses);
+      });
+    } else {
+      console.log("lassoComplete is null or undefined");
+    }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}, [lassoComplete]);
+
+
 
 
   useEffect(() => {
@@ -369,61 +341,82 @@ useEffect(() => {
     setLassoAddresses(updatedLassoAddresses)
     setSelectedAddresses(updatedSelectedAddresses)
     // Emit the reordered addresses without modifying selectedAddresses
-    onSelectedAddresses(newAddresses);
+    // onSelectedAddresses(newAddresses);
     
   };
 
-  useEffect(() => {
-    onSelectedAddresses(selectedAddresses);
-  }, [selectedAddresses]);
+const handleGeocodeStartLocation = async (value) => {
+  try {
+    const results = value ? await geocodeByAddress(value) : [];
+    const latLng = results.length > 0 ? await getLatLng(results[0]) : {};
 
-  
-  const handleGeocodeStartLocation = async (value) => {
-    try {
-      const results = await geocodeByAddress(value);
-      const latLng = await getLatLng(results[0]);
+    const geocodedStartLocation = {
+      address: value || "",
+      latitude: latLng.lat || undefined,
+      longitude: latLng.lng || undefined,
+    };
 
-      const geocodedStartLocation = {
-        address: results[0].formatted_address,
-        latitude: latLng.lat,
-        longitude: latLng.lng
-      };
+    setStartLocation(geocodedStartLocation);
+    onUpdateStartLocation(geocodedStartLocation);
+  } catch (error) {
+    console.error('Error geocoding start location:', error);
+  }
+};
+ const handleGeocodeEndLocation = async (value) => {
+  try {
+    const results = value ? await geocodeByAddress(value) : [];
+    const latLng = results.length > 0 ? await getLatLng(results[0]) : {};
 
-      setStartLocation(geocodedStartLocation);
-      onUpdateStartLocation(geocodedStartLocation);
-    } catch (error) {
-      console.error('Error geocoding start location:', error);
-    }
-  };
+    const geocodedEndLocation = {
+      address: value || "",
+      latitude: latLng.lat || undefined,
+      longitude: latLng.lng || undefined,
+    };
 
-  const handleGeocodeEndLocation = async (value) => {
-    try {
-      const results = await geocodeByAddress(value);
-      const latLng = await getLatLng(results[0]);
-
-      const geocodedEndLocation = {
-        address: results[0].formatted_address,
-        latitude: latLng.lat,
-        longitude: latLng.lng
-      };
-
-      setEndLocation(geocodedEndLocation);
-      onUpdateEndLocation(geocodedEndLocation);
-    } catch (error) {
-      console.error('Error geocoding end location:', error);
-    }
-  };
+    setEndLocation(geocodedEndLocation);
+    onUpdateEndLocation(geocodedEndLocation);
+  } catch (error) {
+    console.error('Error geocoding end location:', error);
+  }
+};
   const handleToggleSwitch = () => {
     setIsOptimizeSwitchOn(!isOptimizeSwitchOn);
   };
-  // const combinedAddresses = lassoAddresses.length > 0 ? [...lassoAddresses, ...selectedAddresses] : selectedAddresses;
     
   useEffect(() => {
     // Set onSelectedAddresses whenever combinedAddresses is updated, but only if lassoAddresses or selectedAddresses change
     const updatedCombinedAddresses = lassoAddresses.length > 0 ? [...lassoAddresses, ...selectedAddresses] : selectedAddresses;
-    setCombinedAddresses(updatedCombinedAddresses)
     onSelectedAddresses(updatedCombinedAddresses);
+    setCombinedAddresses(updatedCombinedAddresses)
   }, [lassoAddresses, selectedAddresses]);
+
+const handleClearDown = () => {
+  setLassoAddresses([]);
+  setSelectedAddresses([]);
+  setSelectedLocation("");
+  setCombinedAddresses([]);
+  onSelectedAddresses([]);
+  onUpdateEndLocation([]);
+  onUpdateStartLocation([]);
+  handleGeocodeStartLocation("");  // Set the start location address to an empty string
+  handleGeocodeEndLocation("");
+  setIsLassoActive(false);
+  setLassoActivate(false);   // Set the end location address to an empty string
+  setStartLocation({});           // Reset the start location object
+  setEndLocation({});
+  setFirstLatLng({});
+  setLastLatLng({});
+  setIsOptimized(false);
+  setIsOptimizeSwitchOn(true);              // Reset the end location object
+  onClearClick(true);
+};
+
+const handleClearUp = () =>{
+  onClearClick(false);
+}
+
+
+
   
   const handleSave = () => {
     try {
@@ -555,7 +548,7 @@ useEffect(() => {
                   Start Location
                 </label>
                 <PlacesAutocomplete
-                  value={startLocation.address}
+                  value={startLocation.address || ""}
                   onChange={(value) => setStartLocation((prev) => ({ ...prev, address: value }))}
                   onSelect={(value) => handleGeocodeStartLocation(value)}
                 >
@@ -605,10 +598,14 @@ useEffect(() => {
              <ul>
                  {combinedAddresses && combinedAddresses.length > 0 ? (
                     combinedAddresses.map((address, index) => (
-                 <DraggableAddress key={address.markerId} address={address} index={index} polylines={polylines} />
+                 <DraggableAddress key={address._id} address={address} index={index} polylines={polylines} />
                  ))
                ) : (
-                 <img src={NullAddress1} className="" />
+                <li className="list-none">
+                {combinedAddresses.length === 0 ?  (
+                  <img src={NullAddress1} alt="No addresses" />
+                ) : null}
+              </li>
                  )}
             </ul>
 
@@ -619,7 +616,7 @@ useEffect(() => {
                   End Location
                 </label>
                 <PlacesAutocomplete   
-                  value={endLocation.address}
+                  value={endLocation.address || ""}
                   onChange={(value) => setEndLocation((prev) => ({ ...prev, address: value }))}
                   onSelect={(value) => handleGeocodeEndLocation(value)}
                 >
@@ -683,6 +680,14 @@ useEffect(() => {
                 className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
               >
                 Save
+              </button>
+              <button
+                onMouseDown={handleClearDown}
+                onMouseUp={handleClearUp}
+                onMouseLeave={handleClearUp}
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              >
+                Clear
               </button>
             </div>
             {provided.placeholder}

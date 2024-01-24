@@ -4,8 +4,9 @@ import CurrentRoute from './CurrentRoute';
 import SavedRoutes from './SavedRoutes';
 import * as MapFunctions from '../../components/map/mapFunctions';
 
-function Routes({ setAddresses,handlePolylinesUpdate, setLassoActivate, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation, lassoComplete, onOptimizeClick, onCustomRouteClick}) {
+function Routes({ setAddresses,handlePolylinesUpdate, setLassoActivate, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick,onSavedRouteClick}) {
   const [addresses, setAddressess] = useState([]);
+  const [savedRouteClick, setSavedRouteClick] = useState(false);
   // const [selectedAddresses, setSelectedAddresses] = useState([]);
   const [activeTab, setActiveTab] = useState('current'); // 'current' or 'saved'
 
@@ -33,6 +34,10 @@ function Routes({ setAddresses,handlePolylinesUpdate, setLassoActivate, onSelect
     onSelectedAddresses(selectedAddresses);
   };
 
+  const handleSavedRouteClick = (value) => {
+    setSavedRouteClick(value);
+  };
+
 
   return (
     <div>
@@ -56,10 +61,14 @@ function Routes({ setAddresses,handlePolylinesUpdate, setLassoActivate, onSelect
         lassoComplete={lassoComplete}
         onOptimizeClick={onOptimizeClick}
         onCustomRouteClick={onCustomRouteClick}
+        handlePolylinesUpdate={handlePolylinesUpdate}
+        savedRouteClick={savedRouteClick}
+        onClearClick={onClearClick}
          />
       ) : (
         <SavedRoutes 
         handlePolylinesUpdate={handlePolylinesUpdate}
+        onSavedRouteClick={handleSavedRouteClick}
         />
       )}
     </div>

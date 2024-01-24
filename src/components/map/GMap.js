@@ -9,15 +9,16 @@ const libraries = ['places', 'drawing'];
 
 const GMap = (props) => {
     const mapRef = useRef();
-    const shapeRefs = useRef([]);
-    const activeShapeIndex = useRef();
+    const polygonRefs = useRef([]);
+    const activePolygonIndex = useRef();
     const drawingManagerRef = useRef();
     const [selectedMarkers, setSelectedMarkers] = useState([]);
     const [clickedMarkers, setClickedMarkers] = useState(null);
-    const [shapes, setShapes] = useState([]);
+    const [polygons, setPolygons] = useState([]);
     const [markers, setMarkers] = useState([]);
     const [initialCenter, setInitialCenter] = useState(null);
     const [polylines, setPolylines] = useState([]);
+
     
     const { isLoaded } = useJsApiLoader({
         googleMapsApiKey: config.googleMapsApiKey,
@@ -30,6 +31,8 @@ const GMap = (props) => {
       onPolylinesUpdate && onPolylinesUpdate(polylines);
       
     }, [polylines, onPolylinesUpdate]);
+
+    
 
     useEffect(() => {
         MapFunctions.getUserLocation(
@@ -71,213 +74,206 @@ const GMap = (props) => {
     };
 
     const onOverlayComplete = async($overlayEvent) => {
+        
         drawingManagerRef.current.setDrawingMode(null);
     
-        const overlayType = $overlayEvent.type;
-        const overlay = $overlayEvent.overlay;
         let newShape;
-
-        switch (overlayType) {
-            case window.google.maps.drawing.OverlayType.RECTANGLE:
-                const bounds = overlay.getBounds();
-                newShape = {
-                    type: 'rectangle',
-                    coordinates: [
-                        { lat: bounds.getNorthEast().lat(), lng: bounds.getNorthEast().lng() },
-                        { lat: bounds.getSouthWest().lat(), lng: bounds.getNorthEast().lng() },
-                        { lat: bounds.getSouthWest().lat(), lng: bounds.getSouthWest().lng() },
-                        { lat: bounds.getNorthEast().lat(), lng: bounds.getSouthWest().lng() },
-                        { lat: bounds.getNorthEast().lat(), lng: bounds.getNorthEast().lng() }
-                    ],
-                };
-                break;
-
-            case window.google.maps.drawing.OverlayType.CIRCLE:
-                const circleCenter = overlay.getCenter();
-                const circleRadius = overlay.getRadius();
-                newShape = {
-                    type: 'circle',
-                    center: { lat: circleCenter.lat(), lng: circleCenter.lng() },
-                    radius: circleRadius,
-                };
-                break;
-
+        switch ($overlayEvent.type) {
             case window.google.maps.drawing.OverlayType.POLYGON:
-                newShape = {
-                    type: 'polygon',
-                    coordinates: overlay.getPath().getArray().map(latLng => ({ lat: latLng.lat(), lng: latLng.lng() })),
-                };
+                newShape = $overlayEvent.overlay
+                    .getPath()
+                    .getArray()
+                    .map((latLng) => new window.google.maps.LatLng(latLng.lat(), latLng.lng()));
                 break;
-
+            case window.google.maps.drawing.OverlayType.CIRCLE:
+                    const center = $overlayEvent.overlay.getCenter();
+                    const radius = $overlayEvent.overlay.getRadius();
+                    newShape = { center, radius };
+                    break;
+            case window.google.maps.drawing.OverlayType.RECTANGLE:
+                const bounds = $overlayEvent.overlay.getBounds();
+                const ne = bounds.getNorthEast();
+                const sw = bounds.getSouthWest();
+                newShape = [
+                    new window.google.maps.LatLng(ne.lat(), ne.lng()),
+                    new window.google.maps.LatLng(sw.lat(), ne.lng()),
+                    new window.google.maps.LatLng(sw.lat(), sw.lng()),
+                    new window.google.maps.LatLng(ne.lat(), sw.lng()),
+                    new window.google.maps.LatLng(ne.lat(), ne.lng()),
+                ];
+                break;
             default:
                 break;
         }
-
-        // Update shapes state
-        setShapes([...shapes, newShape]);
-
-        // Find markers inside the shape
-        const markersInsideShape = markers.filter(marker => {
-            let isInsideShape = false;
     
-            if (marker.position && marker.position.lat !== undefined && marker.position.lng !== undefined) {
-                switch (newShape.type) {
-                    case 'rectangle':
-                        isInsideShape = window.google.maps.geometry.poly.containsLocation(
-                            new window.google.maps.LatLng(marker.position.lat, marker.position.lng),
-                            new window.google.maps.Polygon({ paths: newShape.coordinates })
-                        );
-                        break;
+        if (newShape) {
+            $overlayEvent.overlay?.setMap(null);
+            setPolygons([...polygons, newShape]);
     
-                    case 'circle':
-                        isInsideShape = window.google.maps.geometry.spherical.computeDistanceBetween(
-                            new window.google.maps.LatLng(marker.position.lat, marker.position.lng),
-                            new window.google.maps.LatLng(newShape.center.lat, newShape.center.lng)
-                        ) <= newShape.radius;
-                        break;
+            // Determine markers inside the shape
+            const markersInsideShape = markers.filter((marker) => {
+                let isInside = false;
     
-                    case 'polygon':
-                        isInsideShape = window.google.maps.geometry.poly.containsLocation(
-                            new window.google.maps.LatLng(marker.position.lat, marker.position.lng),
-                            new window.google.maps.Polygon({ paths: newShape.coordinates })
-                        );
-                        break;
-    
-                    default:
-                        break;
+                if (newShape.center) {
+                    // Check if the marker is inside the circle
+                     const markerPosition = new window.google.maps.LatLng(marker.position.lat, marker.position.lng);
+                const distance = window.google.maps.geometry.spherical.computeDistanceBetween(newShape.center, markerPosition);
+                isInside = distance <= newShape.radius;
+                } else if (newShape.bounds) {
+                    // Check if the marker is inside the rectangle
+                    const markerPosition = new window.google.maps.LatLng(marker.position.lat, marker.position.lng);
+                    isInside = newShape.bounds.contains(markerPosition);
+                } else {
+                    // Check if the marker is inside the polygon
+                    const markerPosition = new window.google.maps.LatLng(marker.position.lat, marker.position.lng);
+                    isInside = window.google.maps.geometry.poly.containsLocation(markerPosition, new window.google.maps.Polygon({ paths: newShape }));
                 }
+    
+                return isInside;
+            });
+    
+            // Set the selected markers inside the shape
+            const filteredNewMarkersDetails = markersInsideShape.filter(
+                (newMarker) =>
+                    !selectedMarkers.some(
+                        (selectedMarker) => selectedMarker.markerId === newMarker.markerId
+                    ) &&
+                    !props.selectAddress.some(
+                        (selectAddr) => selectAddr.markerId === newMarker.markerId
+                    )
+            );
+    
+            if (filteredNewMarkersDetails.length === 0) {
+                // Display an alert if no new markers are added
+                alert('Account already added to route');
+                return; // Do not update state or call onLassoComplete
             }
-    
-            return isInsideShape;
-        });
-    
-        // Extract details of markers inside the lasso shape
-        const markersDetailsInLasso = markersInsideShape.map(async (marker) => {
-            return {
-                markerId: marker.markerId,
-                position: marker.position,
-                // addressData: await MapFunctions.getAddressDatabyMarker(marker.markerId),
-            };
-        });
-    
-        const newMarkersDetailsInLasso = await Promise.all(markersDetailsInLasso);
-    
-        // Check if any of the new markers are already selected based on _id
-        const filteredNewMarkersDetails = newMarkersDetailsInLasso.filter(
-            (newMarker) => !selectedMarkers.some((selectedMarker) => selectedMarker.markerId === newMarker.markerId)
-        );
-
-        if (filteredNewMarkersDetails.length === 0) {
-            // Display an alert if no new markers are added
-            alert('Account already added to route');
-            return; // Do not update state or call onLassoComplete
+        
+            // Update selectedMarkers state only with non-duplicate markers
+            const updatedSelectedMarkers = [...selectedMarkers, ...filteredNewMarkersDetails];
+            setSelectedMarkers(updatedSelectedMarkers);
+        
+            // Update props.onLassoComplete with data from all shapes
+            props.onLassoComplete(updatedSelectedMarkers);
         }
     
-        // Update selectedMarkers state only with non-duplicate markers
-        const updatedSelectedMarkers = [...selectedMarkers, ...filteredNewMarkersDetails];
-        setSelectedMarkers(updatedSelectedMarkers);
-    
-        // Update props.onLassoComplete with data from all shapes
-        props.onLassoComplete(updatedSelectedMarkers);
-    
     };
-  
 
-    const onDeleteShape = () => {
-        // Remove the deleted shape and its associated polyline from the state
-        const filtered = shapes.filter((shape, index) => index !== activeShapeIndex.current);
-        setPolylines((prevPolylines) => prevPolylines.filter((polyline, index) => index !== activeShapeIndex.current));
-        setShapes(filtered)
-        // Remove the deleted shape's reference from shapeRefs.current
-        shapeRefs.current = shapeRefs.current.filter((ref, index) => index !== activeShapeIndex.current);
+    console.log(selectedMarkers)
+
+    const onDeleteDrawing = () => {
+        // Check if the activePolygonIndex is valid
+        if (activePolygonIndex.current !== undefined && activePolygonIndex.current < polygons.length) {
+            // Get the deleted shape
+            const deletedShape = polygons[activePolygonIndex.current];
     
-        // Clear selected markers when a shape is deleted
-        setSelectedMarkers([]);
-        props.onLassoComplete([])
-        activeShapeIndex.current = null; // Reset the active shape index
+            // Filter out markers associated with the deleted shape
+            const markersToRemove = selectedMarkers.filter((marker) => {
+                let isInsideDeletedShape = false;
+    
+                if (deletedShape.center) {
+                    // Check if the marker is inside the circle
+                    const markerPosition = new window.google.maps.LatLng(marker.position.lat, marker.position.lng);
+                    const distance = window.google.maps.geometry.spherical.computeDistanceBetween(deletedShape.center, markerPosition);
+                    isInsideDeletedShape = distance <= deletedShape.radius;
+                } else if (deletedShape.bounds) {
+                    // Check if the marker is inside the rectangle
+                    const markerPosition = new window.google.maps.LatLng(marker.position.lat, marker.position.lng);
+                    isInsideDeletedShape = deletedShape.bounds.contains(markerPosition);
+                } else {
+                    // Check if the marker is inside the polygon
+                    const markerPosition = new window.google.maps.LatLng(marker.position.lat, marker.position.lng);
+                    isInsideDeletedShape = window.google.maps.geometry.poly.containsLocation(markerPosition, new window.google.maps.Polygon({ paths: deletedShape }));
+                }
+    
+                return !isInsideDeletedShape; // Keep markers outside the deleted shape
+            });
+    
+            // Update state with filtered selectedMarkers
+            setSelectedMarkers(markersToRemove);
+            props.onLassoComplete(markersToRemove)
+    
+            // Remove the deleted shape from the polygons array
+            const filteredPolygons = polygons.filter((polygon, index) => index !== activePolygonIndex.current);
+            setPolygons(filteredPolygons);
+        } else {
+            console.error("Invalid activePolygonIndex");
+        }
     };
     
+    
 
-    const isMarkerInsideShape = (marker, shape) => {
-        if (marker.position && marker.position.lat !== undefined && marker.position.lng !== undefined) {
-            switch (shape.type) {
-                case 'rectangle':
-                    return window.google.maps.geometry.poly.containsLocation(
-                        new window.google.maps.LatLng(marker.position.lat, marker.position.lng),
-                        new window.google.maps.Polygon({ paths: shape.coordinates })
+    const onEditPolygon = (index) => {
+        const polygonRef = polygonRefs.current[index];
+        if (polygonRef) {
+            const coordinates = polygonRef
+                .getPath()
+                .getArray()
+                .map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }));
+    
+            const allPolygons = [...polygons];
+            allPolygons[index] = coordinates;
+            setPolygons(allPolygons);
+    
+            // Determine markers inside the edited shape
+            const markersInsideShape = markers.filter((marker) => {
+                let isInside = false;
+    
+                if (coordinates.length > 2) {
+                    // Check if the marker is inside the polygon
+                    const markerPosition = new window.google.maps.LatLng(marker.position.lat, marker.position.lng);
+                    isInside = window.google.maps.geometry.poly.containsLocation(markerPosition, new window.google.maps.Polygon({ paths: coordinates }));
+                } else if (coordinates.length === 2) {
+                    // Check if the marker is inside the rectangle
+                    const bounds = new window.google.maps.LatLngBounds(
+                        new window.google.maps.LatLng(coordinates[0].lat, coordinates[0].lng),
+                        new window.google.maps.LatLng(coordinates[1].lat, coordinates[1].lng)
                     );
-
-                case 'circle':
-                    return window.google.maps.geometry.spherical.computeDistanceBetween(
-                        new window.google.maps.LatLng(marker.position.lat, marker.position.lng),
-                        new window.google.maps.LatLng(shape.center.lat, shape.center.lng)
-                    ) <= shape.radius;
-
-                case 'polygon':
-                    return window.google.maps.geometry.poly.containsLocation(
-                        new window.google.maps.LatLng(marker.position.lat, marker.position.lng),
-                        new window.google.maps.Polygon({ paths: shape.coordinates })
-                    );
-
-                default:
-                    return false;
+                    isInside = bounds.contains(new window.google.maps.LatLng(marker.position.lat, marker.position.lng));
+                } else if (coordinates.length === 1) {
+                    // Check if the marker is inside the circle
+                    const center = new window.google.maps.LatLng(coordinates[0].lat, coordinates[0].lng);
+                    const distance = window.google.maps.geometry.spherical.computeDistanceBetween(center, marker.position);
+                    isInside = distance <= coordinates[0].radius;
+                }
+    
+                return isInside;
+            });
+    
+            // Identify markers that were previously inside but are no longer inside the shape
+            const markersToRemove = selectedMarkers.filter((selectedMarker) => {
+                return !markersInsideShape.some((markerInsideShape) => markerInsideShape.markerId === selectedMarker.markerId);
+            });
+    
+            // Combine the existing selected markers and the newly found markers inside the shape
+            let updatedSelectedMarkers = [...selectedMarkers];
+    
+            markersInsideShape.forEach((newMarker) => {
+                if (!updatedSelectedMarkers.some((selectedMarker) => selectedMarker.markerId === newMarker.markerId)) {
+                    updatedSelectedMarkers.push(newMarker);
+                }
+            });
+    
+            // Remove markers that are no longer inside the shape
+            updatedSelectedMarkers = updatedSelectedMarkers.filter((selectedMarker) => !markersToRemove.some((markerToRemove) => markerToRemove.markerId === selectedMarker.markerId));
+    
+            if (updatedSelectedMarkers.length === selectedMarkers.length) {
+                // Display an alert if no new markers are added
+                alert('Account already added to route');
+                return; // Do not update state or call onLassoComplete
             }
-        }
-
-        return false;
-    };
-
-    const onEditShape = (index) => {
-        const shapeRef = shapeRefs.current[index];
-        if (shapeRef) {
-            let coordinates = [];
-
-            switch (shapes[index].type) {
-                case 'rectangle':
-                    const bounds = shapeRef.getBounds();
-                    coordinates = [
-                        { lat: bounds.getNorthEast().lat(), lng: bounds.getNorthEast().lng() },
-                        { lat: bounds.getSouthWest().lat(), lng: bounds.getNorthEast().lng() },
-                        { lat: bounds.getSouthWest().lat(), lng: bounds.getSouthWest().lng() },
-                        { lat: bounds.getNorthEast().lat(), lng: bounds.getSouthWest().lng() },
-                        { lat: bounds.getNorthEast().lat(), lng: bounds.getNorthEast().lng() }
-                    ];
-                    break;
-
-                case 'circle':
-                    const circleCenter = shapeRef.getCenter();
-                    const circleRadius = shapeRef.getRadius();
-                    coordinates = MapFunctions.createCirclePolygon({
-                        center: { lat: circleCenter.lat(), lng: circleCenter.lng() },
-                        radius: circleRadius
-                    });
-                    break;
-
-                case 'polygon':
-                    coordinates = shapeRef.getPath().getArray().map(latLng => ({ lat: latLng.lat(), lng: latLng.lng() }));
-                    break;
-
-                default:
-                    break;
-            }
-
-            const allShapes = [...shapes];
-            allShapes[index] = {
-                type: shapes[index].type,
-                coordinates: coordinates,
-            };
-            setShapes(allShapes);
-
-            // Find markers inside the edited shape
-            const markersInsideEditedShape = markers.filter(marker => isMarkerInsideShape(marker, shapeRef));
-
-            // Update selectedMarkers state
-            setSelectedMarkers([...selectedMarkers, ...markersInsideEditedShape]);
-          
+    
+            // Update selectedMarkers state with the combined set of markers
+            setSelectedMarkers(updatedSelectedMarkers);
+    
+            // Update props.onLassoComplete with data from all shapes
+            props.onLassoComplete(updatedSelectedMarkers);
         }
     };
-  
-   
+    
+    
+    
+    
 
     const handleMarkerClick = (index) => {
         api.get(`/get-address-data-marker?markerId=${index}`, {
@@ -294,17 +290,6 @@ const GMap = (props) => {
           });
       };
 
-    const onEditShapeMouseDown = (index) => {
-        activeShapeIndex.current = index;
-    };
-
-    const onEditShapeMouseUp = (index) => {
-        onEditShape(index);
-    };
-
-    const onEditShapeDragEnd = (index) => {
-        onEditShape(index);
-    };
 // Create a set to keep track of processed polylines
 const processedPolylines = new Set();
 let lastCoordinateInEntireArray = null;
@@ -355,9 +340,71 @@ let lastCoordinateInEntireArray = null;
         } else {
             console.warn("props.savedPolylines is undefined");
         }
-    }, [props.savedPolylines]);
+    }, [props.savedPolylines, setPolylines]);
 
-    
+    useEffect(()=> {
+        if(props.clearClick){
+            setPolylines([]);
+            setSelectedMarkers([]);
+            setPolygons([]);
+        }
+    },[props.clearClick,setPolylines,props.selectAddress,props.startLocation,props.endLocation])
+
+    const polygonOptions = {
+        fillOpacity: 0.3,
+        fillColor: '#ff0000',
+        strokeColor: '#ff0000',
+        strokeWeight: 2,
+        draggable: true,
+        editable: true,
+    };
+
+    const circleOptions = {
+        fillColor: '#00ff00',
+        fillOpacity: 0.3,
+        strokeColor: '#00ff00',
+        strokeWeight: 2,
+        draggable: true,
+        editable: true,
+    };
+
+    const rectangleOptions = {
+        fillColor: '#0000ff',
+        fillOpacity: 0.3,
+        strokeColor: '#0000ff',
+        strokeWeight: 2,
+        draggable: true,
+        editable: true,
+    };
+
+    const drawingManagerOptions = {
+        polygonOptions: polygonOptions,
+        circleOptions: circleOptions,
+        rectangleOptions: rectangleOptions,
+        drawingControl: true,
+        drawingControlOptions: {
+            position: window.google?.maps?.ControlPosition?.TOP_CENTER,
+            drawingModes: [
+                window.google?.maps?.drawing?.OverlayType?.POLYGON,
+                window.google?.maps?.drawing?.OverlayType?.CIRCLE,
+                window.google?.maps?.drawing?.OverlayType?.RECTANGLE,
+            ],
+        },
+    };
+
+    const onLoadPolygon = (polygon, index) => {
+        polygonRefs.current[index] = polygon;
+    };
+
+    const onClickPolygon = (index) => {
+        activePolygonIndex.current = index;
+    };
+
+    const onLoadDrawingManager = (drawingManager) => {
+        drawingManagerRef.current = drawingManager;
+    };
+
+
     return (
         isLoaded ? (
             <div className='map-container' style={{ position: 'relative', display: "block" }}>
@@ -369,78 +416,66 @@ let lastCoordinateInEntireArray = null;
                     options={{
                         streetViewControl: false,
                         mapTypeControl: false,
-                        zoomControl: false,
                         fullscreenControl: false,
                     }}
                 >
                     {props.LassoActive && (
                         <div className="grid">
                             <DrawingManager
-                                onLoad={(drawingManager) => (drawingManagerRef.current = drawingManager)}
+                                onLoad={onLoadDrawingManager}
                                 onOverlayComplete={onOverlayComplete}
-                                options={{
-                                    drawingControl: true,
-                                    drawingControlOptions: {
-                                        position: window.google?.maps?.ControlPosition?.TOP_CENTER,
-                                        drawingModes: [
-                                            window.google?.maps?.drawing?.OverlayType?.POLYGON,
-                                            window.google?.maps?.drawing?.OverlayType?.CIRCLE,
-                                            window.google?.maps?.drawing?.OverlayType?.RECTANGLE,
-                                        ]
-                                    }
-                                }}
+                                options={drawingManagerOptions}
                             />
-                            <span
-                                onClick={onDeleteShape}
-                                title='Delete shape'
+                            {drawingManagerRef.current && (
+                            <div
+                                onClick={onDeleteDrawing} title='Delete shape'
                                 style={{ cursor: 'pointer', height: '24px', width: '24px', marginTop: '5px', backgroundColor: '#fff', zIndex: 99999, left: "930px", position: "relative" }}
-                            ></span>
+                            ></div>
+                            )}
                         </div>
                     )}
 
-                    {shapes.map((shape, index) => {
-                        switch (shape.type) {
-                            case 'rectangle':
-                                return (
-                                    <Rectangle
-                                        key={index}
-                                        ref={(ref) => shapeRefs.current[index] = ref}
-                                        onMouseDown={() => onEditShapeMouseDown(index)}
-                                        onMouseUp={() => onEditShapeMouseUp(index)}
-                                        onDragEnd={() => onEditShapeDragEnd(index)}
-                                        options={{ ...shape, draggable: true, editable: false }}
-                                    />
-                                );
-
-                            case 'circle':
-                                return (
-                                    <Circle
-                                        key={index}
-                                        ref={(ref) => shapeRefs.current[index] = ref}
-                                        onMouseDown={() => onEditShapeMouseDown(index)}
-                                        onMouseUp={() => onEditShapeMouseUp(index)}
-                                        onDragEnd={() => onEditShapeDragEnd(index)}
-                                        options={{ ...shape, draggable: true, editable: false }}
-                                    />
-                                );
-
-                            case 'polygon':
-                                return (
-                                    <Polygon
-                                        key={index}
-                                        ref={(ref) => shapeRefs.current[index] = ref}
-                                        onMouseDown={() => onEditShapeMouseDown(index)}
-                                        onMouseUp={() => onEditShapeMouseUp(index)}
-                                        onDragEnd={() => onEditShapeDragEnd(index)}
-                                        options={{ ...shape, draggable: true, editable: false }}
-                                    />
-                                );
-
-                            default:
-                                return null;
+{polygons.map((shape, index) => {
+                        if (shape.center) {
+                            // Render Circle
+                            return (
+                                <Circle
+                                    key={index}
+                                    center={shape.center}
+                                    radius={shape.radius}
+                                    options={circleOptions}
+                                    draggable
+                                    editable
+                                />
+                            );
+                        } else if (shape.bounds) {
+                            // Render Rectangle
+                            return (
+                                <Rectangle
+                                    key={index}
+                                    bounds={shape.bounds}
+                                    options={rectangleOptions}
+                                    draggable
+                                    editable
+                                />
+                            );
+                        } else {
+                            // Render Polygon
+                            return (
+                                <Polygon
+                                    key={index}
+                                    onLoad={(event) => onLoadPolygon(event, index)}
+                                    onMouseDown={() => onClickPolygon(index)}
+                                    onMouseUp={() => onEditPolygon(index)}
+                                    onDragEnd={() => onEditPolygon(index)}
+                                    options={polygonOptions}
+                                    paths={shape}
+                                    draggable
+                                    editable
+                                />
+                            );
                         }
                     })}
-
                     {markers.map((marker, index) => (
                         <Marker key={marker.markerId} position={marker.position} name={`Marker ${index}`} onClick={() => handleMarkerClick(marker.markerId)} />
                     ))}
