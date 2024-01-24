@@ -14,7 +14,7 @@ import api from "../../config/api";
 
 
 const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation, lassoComplete, // New prop
-onOptimizeClick, onCustomRouteClick, onClearClick, savedRouteClick}) => {
+onOptimizeClick, onCustomRouteClick, onClearClick, savedRouteClick, selectedLocation}) => {
   const [isLassoActive, setIsLassoActive] = useState(false);
   const [isOptimized,setIsOptimized] = useState(false);
   const [combinedAddresses,setCombinedAddresses] = useState([]);
@@ -23,15 +23,11 @@ onOptimizeClick, onCustomRouteClick, onClearClick, savedRouteClick}) => {
   const [lastLatLng, setLastLatLng] = useState({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedAddresses, setSelectedAddresses] = useState([]);
-  const [userLocations, setUserLocations] = useState([]);
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [Locations, setLocations] = useState([]);
   const [lassoAddresses, setLassoAddresses] = useState([]);
   const [startLocation, setStartLocation] = useState({});
   const [endLocation, setEndLocation] = useState({});
   const companyid = getCompanyID();
   const userid = getUserID();
-
   const DraggableAddress = ({ address, index, polylines }) => {
     const [routeDetails, setRouteDetails] = useState({ distance: "", duration: "" });
   
@@ -49,18 +45,18 @@ onOptimizeClick, onCustomRouteClick, onClearClick, savedRouteClick}) => {
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            className={`border${snapshot.isDragging ? ' opacity-50' : ''} transition-opacity duration-200 ease-in-out p-0.5 relative`}
+            className={`border${snapshot.isDragging ? ' opacity-50' : ''} transition-opacity duration-200 ease-in-out px-0.5 py-1 relative text-sm font-medium rounded-md mt-1`}
           >
-            {address["First Name"]} {address["Last Name"]}
-            <div className="text-sm text-gray-600">
+            <div className="pl-2">
+            {address["First Name"]} {address["Last Name"]}</div>
+              <hr className="ml-2 border-t border-gray-200 w-11/12" />
+            <div className="text-xs pl-2 text-gray-600 font-normal">
               {index < polylines.length && (
                 <>
-                  <div>Distance: {routeDetails.distance}</div>
-                  <div>Duration: {routeDetails.duration}</div>
+ {routeDetails.distance} - {routeDetails.duration}
                 </>
               )}
             </div>
-            <hr className="my-0 border-t border-gray-300" />
           </div>
         )}
       </Draggable>
@@ -276,23 +272,6 @@ useEffect(() => {
 
 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userId = getUserID();
-        const userLocationsData = await fetchUserLocations(userId);
-        setUserLocations(userLocationsData);
-        const allLocations = await fetchLocations();
-        setLocations(allLocations);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-
   const handleLassoClick = () => {
     setIsLassoActive(!isLassoActive);
     setLassoActivate(!isLassoActive);
@@ -393,7 +372,6 @@ const handleGeocodeStartLocation = async (value) => {
 const handleClearDown = () => {
   setLassoAddresses([]);
   setSelectedAddresses([]);
-  setSelectedLocation("");
   setCombinedAddresses([]);
   onSelectedAddresses([]);
   onUpdateEndLocation([]);
@@ -479,24 +457,8 @@ const handleClearUp = () =>{
         {(provided) => (
           <div {...provided.droppableProps} ref={provided.innerRef}>
             <div>
-              <br />
-              <select
-                id="locationDropdown"
-                onChange={(e) => setSelectedLocation(e.target.value)}
-                value={selectedLocation}
-                
-              >
-                <option value="">Select a location</option>
-                {userLocations.map((userLocation) => {
-                  const location = Locations.find((loc) => loc._id === userLocation.LocationID);
-                  return (
-                    <option key={userLocation._id} value={userLocation.LocationID}>
-                      {location ? location.Location : "Unknown Location"}
-                    </option>
-                  );
-                })}
-              </select>
-              <div className="flex items-center">
+
+              <div className="flex items-center mt-4">
         <label style={{ position: "relative", display: "inline-block", width: "60px", height: "34px" }} className="switch-toggle">
           <input
             type="checkbox"
@@ -509,7 +471,7 @@ const handleClearUp = () =>{
           <div style={{ position: "absolute", cursor: "pointer", top: 2, left: 2, right: 2, bottom: 2, backgroundColor: isOptimizeSwitchOn ? "#4CAF50" : "#BDBDBD", borderRadius: "17px", transition: "background-color 0.3s" }}></div>
           <div style={{ position: "absolute", content: "", height: "22px", width: "22px", left: "6px", bottom: "6px", backgroundColor: "#FFFFFF", borderRadius: "50%", transition: "transform 0.3s", transform: isOptimizeSwitchOn ? "translateX(26px)" : "translateX(0)" }}></div>
         </label>
-        <span className="text-sm text-gray-600 ml-2">{isOptimizeSwitchOn ? "Optimized Route" : "Custom Route"}</span>
+        <span className="text-sm font-medium text-gray-600 ml-2">{isOptimizeSwitchOn ? "Optimized Route" : "Custom Route"}</span>
       </div>
 
 
@@ -544,7 +506,7 @@ const handleClearUp = () =>{
 
               {/* Start Location Input */}
               <div>
-                <label htmlFor="startLocation" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="startLocation" className="block ml-1 text-sm font-medium text-gray-700">
                   Start Location
                 </label>
                 <PlacesAutocomplete
@@ -556,14 +518,14 @@ const handleClearUp = () =>{
                     <div className="relative">
                       <input
                         {...getInputProps({
-                          placeholder: 'Start Location',
-                          className: 'px-1 py-0.5 border rounded-md focus:outline-none',
+                          placeholder: 'Enter Start Location',
+                          className: 'w-full px-1 py-2 border text-sm text-left font-medium rounded-md focus:outline-none',
                         })}
                       />
                       <div
                         className="absolute top-14 left-0 z-50 w-full max-h-72 overflow-y-auto bg-white rounded-md shadow-md"
                       >
-                        {loading && <div>Loading...</div>}
+                        {loading && <div className="text-lg">Loading...</div>}
                         {suggestions.length > 0 && (
                           <ul
                           className="p-0 m-0 list-none"
@@ -572,7 +534,7 @@ const handleClearUp = () =>{
                               <li
                                 key={index}
                                 {...getSuggestionItemProps(suggestion, {
-                                  className : "p-0.5 border-b border-gray-300 cursor-pointer",
+                                  className : "p-0.5 border-b text-sm border-gray-300 cursor-pointer",
                                 })}
                               >
                                 <div
@@ -596,9 +558,13 @@ const handleClearUp = () =>{
               <div className=" mt-2 no-scrollbar overflow-auto max-h-72">
 
              <ul>
+             <span  className="block mt-0 ml-1 text-sm font-medium text-gray-700">
+                  Accounts
+                </span>
                  {combinedAddresses && combinedAddresses.length > 0 ? (
                     combinedAddresses.map((address, index) => (
-                 <DraggableAddress key={address._id} address={address} index={index} polylines={polylines} />
+                 <
+                  DraggableAddress key={address._id} address={address} index={index} polylines={polylines} className="bg-blue-500 p-4 rounded-lg shadow-md mb-4"/>
                  ))
                ) : (
                 <li className="list-none">
@@ -612,7 +578,7 @@ const handleClearUp = () =>{
           </div>
               {/* End Location Input */}
               <div>
-                <label htmlFor="endLocation" className="mt-1 block text-sm font-medium text-gray-700">
+                <label htmlFor="endLocation" className="mt-1 ml-1 block text-sm font-medium text-gray-700">
                   End Location
                 </label>
                 <PlacesAutocomplete   
@@ -625,13 +591,13 @@ const handleClearUp = () =>{
                       <input
                         {...getInputProps({
                           placeholder: 'End Location',
-                          className: 'px-1 py-0.5 border rounded-md focus:outline-none',
+                          className: 'w-full px-1 py-2 border font-medium text-sm text-left rounded-md focus:outline-none',
                         })}
                       />
                       <div
                         className="absolute bottom-14 left-0 z-50 w-full max-h-72 overflow-y-auto bg-white rounded-md shadow-md"
                       >
-                        {loading && <div>Loading...</div>}
+                        {loading && <div className="text-lg">Loading...</div>}
                         {suggestions.length > 0 && (
                           <ul
                           className="p-0 m-0 list-none"
@@ -640,7 +606,7 @@ const handleClearUp = () =>{
                               <li
                                 key={index}
                                 {...getSuggestionItemProps(suggestion, {
-                                  className : "p-0.5 border-b border-gray-300 cursor-pointer",
+                                  className : "p-0.5 border-b text-sm border-gray-300 cursor-pointer",
                                 })}
                               >
                                 <div
@@ -662,9 +628,8 @@ const handleClearUp = () =>{
 
 
               {polylines.length > 0 && (
-                <div className="text-sm text-gray-600 mt-1">
-                  <div>End Location Distance: {polylines[polylines.length - 1].distance}</div>
-                  <div>End Location Duration: {polylines[polylines.length - 1].duration}</div>
+                <div className="text-xs pl-2 text-gray-600 ">
+                  {polylines[polylines.length - 1].distance} - {polylines[polylines.length - 1].duration}
                 </div>
               )}
               <button

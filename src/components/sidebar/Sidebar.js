@@ -9,12 +9,20 @@ import Profile from '../../Screens/Profile/Profile';
 import Admin from '../../Screens/Admin/Admin';
 import useFetch from '../../authentication/hooks/fetch.hook';
 import FollowUp from "../../Screens/Followup/FollowUp";
+import fetchUserLocations from '../fetch/fetchUserLocations';
+import fetchLocations from '../fetch/fetchLocations';
+import getUserID from '../fetch/getUser';
+
 
 function Sidebar(props) {
   const [selectedOption, setSelectedOption] = useState(null); 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState('')
+  const [Locations, setLocations] = useState([]);
   const [{apiData}] = useFetch('');
-
+  const [userLocations, setUserLocations] = useState([]);
+  // const userlocation = fetchUserLocations();
+  // console.log(userlocation)
   const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick} = props
 
   const handleOptionClick = (option, addresses) => {
@@ -46,7 +54,7 @@ function Sidebar(props) {
       case 'Admin':
         return <Admin />;
       case 'Account':
-        return <Account setAddresses={props.setAddresses} />;
+        return <Account setAddresses={props.setAddresses} selectedLocation={selectedLocation}/>;
       case 'Route':
         return <Routes 
         setAddresses={props.setAddresses} 
@@ -58,6 +66,7 @@ function Sidebar(props) {
         onOptimizeClick={onOptimizeClick}
         onCustomRouteClick={onCustomRouteClick}
         onClearClick={onClearClick}
+        selectedLocation={selectedLocation}
         handlePolylinesUpdate={handlePolylinesUpdate}
         lassoComplete = {lassoComplete}/>;
       case 'HelpSupport':
@@ -73,7 +82,7 @@ function Sidebar(props) {
     }
   };
 
-  const optionStyle = "p-3 cursor-pointer"
+  const optionStyle = "p-3 cursor-pointer hover:bg-gray-50 hover:bg-opacity-5 hover:rounded-lg"
 
 
   const selectedOptionStyle = "p-3 cursor-pointer bg-gray-100 bg-opacity-25 rounded-lg"
@@ -81,6 +90,22 @@ function Sidebar(props) {
 
   const isAdmin = apiData?.RoleHierarchy;
  
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userId = getUserID();
+        const userLocationsData = await fetchUserLocations(userId);
+        setUserLocations(userLocationsData);
+        const allLocations = await fetchLocations();
+        setLocations(allLocations);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Constant to determine whether to display the Admin option
   const shouldDisplayAdmin = isAdmin;
@@ -90,6 +115,28 @@ function Sidebar(props) {
 
     >
       <h2 className="text-white text-5xl font-bold leading-loose">EasyRoute</h2>
+
+      <select
+      className="text-white bg-customColor  rounded-lg text-xl px-12 p-3 text-center inline-flex border border-gray-100 border-opacity-25 mb-2 focus:outline-none"
+      id="locationDropdown"
+      onChange={(e) => setSelectedLocation(e.target.value)}
+      value={selectedLocation}
+    >
+      <option value="" disabled className="text-gray-500 px-5 hover:bg-gray-100 p-3 text-xl bg-gray-700  inline-flex text-left">Select Location</option>
+      {userLocations.map((userLocation) => {
+        const location = Locations.find((loc) => loc._id === userLocation.LocationID);
+        return (
+          <option
+            key={userLocation._id}
+            value={userLocation.LocationID}
+            className="text-white block  hover:bg-gray-100 text-left text-xl bg-gray-700  inline-flex items-center "
+          >
+            {location ? location.Location : ""}
+          </option>
+        );
+      })}
+    </select>
+
 
       {(shouldDisplayAdmin === 0 || shouldDisplayAdmin === 1) && (
         <p

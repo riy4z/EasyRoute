@@ -259,6 +259,17 @@ export const getAddressDatabyMarker = async (markerId) => {
     }
   }
 
+  export const getAddressesFromDatabaseByLocation = async (createPinsFromAddresses,Location) => {
+    try {
+      console.log(Location)
+      const response = await api.get(`/get-address-data-locationid/${Location}`);
+      const addresses = await response.data;
+      createPinsFromAddresses(addresses);
+    } catch (error) {
+      console.error('Error retrieving addresses from the database:', error);
+    }
+  }
+
 
 
 

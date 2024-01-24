@@ -2,8 +2,6 @@ import React from "react";
 import handleFileUpload from "../../components/csv/handleFileUpload";
 import Popup from "./Popup";
 import AccountDetails from "./AccountDetails";
-import fetchLocations from '../../components/fetch/fetchLocations';
-import fetchUserLocations from '../../components/fetch/fetchUserLocations';
 import getCompanyID from "../../components/fetch/getCompany";
 import getUserID from "../../components/fetch/getUser";
 import toast, { Toaster } from 'react-hot-toast';
@@ -16,14 +14,12 @@ class Account extends React.Component {
       isPopupOpen: false,
       isOverlayVisible: false,
       selectedAddress: null, 
-      locations: [],
-      userLocations: [],
       savedaddress: [],
       companyId:'',
       userId:'',
       searchInput: "", // State variable to store the search input
       isAccountDetailsExpanded: false,
-      selectedLocation: '',
+      selectedLocation : props.selectedLocation
     };
   }
 
@@ -67,10 +63,19 @@ class Account extends React.Component {
 
   // Automatically fetch address data when the component mounts
   componentDidMount() {
-    this.fetchLocationData();
     this.fetchCompanyID();
     this.fetchAddressData();
     this.fetchUserID();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.selectedLocation !== prevProps.selectedLocation) {
+      // Selected location from props has changed
+      this.setState({ selectedLocation: this.props.selectedLocation }, () => {
+        // Fetch address data based on the new selected location
+        this.fetchAddressData();
+      });
+    }
   }
 
   fetchCompanyID = async () => {
@@ -96,20 +101,7 @@ class Account extends React.Component {
     }
   }
 
-  fetchLocationData = async () => {
-    try {
-      const locationsData = await fetchLocations();
-      const userLocationsData = await fetchUserLocations();
-      this.setState({
-        locations: locationsData,
-        userLocations: userLocationsData,
 
-      });
-    } catch (error) {
-      console.error('Error fetching location data:', error);
-      // Handle error as needed
-    }
-  };
 
   handleFileSelect = () => {
     if (this.state.selectedLocation) {
@@ -261,35 +253,6 @@ updateSavedAddress = (updatedAddress) => {
   this.setSavedAddresses(updatedAddresses);
 };
 
-renderLocationDropdown() {
-  const { locations, userLocations, selectedLocation } = this.state;
-  const locationdropdownstyle = "mt-20"
-  return (
-    <select
-      id="locationDropdown"
-      value={selectedLocation}
-      onChange={(e) => this.setState({ selectedLocation: e.target.value })}
-      className = {locationdropdownstyle}
-    >
-      <option value="">Select a location</option>
-      {Array.isArray(userLocations) && userLocations.length > 0 ? (
-        userLocations.map((userLocation) => {
-          const location = locations.find(loc => loc._id === userLocation.LocationID);
-          return (
-            <option key={userLocation._id} value={userLocation.LocationID}>
-              {location ? location.Location : 'Unknown Location'}
-            </option>
-          );
-        })
-      ) : (
-        <option value="" disabled>
-          No locations available
-        </option>
-      )}
-    </select>
-  );
-}
-
 
   render() {
     const { savedaddress, searchInput, selectedAddress, isAccountDetailsExpanded, selectedLocation } = this.state;
@@ -314,14 +277,14 @@ renderLocationDropdown() {
 
    
 
-    const buttonStyle = "cursor-pointer bg-blue-600 rounded-lg px-14 py-1.5 text-white font-medium absolute text-xl top-32"
+    const buttonStyle = "cursor-pointer bg-blue-700 hover:bg-blue-800 w-11/12 rounded-lg px-8 py-1.5 text-white font-medium absolute text-xl mt-3"
 
 
     const buttonStyle1 = "cursor-pointer bg-customColor1 rounded-lg p-2 text-white font-medium absolute bottom-4 left-16 text-xl"
 
     
     const listContainerStyle =  `absolute ${
-      savedaddress && savedaddress.length > 0 ? 'overflow-y-scroll h-3/5 mt-20' : 'overflow-hidden'
+      savedaddress && savedaddress.length > 0 ? 'overflow-y-scroll h-2/3 mt-20' : 'overflow-hidden'
     }`;
 
     let listContent;
@@ -357,9 +320,7 @@ renderLocationDropdown() {
       <div >
         <Toaster position="top-center" reverseOrder={false}></Toaster>
         <h1 className="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
-        <div>
-        {this.renderLocationDropdown()}
-        </div>
+
         <div>
         <button className={buttonStyle} onClick={this.handleFileSelect}>
           Import Accounts
@@ -374,7 +335,7 @@ renderLocationDropdown() {
        
        </div>
         
-        
+        <br/>
         
         <div>
         <div>
