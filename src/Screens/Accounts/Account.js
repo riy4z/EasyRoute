@@ -277,10 +277,12 @@ updateSavedAddress = (updatedAddress) => {
 
    
 
-    const buttonStyle = "cursor-pointer bg-blue-700 hover:bg-blue-800 w-11/12 rounded-lg px-8 py-1.5 text-white font-medium absolute text-xl mt-3"
+
+    const buttonStyle = "cursor-pointer bg-blue-700 hover:bg-blue-900 rounded-lg px-14 py-1.5 text-white font-medium absolute text-xl top-32"
 
 
-    const buttonStyle1 = "cursor-pointer bg-customColor1 rounded-lg p-2 text-white font-medium absolute bottom-4 left-16 text-xl"
+
+    const buttonStyle1 = "cursor-pointer bg-blue-700 hover:bg-blue-900 rounded-lg p-2 text-white font-medium absolute bottom-4 left-16 text-xl"
 
     
     const listContainerStyle =  `absolute ${

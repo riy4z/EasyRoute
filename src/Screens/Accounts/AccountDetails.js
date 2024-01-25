@@ -305,8 +305,8 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
   
   const buttonStyle="border-2 border-red-600 mt-6 w-full py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
 
-  const buttonStyle1 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer bottom-64 left-2"
-  const buttonStyle2 = "bg-blue-600 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer bottom-64 right-2.5"
+  const buttonStyle1 = "bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer"
+  const buttonStyle2 = "bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer"
 
   return (
     <div className={` ${isExpanded ? 'opacity-100' : 'opacity-0'} fixed top-0 right-0 bg-white text-black w-[300px] h-full p-0 z-0 transition-opacity ease-out duration-700 `}>
@@ -396,16 +396,18 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
               </div>
 
               <div className='mt-6 space-x-4'>
-                <button className={buttonStyle} onClick={handleDelete}>
+                <button className="border-2 border-red-600 mt-6 w-full py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
+                 onClick={handleDelete}>
                   Delete
                 </button>
                 <button
-                  className={buttonStyle1}
+                  className="bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer"
                   onClick={() => alert('Button 1 clicked')}
                 >
                   Add to Route
                 </button>
-                <button className={buttonStyle2} onClick={handleCheckInClick}>
+                <button className="bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer"
+                 onClick={handleCheckInClick}>
                   Check-in
                 </button>
               </div>

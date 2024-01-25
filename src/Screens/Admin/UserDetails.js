@@ -12,6 +12,7 @@ function UserDetails({ UserDetails, closePopup }) {
   const [newLocation, setNewLocation] = useState("");
   const [showAddLocationDropdown, setShowAddLocationDropdown] = useState(false);
   const [availableLocations, setAvailableLocations] = useState([]);
+ 
 
 
   useEffect(() => {
@@ -82,49 +83,48 @@ function UserDetails({ UserDetails, closePopup }) {
     setShowAddLocationDropdown(prevState => !prevState);
   }, []);
 
-  const handleDropDownChange = async(value, key) => {
-    await handleAddLocation(key, value);
-  };
-
-  const handleAddLocation = async (id, value) => {
+  const handleDropdownChangeAndAddLocation = async (selectedLocationValue) => {
     try {
-      if (newLocation !== "" && Array.isArray(availableLocations) && availableLocations.length > 0) {
-        // Use the addUserLocation function to add the location
-        const response = await addUserLocation(UserDetails._id, id);
-        console.log('addUserLocation response:', response);
+      const selectedLocationOption = availableLocations.find(location => location.Location === selectedLocationValue);
   
-        // Update the state to reflect the addition
-        setLocation(prevLocation => [...prevLocation, { _id: id, Location: value }]);
-        setNewLocation("");
+      if (selectedLocationOption) {
+        const selectedLocationId = selectedLocationOption._id;
+        const confirmed = window.confirm(`Are you sure you want to add "${selectedLocationValue}" as a new location?`);
+  
+        if (confirmed) {
+          const response = await addUserLocation(UserDetails._id, selectedLocationId);
+          console.log('addUserLocation response:', response);
+  
+          setLocation(prevLocation => [...prevLocation, { _id: selectedLocationId, Location: selectedLocationValue }]);
+          setNewLocation("");
+        }
       } else {
-        console.error(`Error: id or availableLocations is invalid.`);
+        console.error("Error: Selected location not found.");
       }
     } catch (error) {
-      console.error('Error adding location:', error);
+      console.error('Error handling dropdown change and adding location:', error);
     }
   };
-  
  
   const handleDeleteLocation = useCallback(async (locationId) => {
     try {
+      const confirmDelete = window.confirm('Are you sure you want to delete this location?');
+    
+      if (confirmDelete) {
       await deleteUserLocation(UserDetails._id, locationId);
       const updatedLocations = Location.filter((location) => location._id !== locationId);
       setLocation(updatedLocations);
-    } catch (error) {
+    }} catch (error) {
       console.error('Error deleting location:', error);
     }
   }, [Location, UserDetails._id]);
 
-  const buttonStyle = {
-    marginLeft: '10px',
-    cursor: 'pointer',
-  };
-
-  const labelStyle = { marginBottom: '5px' };
+  const labelStyle = 'mb-2 text-xl';
 
   const deleteButtonClass =
-    'absolute mt-24 left-2 border-2 border-red-500 px-[88px] py-2 rounded-lg text-red-500 text-xl shadow-sm text-center hover:bg-red-500 hover:text-white';
-
+    'absolute mt-28 left-2 border-2 border-red-500 px-[88px] py-2 rounded-lg text-red-500 text-xl shadow-sm text-center hover:bg-red-500 hover:text-white';
+  const locationButtonClass=
+  'absolute mt-10 left-2 border-2 border-blue-700 px-20 py-2 rounded-lg text-blue-700 text-xl shadow-sm text-center hover:bg-blue-700 hover:text-white'
     return (
       <div>
         <div className="fixed top-0 right-0 bg-white text-black w-[300px] h-full p-0 z-0 transition-opacity ease-out duration-700">
@@ -141,67 +141,59 @@ function UserDetails({ UserDetails, closePopup }) {
           <div className="ml-2">
             {UserDetails ? (
               <>
-                <label style={labelStyle}>
+
+
+                <label className={labelStyle}>
                   <strong>Name:</strong>
-                  <input
-                    className="border border-gray-300 p-1 rounded"
-                    type="text"
-                    value={`${UserDetails.firstName} ${UserDetails.lastName}`}
-                    readOnly
-                  />
+                  <p
+                    className="text-xl text-black">
+                    {`${UserDetails.firstName} ${UserDetails.lastName}`} 
+                  </p>
                 </label>
     
-                <label style={labelStyle}>
+                <label className={labelStyle}>
                   <strong>Email:</strong>
-                  <input
-                    className="border border-gray-300 p-1 rounded"
-                    type="text"
-                    value={`${UserDetails.email}`}
-                    readOnly
-                  />
+                  <p
+                    className="text-xl text-black">
+                    {`${UserDetails.email}`} 
+                  </p>
                 </label>
     
-                <label style={labelStyle}>
+                <label className={labelStyle}>
                   <strong>Mobile Number:</strong>
-                  <input
-                    className="border border-gray-300 p-1 rounded"
-                    type="text"
-                    value={`${UserDetails.mobile}`}
-                    readOnly
-                  />
+                  <p
+                    className="text-xl text-black">
+                    {`${UserDetails.mobile}`} 
+                  </p>
                 </label>
     
-                <label style={labelStyle}>
+                <label className='mb-2 text-xl'>
                   <strong>Location: {' '}
-                    <button className="fa-solid fa-plus" size={15} style={{ cursor: 'pointer' }} onClick={toggleDropdown} />
-                  </strong>
-                  <div className="input-container">
-                    <ul>
-                      {Location.map(location => (
-                        <li key={location._id}>{location.Location}
-                          <button className="fa-solid fa-xmark" style={buttonStyle}
-                            onClick={() => handleDeleteLocation(location._id)}></button>
-                        </li>
-                      ))}
-                    </ul>
+                    {/* <button className="fa-solid fa-circle-plus cursor-pointer text-2xl ml-40"   ></button> */}
+                  </strong></label>
+                  <div>
+                  <div className="mt-2 border">
+  <ul className='overflow-y-auto max-h-24 text-xl'>
+    {Location.map(location => (
+      <li className="border-b p-2 flex justify-between items-center" key={location._id}>
+        <span>{location.Location}</span>
+        <i className="fa-solid fa-xmark" onClick={() => handleDeleteLocation(location._id)}></i>
+      </li>
+    ))}
+  </ul>
+</div>
+
                     {showAddLocationDropdown && (
-  <select
+  <select className="text-xl"
     value={newLocation}
     onChange={(e) => {
       const selectedLocationValue = e.target.value;
-      const selectedLocationOption = Array.from(e.target.options).find(option => option.value === selectedLocationValue);
-
-      if (selectedLocationOption) {
-        const selectedLocationId = selectedLocationOption.getAttribute('data-id');
-        setNewLocation(selectedLocationValue); // Update the state first
-        handleDropDownChange(selectedLocationValue, selectedLocationId); // Then call the function
-      } else {
-        console.error("Error: Selected location not found.");
-      }
+      setNewLocation(selectedLocationValue); // Update the state first
+      handleDropdownChangeAndAddLocation(selectedLocationValue); // Then call the function
     }}
   >
-                        <option value="">Select a location</option>
-                        {availableLocations.map(location => (
+    <option value="">Select a location</option>
+    {availableLocations.map(location => (
       <option key={location._id} value={location.Location} data-id={location._id}>
         {location.Location}
       </option>
@@ -210,28 +202,22 @@ function UserDetails({ UserDetails, closePopup }) {
 )}
                     
                   </div>
-                </label>
+              
     
-                <label style={labelStyle}>
+                <label className={labelStyle}>
                   <strong>Role:</strong>
-                  <div className="input-container">
-                    <input
-                      className="border border-gray-300 p-1 rounded"
-                      type="text"
-                      value={Roles}
-                      readOnly
-                    />
-                  </div>
+                  <p
+                    className="text-xl text-black">
+                    {`${Roles}`} 
+                  </p>
                 </label>
     
-                <label style={labelStyle}>
+                <label className={labelStyle}>
                   <strong>Company Name:</strong>
-                  <input
-                    className="border border-gray-300 p-1 rounded"
-                    type="text"
-                    value={Company}
-                    readOnly
-                  />
+                  <p
+                    className="text-xl text-black">
+                    {`${Company}`} 
+                  </p>
                 </label>
     
               </>
@@ -239,7 +225,7 @@ function UserDetails({ UserDetails, closePopup }) {
               <p>Loading user details...</p>
             )}
           </div>
-    
+          <button className={locationButtonClass} onClick={toggleDropdown}>Add Location</button>
           <button className={deleteButtonClass}>Delete User</button>
         </div>
       </div>

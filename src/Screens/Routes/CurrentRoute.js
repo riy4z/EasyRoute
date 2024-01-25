@@ -480,7 +480,7 @@ const handleClearUp = () =>{
                 className={`text-white ${
                   isLassoActive
                     ? "bg-red-500 hover:bg-red-600 focus:ring-4 focus:ring-red-300"
-                    : "bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
+                    : "bg-blue-700 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300"
                 } font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none`}
               >
                 {isLassoActive ? "Deactivate Lasso" : "Activate Lasso"}
@@ -488,7 +488,7 @@ const handleClearUp = () =>{
 
               <button
                 onClick={handleOpenPopup}
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                className="text-white border-2 border-blue-700 hover:border-blue-900 bg-blue-700 hover:bg-blue-900 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
               >
                 Add Account to Route
               </button>
@@ -636,13 +636,13 @@ const handleClearUp = () =>{
                 onMouseDown={handleOptimizeDown}
                 onMouseUp={handleOptimizeUp}
                 onMouseLeave={handleOptimizeUp}
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                className="text-white bg-blue-700 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
               >
                 Optimize
               </button>
               <button
                 onClick={handleSave}
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                className="text-white bg-blue-700 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
               >
                 Save
               </button>
@@ -650,7 +650,7 @@ const handleClearUp = () =>{
                 onMouseDown={handleClearDown}
                 onMouseUp={handleClearUp}
                 onMouseLeave={handleClearUp}
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                className="text-white bg-blue-700 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
               >
                 Clear
               </button>

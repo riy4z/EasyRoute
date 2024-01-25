@@ -71,19 +71,19 @@ function Admin() {
   
       {showAddButtons === 0 && (
         <>
-          <button className="mt-6 bg-customColor1 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-16" onClick={openLocationPopup}>
+          <button className="mt-6 bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-16" onClick={openLocationPopup}>
             <i className="fas fa-info-circle" style={{ marginRight: 10 }}></i>
             Location
           </button>
   
-          <button className="mt-4 bg-customColor1 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-20" onClick={openRolePopup}>
+          <button className="mt-4 bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-20" onClick={openRolePopup}>
             <i className="fas fa-solid fa-users" style={{ marginRight: 10 }}></i>
             Role
           </button>
         </>
       )}
   
-      <button className="mt-4 bg-customColor1 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-11" onClick={openInvitePopup}>
+      <button className="mt-4 bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-11" onClick={openInvitePopup}>
         <i className="fas fa-user-plus" style={{ marginRight: 10 }}></i>
         Invite Users
       </button>
@@ -159,7 +159,7 @@ function Admin() {
           _id:"65643d525b99a474bd4713ba",
           username:"riy4z",
           password:"$2b$10$6vm1h3mR6OIUXIySUI2Y6OPvKApzcGPy6wBQ5mtEIdyNI4Dt0GdTe",
-          email:"jriyazamd@gmail.com",
+          email:"shehnazrasheetha2@gmail.com",
           address:"haha",
           firstName:"Riyaz",
           lastName:"Ahamed",

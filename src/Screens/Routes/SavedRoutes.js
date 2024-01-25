@@ -50,6 +50,11 @@ function SavedRoutes(props) {
  
   const handleDeleteRoute = async (routeId) => {
     try {
+      const confirmDelete = window.confirm('Are you sure you want to delete this route?');
+
+      if (!confirmDelete) {
+        return; // User canceled the deletion
+      }
       // Assuming you have an API endpoint like `/api/routes/:routeId` for deleting routes
       const response = await api.delete(`/deleteRoute/${routeId}`, {
         headers: {
@@ -118,13 +123,12 @@ function SavedRoutes(props) {
       </div>
       <ul>
         {userRoutes.map((route) => (
-          <li key={route.route._id}>
+          <li key={route.route._id} className='border overflow-y-auto px-2'> 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: "pointer" }}>
               <span onClick={()=>handleonclick(route.route)}>{route.route.RouteName}</span>
               <div>
-                <button className="fa-solid fa-xmark" onClick={() => handleDeleteRoute(route.route._id)}></button>
                 <button
-                  className="fa-solid fa-pencil"
+                  className="fa-solid fa-pencil  px-4"
                   onClick={() => {
                     const newRouteName = prompt('Enter new route name:', route.route.RouteName);
                     if (newRouteName !== null) {
@@ -132,6 +136,7 @@ function SavedRoutes(props) {
                     }
                   }}
                 ></button>
+                  <button className="fa-solid fa-xmark" onClick={() => handleDeleteRoute(route.route._id)}></button>
               </div>
             </div>
 
