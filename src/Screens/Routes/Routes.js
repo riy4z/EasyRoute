@@ -33,7 +33,12 @@ useEffect(() => {
 
   const handleSavedRouteClick = (value) => {
     setSavedRouteClick(value);
+    if (value) {
+      setActiveTab('current')
+    }
   };
+ 
+
 
 
   return (

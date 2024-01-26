@@ -19,7 +19,7 @@ class Account extends React.Component {
       userId:'',
       searchInput: "", // State variable to store the search input
       isAccountDetailsExpanded: false,
-      selectedLocation : props.selectedLocation
+      selectedLocation : props.selectedLocation,
     };
   }
 
@@ -369,12 +369,14 @@ updateSavedAddress = (updatedAddress) => {
   
             addressData={selectedAddress}
             isExpanded={isAccountDetailsExpanded}
+            selectedLocation={this.state.selectedLocation}
             onToggleExpand={() => this.setState({ isAccountDetailsExpanded: !isAccountDetailsExpanded })
             }
+            
             onUpdateAddress={(updatedAddress) => {
               this.updateSavedAddress(updatedAddress);
               this.setState({ selectedAddress: updatedAddress });
-            }} // Pass the callback function
+            }}
             />
             )}
 

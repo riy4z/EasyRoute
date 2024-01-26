@@ -171,6 +171,20 @@ useEffect(() => {
     }
   };
 
+  const handleOptimizeLeave = () => {
+    // Check if polylines is defined and has elements
+    if (isOptimizeSwitchOn) {
+      // Set onOptimizeClick to false when the button is released only if the toggle switch is on
+      onOptimizeClick(false);
+      setIsOptimized(true);
+    }
+    if (!isOptimizeSwitchOn) {
+      // Set onOptimizeClick to false when the button is released only if the toggle switch is on
+      onCustomRouteClick(false);
+      setIsOptimized(true);
+    }
+  };
+
 
   useEffect(() => {
     if (isOptimized && polylines) {
@@ -449,7 +463,6 @@ const handleClearUp = () =>{
     }
   };
 
-
  
   return (
     <DragDropContext onDragEnd={handleAddressReorder}>
@@ -554,26 +567,24 @@ const handleClearUp = () =>{
                 </PlacesAutocomplete>
               </div>
 
-
-              <div className=" mt-2 no-scrollbar overflow-auto max-h-72">
-
-             <ul>
-             <span  className="block mt-0 ml-1 text-sm font-medium text-gray-700">
+              <span  className="block mt-2 ml-1 text-sm font-medium text-gray-700">
                   Accounts
                 </span>
+              <div className=" mt-2 overflow-auto max-h-72">
+
                  {combinedAddresses && combinedAddresses.length > 0 ? (
                     combinedAddresses.map((address, index) => (
                  <
                   DraggableAddress key={address._id} address={address} index={index} polylines={polylines} className="bg-blue-500 p-4 rounded-lg shadow-md mb-4"/>
                  ))
                ) : (
-                <li className="list-none">
+                <div>
                 {combinedAddresses.length === 0 ?  (
                   <img src={NullAddress1} alt="No addresses" />
                 ) : null}
-              </li>
+              </div>
                  )}
-            </ul>
+            
 
           </div>
               {/* End Location Input */}
@@ -635,7 +646,7 @@ const handleClearUp = () =>{
               <button
                 onMouseDown={handleOptimizeDown}
                 onMouseUp={handleOptimizeUp}
-                onMouseLeave={handleOptimizeUp}
+                onMouseLeave={handleOptimizeLeave}
                 className="text-white bg-blue-700 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
               >
                 Optimize

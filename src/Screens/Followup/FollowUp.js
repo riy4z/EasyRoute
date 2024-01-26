@@ -1,56 +1,100 @@
+// FollowUp.js
 import React, { useState, useEffect } from 'react';
 import api from '../../config/api';
 import getCompanyID from '../../components/fetch/getCompany';
+import AccountDetails from '../Accounts/AccountDetails';
 
-const FollowUp = () => {
+const FollowUp = (props) => {
   const [followUpData, setFollowUpData] = useState([]);
   const [addressInfoList, setAddressInfoList] = useState([]);
-  const  companyID  = getCompanyID();
-  
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [isAccountDetailsExpanded, setIsAccountDetailsExpanded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [listItemClick, setListItemClick] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await api.get(`/getFollowUpDataByCompany?companyId=${companyID}`);
-        setFollowUpData(response.data.followUps);
+        const response = await api.get(`/getFollowUpDataByLocation?locationId=${props.selectedLocation}`);
+        const sortedFollowUpData = response.data.followUps.sort((a, b) => new Date(a.followUp) - new Date(b.followUp));
+        setFollowUpData(sortedFollowUpData);
       } catch (error) {
         console.error('Error fetching follow-up data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [companyID]);
+  }, [refresh, props.selectedLocation]);
+
 
   useEffect(() => {
-    const fetchAddressInfo = async () => {
-      const infoList = await Promise.all(
-        followUpData.map(async (item) => {
-          const response = await api.get(`/get-address-data-marker?markerId=${item.addressId}`);
-          return response.data;
-        })
-      );
-      setAddressInfoList(infoList);
-    };
+    if (followUpData.length > 0) {
+      const fetchAddressInfo = async () => {
+        const infoList = await Promise.all(
+          followUpData.map(async (item) => {
+            const response = await api.get(`/get-address-data-marker?markerId=${item.addressId}`);
+            return response.data;
+          })
+        );
+        setAddressInfoList(infoList);
+      };
 
-    fetchAddressInfo();
+      fetchAddressInfo();
+    }
   }, [followUpData]);
 
-  
-return (
-  <div className="container mx-auto mt-8 p-6 bg-white rounded-lg shadow-md max-h-screen overflow-y-auto">
-    <h2 className="text-3xl font-semibold mb-4 ">FollowUp Screen</h2>
-    <ul>
-      {followUpData.map((item, index) => (
-        <li key={item.markerId} className="mb-4 p-4 border border-gray-300 rounded-lg">
-          <span className="font-semibold text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">
-          </span> {`${addressInfoList[index]?.[0]?.['First Name'] || ''} ${addressInfoList[index]?.[0]?.['Last Name'] || ''}`}
-          <span className="ml-2 font-semibold text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">
-          </span> {new Date(item.followUp).toLocaleString()}
-        </li>
-      ))}
-    </ul>
-  </div>
-);
+  const handleListItemClick = (address) => {
+    setSelectedAddress(address);
+    setIsAccountDetailsExpanded(true);
+    setListItemClick(true);
+  };
+
+  const handleToggleExpand = () => {
+    setIsAccountDetailsExpanded(!isAccountDetailsExpanded);
+  };
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+console.log(addressInfoList)
+  return (
+    <div className="container mx-auto mt-8 p-6 bg-white rounded-lg shadow-md max-h-screen overflow-y-auto">
+      <h2 className="text-3xl font-semibold mb-4">FollowUp Screen</h2>
+      <ul className="space-y-4">
+        {followUpData.map((item, index) => (
+          <li
+            key={item.markerId}
+            className="p-4 border border-gray-300 rounded-lg cursor-pointer transition duration-300 ease-in-out transform hover:shadow-md hover:-translate-y-1"
+            onClick={() => handleListItemClick(addressInfoList[index]?.[0])}
+          >
+            <span className="text-lg font-semibold">
+              {new Date(item.followUp).toLocaleDateString()}
+            </span>
+            <div className="flex items-center mt-2">
+              <span className="text-gray-600 text-base">
+                {`${addressInfoList[index]?.[0]?.['First Name'] || ''} ${addressInfoList[index]?.[0]?.['Last Name'] || ''}`}
+              </span>
+            </div>
+          </li>
+        ))}
+      </ul>
+      {isAccountDetailsExpanded && (
+        <AccountDetails
+          addressData={selectedAddress}
+          isExpanded={isAccountDetailsExpanded}
+          onToggleExpand={handleToggleExpand}
+          listItemClick={listItemClick}
+          setRefresh={setRefresh}
+          refresh={refresh}
+          selectedLocation={props.selectedLocation}  
+        />
+      )}
+    </div>
+  );
 };
 
 export default FollowUp;

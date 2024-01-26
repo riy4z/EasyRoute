@@ -4,6 +4,7 @@ import * as MapFunctions from './mapFunctions';
 import AccountDetails from '../../Screens/Accounts/AccountDetails';
 import config from '../../config/config';
 import api from '../../config/api';
+import deleteIcon from '../../assets/images/remove.png'
 
 const libraries = ['places', 'drawing'];
 
@@ -404,6 +405,17 @@ let lastCoordinateInEntireArray = null;
         drawingManagerRef.current = drawingManager;
     };
 
+    const deleteIconStyle = {
+        cursor: 'pointer',
+        backgroundImage: `url(${deleteIcon})`,
+        height: 24,
+        width: 24,
+        marginTop: '0.4%', 
+        backgroundColor: '#fff',
+        position: 'absolute',
+        left: "54%",
+        zIndex: 99999
+    }
 
     return (
         isLoaded ? (
@@ -429,7 +441,7 @@ let lastCoordinateInEntireArray = null;
                             {drawingManagerRef.current && (
                             <div
                                 onClick={onDeleteDrawing} title='Delete shape'
-                                style={{ cursor: 'pointer', height: '24px', width: '24px', marginTop: '5px', backgroundColor: '#fff', zIndex: 99999, left: "930px", position: "relative" }}
+                                style={deleteIconStyle}
                             ></div>
                             )}
                         </div>

@@ -10,7 +10,7 @@ import CheckInPopup from './CheckInPopup';
 import DatePicker from 'react-datepicker';
 import { addMinutes } from 'date-fns'
 
-const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddress, children }) => {
+const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddress, children, listItemClick, refresh, setRefresh, selectedLocation }) => {
 
   const [formData, setFormData] = useState({
     streetAddress: '',
@@ -98,6 +98,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
         userID: userID,
         companyID: companyID,
         followUp: formData.followUp,
+        LocationID: selectedLocation
       };
 
       api
@@ -196,7 +197,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
       addressId: addressData._id,
       meetingNotes: meetingNotes,
       userID: userID, 
-      companyID: companyID,
+      companyID: companyID
     };
   
     api
@@ -205,8 +206,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
         // console.log('Check-in successful:', response.data);
 
         const historyResponse = await api.get(`/getMeetingNotesAndHistory?addressId=${addressData._id}`);
-        const updatedHistoryData = await historyResponse.json();
-
+        const updatedHistoryData = historyResponse.data;
         const  companyID  = getCompanyID();
         const filteredHistoryData = updatedHistoryData.filter(historyItem => historyItem.companyID === companyID);
         setHistoryData(filteredHistoryData);
@@ -214,11 +214,32 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
         setActiveTab('history');
   
         setCheckInPopupOpen(false);
+
+        
+        
+        if (listItemClick) {
+          api.delete(`/deleteFollowUp/${addressData.markerId}`)
+          .then(response => {
+            // Handle success, update UI or show success message
+            alert("Checked in successfully")
+            setRefresh(!refresh)
+            
+            // Perform additional actions as needed after successful deletion
+          })
+          .catch(error => {
+            // Handle error
+            console.error('Error checking in:', error);
+            alert('Failed to check in.');
+          });
+        
+        }
       })
       .catch((error) => {
         console.error('Error during check-in:', error);
       });
+      
   };
+
 
   const onEditName = () => {
     const newFirstName = prompt('Enter the new first name:');
@@ -302,7 +323,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
   
   
   
-  
+ 
   const buttonStyle="border-2 border-red-600 mt-6 w-full py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
 
   const buttonStyle1 = "bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer"
@@ -322,32 +343,30 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
       </div>
 
       <div className={`${isExpanded ? 'block' : 'hidden'}`}>
-        <div className='m-4'>
-          <div className='flex justify-between p-4 bg-gray-200 rounded-t-md'>
-            <div
-              className={`cursor-pointer ${activeTab === 'details' ? 'text-blue-600 font-bold' : 'text-gray-700'}`}
-              onClick={() => setActiveTab('details')}
-            >
-              Details
-            </div>
-            <div
-              className={`cursor-pointer ${activeTab === 'history' ? 'text-blue-600 font-bold' : 'text-gray-700'}`}
-              onClick={() => setActiveTab('history')}
-            >
-              History
-            </div>
-          </div>
+        <div className="p-4">
+          <div>
+           <ul className="hidden text-sm font-medium text-center text-gray-500 rounded-lg shadow sm:flex dark:divide-gray-700 dark:text-gray-400">
+        <li className={`w-full ${activeTab === 'details' ? 'bg-customColor rounded-s-lg text-white' : 'hover:text-gray-700 hover:bg-gray-50 text-customColor'}`}>
+          <span onClick={() => setActiveTab('details')} className="inline-block w-full p-4 border-r border-gray-200 dark:border-gray-700 rounded-s-lg focus:outline-none cursor-pointer " >Details</span>
+        </li>
+        <li className={`w-full ${activeTab === 'history' ? 'bg-customColor rounded-e-lg text-white' : 'hover:text-gray-700 hover:bg-gray-50 text-customColor'}`}>
+          <span onClick={() => setActiveTab('history')} className="inline-block w-full p-4 border-r border-gray-200  rounded-e-lg   focus:outline-none cursor-pointer ">History</span>
+        </li>
+      </ul>
+      </div>
 
           {activeTab === 'details' && (
             <>
               {/* Display account details */}
               <p style={{ fontSize: "14px" }}>
+              <div className='flex justify-between items-center'>
             <strong style={{fontSize:20}}> {addressData['First Name']} {addressData['Last Name']}</strong>
-            <i className="fas fa-thin fa-pencil" style={{ marginRight: 25, cursor:'pointer' }}  onClick={() => onEditName(addressData._id)}/><br></br>
+            <span className="cursor-pointer text-blue-700 hover:underline"  onClick={() => onEditName(addressData._id)}>Edit</span>
+            </div>
             {addressData['Street Address']}, {addressData['City']}, {addressData['State'] }-{addressData['ZIP Code']}</p>
             <i className="fas fa-thin fa-pencil" style={{ marginRight: 25, cursor:'pointer' }}  onClick={() => onEditAddress(addressData._id)}/><br></br>
 
-              <div className='mt-4'>
+              <div className='mt-2'>
                 <label className='text-sm'>Phone:</label>
                 <input
                   name='phone'
@@ -358,7 +377,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
                   className='w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200'
                 />
               </div>
-              <div className='mt-4'>
+              <div className='mt-2'>
                 <label className='text-sm'>Email:</label>
                 <input
                   type='email'
@@ -368,7 +387,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
                   className='w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200'
                 />
               </div>
-              <div className='mt-4'>
+              <div className='mt-2'>
                 <label className='text-sm'>Last Check-in:</label>
                 <input
                   type='text'
@@ -378,7 +397,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
                   className='w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200'
                 />
               </div>
-              <div className='mt-4'>
+              <div className='mt-2'>
                 <label className='text-sm'>Follow Up:</label>
                 <div className='relative'>
                   <DatePicker
@@ -395,35 +414,29 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
                 </div>
               </div>
 
-              <div className='mt-6 space-x-4'>
-                <button className="border-2 border-red-600 mt-6 w-full py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
-                 onClick={handleDelete}>
-                  Delete
-                </button>
-                <button
-                  className="bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer"
-                  onClick={() => alert('Button 1 clicked')}
-                >
-                  Add to Route
-                </button>
-                <button className="bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer"
+              <div className='mt-4'>
+                <button className="bg-blue-700 hover:bg-blue-900 rounded-lg text-white w-full py-1 px-2 text-center font-medium text-xl cursor-pointer"
                  onClick={handleCheckInClick}>
                   Check-in
+                </button>
+                <button className="border-2 border-red-600 mt-2 w-full py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
+                 onClick={handleDelete}>
+                  Delete
                 </button>
               </div>
             </>
           )}
 
           {activeTab === 'history' && historyData && (
-            <div className='mt-6 history-container' style={{ maxHeight: '800px', overflowY: 'scroll' }}>
-              <h4 className='text-lg font-bold mb-2'>History</h4>
+            <div className='mt-6 max-h-[800px] overflow-y-auto'>
               {historyData.map((historyItem) => (
                 <div key={historyItem._id} className='border rounded-md p-3 mb-3 bg-gray-100'>
                   
-                    <p className='text-xl font-semibold'>{`${historyItem.firstName} ${historyItem.lastName}`}</p>
+                    <p className='text-lg font-semibold'>{`${historyItem.firstName} ${historyItem.lastName}`}</p>
                   
-                  <p className='text-gray-700'>{`Meeting Notes: ${historyItem.meetingNotes}`}</p>
-                  <p className='text-gray-700'>{`Created At: ${new Date(historyItem.createdAt).toLocaleString()}`}</p>
+                  <p className='text-xs font-semibold'>{`Notes:`}</p>
+                  <p className='text-sm'>{historyItem.meetingNotes}</p>
+                  <p className='text-xs mt-2 text-gray-400'>{`Last Check-in: ${new Date(historyItem.createdAt).toLocaleString()}`}</p>
                 </div>
               ))}
             </div>

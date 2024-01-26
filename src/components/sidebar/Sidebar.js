@@ -21,8 +21,7 @@ function Sidebar(props) {
   const [Locations, setLocations] = useState([]);
   const [{apiData}] = useFetch('');
   const [userLocations, setUserLocations] = useState([]);
-  // const userlocation = fetchUserLocations();
-  // console.log(userlocation)
+
   const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick} = props
 
   const handleOptionClick = (option, addresses) => {
@@ -47,6 +46,7 @@ function Sidebar(props) {
     props.setLassoActivate(isActive);
   };
 
+ 
 
 
   const renderContent = () => {
@@ -54,7 +54,7 @@ function Sidebar(props) {
       case 'Admin':
         return <Admin />;
       case 'Account':
-        return <Account setAddresses={props.setAddresses} selectedLocation={selectedLocation}/>;
+        return <Account setAddresses={props.setAddresses} selectedLocation={selectedLocation} />;
       case 'Route':
         return <Routes 
         setAddresses={props.setAddresses} 
@@ -74,7 +74,9 @@ function Sidebar(props) {
       case 'Settings':
         return <Settings />;
         case 'FollowUp': // Add 'FollowUp' option
-        return <FollowUp/>;
+        return <FollowUp
+        selectedLocation={selectedLocation}
+        />;
       case 'Profile':
         return <Profile />;
       default:

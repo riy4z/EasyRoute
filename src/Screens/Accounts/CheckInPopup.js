@@ -19,6 +19,8 @@ const CheckInPopup = ({ isOpen, onClose, onCheckInSubmit }) => {
     return null;
   }
 
+  
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-opacity-50 backdrop-filter backdrop-blur-md">
       <div className="bg-white p-8 rounded shadow-lg relative">
