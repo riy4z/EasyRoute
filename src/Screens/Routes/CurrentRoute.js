@@ -28,6 +28,9 @@ onOptimizeClick, onCustomRouteClick, onClearClick, savedRouteClick, selectedLoca
   const [endLocation, setEndLocation] = useState({});
   const companyid = getCompanyID();
   const userid = getUserID();
+  // Add this at the beginning of your component function
+const [optimizeDownOccurred, setOptimizeDownOccurred] = useState(false);
+
   const DraggableAddress = ({ address, index, polylines }) => {
     const [routeDetails, setRouteDetails] = useState({ distance: "", duration: "" });
   
@@ -140,51 +143,61 @@ useEffect(() => {
 }, [firstLatLng, lastLatLng, polylines, savedRouteClick]);
 
 
-  const handleOptimizeDown = () => {
-    if (!startLocation.address || !endLocation.address) {
-      alert("Enter your start and end location for directions");
-      return;
-    }
-    if (isOptimizeSwitchOn) {
-      // Set onOptimizeClick to true when the button is pressed only if the toggle switch is on
-      onOptimizeClick(true);
-      setIsOptimized(true);
-    }
-    if (!isOptimizeSwitchOn) {
-      // Set onOptimizeClick to true when the button is pressed only if the toggle switch is on
-      onCustomRouteClick(true);
-      setIsOptimized(true);
-    }
-  };
+const handleOptimizeDown = () => {
+  if (!startLocation.address || !endLocation.address) {
+    alert("Enter your start and end location for directions");
+    return;
+  }
 
-  const handleOptimizeUp = () => {
-    // Check if polylines is defined and has elements
-    if (isOptimizeSwitchOn) {
-      // Set onOptimizeClick to false when the button is released only if the toggle switch is on
-      onOptimizeClick(false);
-      setIsOptimized(true);
-    }
-    if (!isOptimizeSwitchOn) {
-      // Set onOptimizeClick to false when the button is released only if the toggle switch is on
-      onCustomRouteClick(false);
-      setIsOptimized(true);
-    }
-  };
+  if (isOptimizeSwitchOn) {
+    // Set onOptimizeClick to true when the button is pressed only if the toggle switch is on
+    onOptimizeClick(true);
+    setIsOptimized(true);
+    setOptimizeDownOccurred(true); // Set the state variable to true
+  }
 
-  const handleOptimizeLeave = () => {
-    // Check if polylines is defined and has elements
-    if (isOptimizeSwitchOn) {
-      // Set onOptimizeClick to false when the button is released only if the toggle switch is on
-      onOptimizeClick(false);
-      setIsOptimized(true);
-    }
-    if (!isOptimizeSwitchOn) {
-      // Set onOptimizeClick to false when the button is released only if the toggle switch is on
-      onCustomRouteClick(false);
-      setIsOptimized(true);
-    }
-  };
+  if (!isOptimizeSwitchOn) {
+    // Set onOptimizeClick to true when the button is pressed only if the toggle switch is on
+    onCustomRouteClick(true);
+    setIsOptimized(true);
+    setOptimizeDownOccurred(true); // Set the state variable to true
+  }
+};
 
+const handleOptimizeUp = () => {
+  // Check if polylines is defined and has elements
+  if (isOptimizeSwitchOn && optimizeDownOccurred) {
+    // Set onOptimizeClick to false when the button is released only if the toggle switch is on
+    onOptimizeClick(false);
+    setIsOptimized(true);
+    setOptimizeDownOccurred(false); // Reset the state variable
+  }
+
+  if (!isOptimizeSwitchOn && optimizeDownOccurred) {
+    // Set onOptimizeClick to false when the button is released only if the toggle switch is on
+    onCustomRouteClick(false);
+    setIsOptimized(true);
+    setOptimizeDownOccurred(false); // Reset the state variable
+  }
+};
+
+const handleOptimizeLeave = () => {
+  // Check if polylines is defined and has elements
+  if (isOptimizeSwitchOn && optimizeDownOccurred) {
+    // Set onOptimizeClick to false when the button is released only if the toggle switch is on
+    onOptimizeClick(false);
+    setIsOptimized(true);
+    setOptimizeDownOccurred(false); // Reset the state variable
+  }
+
+  if (!isOptimizeSwitchOn && optimizeDownOccurred) {
+    // Set onOptimizeClick to false when the button is released only if the toggle switch is on
+    onCustomRouteClick(false);
+    setIsOptimized(true);
+    setOptimizeDownOccurred(false); // Reset the state variable
+  }
+  // Move setIsOptimized outside of the conditional statements
+};
 
   useEffect(() => {
     if (isOptimized && polylines) {
@@ -567,7 +580,7 @@ const handleClearUp = () =>{
                 </PlacesAutocomplete>
               </div>
 
-              <span  className="block mt-2 ml-1 text-sm font-medium text-gray-700">
+              <span className="block mt-2 ml-1 text-sm font-medium text-gray-700">
                   Accounts
                 </span>
               <div className=" mt-2 overflow-auto max-h-72">
@@ -585,7 +598,6 @@ const handleClearUp = () =>{
               </div>
                  )}
             
-
           </div>
               {/* End Location Input */}
               <div>
