@@ -103,7 +103,7 @@ class Popup extends Component {
     return (
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-opacity-50 backdrop-filter backdrop-blur-md flex items-center justify-center">
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-lg shadow-lg z-50 w-11/12 max-w-md font-sans ">
-        <div className="absolute top-4 right-4 cursor-pointer" onClick={onClose}>
+        <div className="absolute top-4 right-4 cursor-pointer text-2xl" onClick={onClose}>
           <RxCrossCircled/>
         </div>
         <h2 className="text-3xl font-bold text-center mb-4">Add New Account</h2>
@@ -221,7 +221,7 @@ class Popup extends Component {
 
         <button
           onClick={this.handleSave}
-          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded-md transition duration-300 text-sm"
+          className="w-full mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded-md transition duration-300 text-sm"
           onMouseEnter={() => this.setState({ isHovered: true })}
           onMouseLeave={() => this.setState({ isHovered: false })}
         >

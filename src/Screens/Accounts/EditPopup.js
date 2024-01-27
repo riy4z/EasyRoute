@@ -100,7 +100,7 @@ const EditPopup = ({ onClose, selectedLocation, addressData, companyID, onUpdate
   return (
     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-opacity-50 backdrop-filter backdrop-blur-md flex items-center justify-center">
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-lg shadow-lg z-50 w-11/12 max-w-md font-sans ">
-        <div className="absolute top-4 right-4 cursor-pointer" onClick={onClose}>
+        <div className="absolute top-4 right-4 cursor-pointer text-2xl" onClick={onClose}>
           <RxCrossCircled/>
         </div>
         <h2 className="text-3xl font-bold text-center mb-4">Edit Details</h2>
