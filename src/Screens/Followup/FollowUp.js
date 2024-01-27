@@ -62,8 +62,9 @@ const FollowUp = (props) => {
   }
 console.log(addressInfoList)
   return (
-    <div className="container mx-auto mt-8 p-6 bg-white rounded-lg shadow-md max-h-screen overflow-y-auto">
-      <h2 className="text-3xl font-semibold mb-4">FollowUp Screen</h2>
+    <div>
+      <h1 className="text-5xl font-medium text-customColor1 text-left mb-2">Follow Up</h1>
+    <div className="container mx-auto mt-8 p-6 bg-white rounded-lg shadow-md max-h-screen overflow-y-auto"> 
       <ul className="space-y-4">
         {followUpData.map((item, index) => (
           <li
@@ -93,6 +94,7 @@ console.log(addressInfoList)
           selectedLocation={props.selectedLocation}  
         />
       )}
+    </div>
     </div>
   );
 };
