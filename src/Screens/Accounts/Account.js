@@ -7,6 +7,7 @@ import getUserID from "../../components/fetch/getUser";
 import toast, { Toaster } from 'react-hot-toast';
 import api from "../../config/api";
 
+
 class Account extends React.Component {
   constructor(props) {
     super(props);
@@ -278,7 +279,7 @@ updateSavedAddress = (updatedAddress) => {
    
 
 
-    const buttonStyle = "cursor-pointer bg-blue-700 hover:bg-blue-900 rounded-lg px-14 py-1.5 text-white font-medium absolute text-xl top-32"
+    const buttonStyle = "cursor-pointer bg-blue-700 hover:bg-blue-900 rounded-lg px-14 py-1.5 text-white font-medium absolute text-xl mt-4"
 
 
 
@@ -286,7 +287,7 @@ updateSavedAddress = (updatedAddress) => {
 
     
     const listContainerStyle =  `absolute ${
-      savedaddress && savedaddress.length > 0 ? 'overflow-y-scroll h-2/3 mt-20' : 'overflow-hidden'
+      savedaddress && savedaddress.length > 0 ? 'overflow-y-scroll h-[65%] mt-8 pl' : 'overflow-hidden'
     }`;
 
     let listContent;
@@ -346,11 +347,10 @@ updateSavedAddress = (updatedAddress) => {
           placeholder="Search Accounts"
           value={searchInput}
           onChange={this.handleSearchInputChange}
-          className="absolute p-1 px-3 w-11/12 border-solid border-2 rounded-full mt-6 text-xl"
+          className="p-1 px-4 border-solid border-2 rounded-full block mt-12 text-xl"
 
         />
         </div>
-        <i className="absolute mt-8 right-7 text-gray-300 fas fa-solid fa-magnifying-glass"/>   
         </div>
         <button className={buttonStyle1} onClick={this.openPopup}>
         <i className="fas fa-plus-circle" style={{ marginRight: 10}}></i>

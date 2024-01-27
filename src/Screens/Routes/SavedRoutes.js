@@ -109,7 +109,7 @@ function SavedRoutes(props) {
   
 
   return (
-    <div>
+    <div className="text-2xl leading-loose">
       <div>
       <input
   id="showAllCheckbox"

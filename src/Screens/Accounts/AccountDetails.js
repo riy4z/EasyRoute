@@ -8,15 +8,12 @@ import getUserID from '../../components/fetch/getUser';
 import 'react-datepicker/dist/react-datepicker.css';
 import CheckInPopup from './CheckInPopup';
 import DatePicker from 'react-datepicker';
-import { addMinutes } from 'date-fns'
+import { addMinutes } from 'date-fns';
+import EditPopup from './EditPopup';
 
 const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddress, children, listItemClick, refresh, setRefresh, selectedLocation }) => {
 
   const [formData, setFormData] = useState({
-    streetAddress: '',
-    city: '',
-    phone: '',
-    email: '',
     lastCheckIn: '',
     followUp: '',
   });
@@ -25,6 +22,8 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
   const [confirmDate, setConfirmDate] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   const [historyData, setHistoryData] = useState([]);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const companyID = getCompanyID();
 
   const fetchUserDetails = async (userId) => {
     try {
@@ -100,7 +99,10 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
         followUp: formData.followUp,
         LocationID: selectedLocation
       };
-
+      
+      if(!dataToSave.LocationID){
+          alert("No Location")
+      }
       api
         .post('/saveFollowUp', dataToSave)
         .then((response) => {
@@ -239,98 +241,15 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
       });
       
   };
-
-
-  const onEditName = () => {
-    const newFirstName = prompt('Enter the new first name:');
-    const newLastName = prompt('Enter the new last name:');
-  
-    if (newFirstName !== null && newLastName !== null) {
-      const updatedData = { ...addressData, 'First Name': newFirstName, 'Last Name': newLastName };
-      api.patch(`/update-address-data/${addressData._id}`, updatedData)
-        .then(response => {
-          // console.log('Name updated successfully:', newFirstName, newLastName);
-          // Perform additional actions as needed after successful update
-          onUpdateAddress(updatedData);
-        })
-        .catch(error => {
-          console.error('Error updating name:', error);
-          alert('Failed to update name.');
-        });
-    }
-  };
-  
-  const onEditAddress = async () => {
-    const newStreetAddress = prompt('Enter the new street address:');
-  
-    // If the user cancels the prompt for newStreetAddress, exit the function
-    if (newStreetAddress === null) {
-      return;
-    }
-  
-    const newCity = prompt('Enter the new city:');
-    const newState = prompt('Enter the new state:');
-    const newZIPCode = prompt('Enter the new ZIP code:');
-  
-    if (newCity !== null && newState !== null && newZIPCode !== null) {
-      const addressToGeocode = `${newStreetAddress}, ${newCity}, ${newState} ${newZIPCode}`;
-  
-      try {
-        // Use Axios for making the HTTP request
-        const response = await axios.get(
-          'https://maps.googleapis.com/maps/api/geocode/json',
-          {
-            params: {
-              address: addressToGeocode,
-              key: config.googleMapsApiKey,
-            },
-          }
-        );
-  
-        const data = response.data;
-  
-        if (data.results && data.results.length > 0) {
-          const location = data.results[0].geometry.location;
-          const updatedData = {
-            ...addressData,
-            'Street Address': newStreetAddress,
-            'City': newCity,
-            'State': newState,
-            'ZIP Code': newZIPCode,
-            'Latitude': location.lat,
-            'Longitude': location.lng,
-          };
-  
-          api.patch(`/update-address-data/${addressData._id}`, updatedData)
-            .then(response => {
-              // console.log('Address updated successfully:', updatedData);
-              // Perform additional actions as needed after successful update
-              onUpdateAddress(updatedData);
-            })
-            .catch(error => {
-              console.error('Error updating address:', error);
-              alert('Failed to update address.');
-            });
-        } else {
-          alert('Geocoding failed. Please check the entered address.');
-        }
-      } catch (error) {
-        console.error('Error during geocoding:', error);
-        alert('Failed to geocode address.');
-      }
-    }
-  };
-  
+ 
   
   
  
   const buttonStyle="border-2 border-red-600 mt-6 w-full py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
 
-  const buttonStyle1 = "bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer"
-  const buttonStyle2 = "bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1 px-2 text-center font-medium text-xl cursor-pointer"
 
   return (
-    <div className={` ${isExpanded ? 'opacity-100' : 'opacity-0'} fixed top-0 right-0 bg-white text-black w-[300px] h-full p-0 z-0 transition-opacity ease-out duration-700 `}>
+    <div className={` ${isExpanded ? 'opacity-100' : 'opacity-0'} fixed top-0 right-0  bg-white text-black w-72 h-screen p-0 z-0 transition-opacity ease-out duration-700 `}>
       <div className='bg-customColor p-3'>
         <h3 className='text-white text-xl ml-2 flex items-center justify-between'>
           Account Details
@@ -358,61 +277,50 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
           {activeTab === 'details' && (
             <>
               {/* Display account details */}
-              <p style={{ fontSize: "14px" }}>
-              <div className='flex justify-between items-center'>
-            <strong style={{fontSize:20}}> {addressData['First Name']} {addressData['Last Name']}</strong>
-            <span className="cursor-pointer text-blue-700 hover:underline"  onClick={() => onEditName(addressData._id)}>Edit</span>
+             
+              <div className='flex justify-between items-center mt-4'>
+            <span className="text-xl font-bold"> {addressData['First Name']} {addressData['Last Name']}</span>
+            <span className="cursor-pointer text-blue-700 hover:underline text-sm"  onClick={() => setEditModalOpen(true)}>Edit</span>
             </div>
-            {addressData['Street Address']}, {addressData['City']}, {addressData['State'] }-{addressData['ZIP Code']}</p>
-            <i className="fas fa-thin fa-pencil" style={{ marginRight: 25, cursor:'pointer' }}  onClick={() => onEditAddress(addressData._id)}/><br></br>
+            <p className='text-sm flex'>{addressData['Street Address']}, {addressData['City']}, {addressData['State'] }-{addressData['ZIP Code']}</p>
+            {/* <i className="fas fa-thin fa-pencil" style={{ marginRight: 25, cursor:'pointer' }}  onClick={() => onEditAddress(addressData._id)}/><br></br> */}
+       
+              <div className='mt'>
+                <label className='text-sm font-semibold'>Phone:</label>
+      
+                <span className='text-sm block'>{addressData['Phone'] || "(No Phone Number)"}</span>
 
-              <div className='mt-2'>
-                <label className='text-sm'>Phone:</label>
-                <input
-                  name='phone'
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  type='tel'
-                  pattern='[0-9]{3}-[0-9]{2}-[0-9]{3}'
-                  className='w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200'
-                />
               </div>
-              <div className='mt-2'>
-                <label className='text-sm'>Email:</label>
-                <input
-                  type='email'
-                  name='email'
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className='w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200'
-                />
+              <div className='mt-2 block'>
+                <label className='text-sm font-semibold'>Email:</label>
+      
+                <span className='text-sm block'>{addressData['Email'] || "(No Email)"}</span>
+
               </div>
-              <div className='mt-2'>
-                <label className='text-sm'>Last Check-in:</label>
-                <input
-                  type='text'
-                  name='lastCheckIn'
-                  value={formData.lastCheckIn}
-                  onChange={handleInputChange}
-                  className='w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200'
-                />
+              <div className='mt-2 block '>
+                <label className='text-sm font-semibold'>Last Check-in:</label>
+                <span className="block text-sm">{formData.lastCheckIn}</span>
               </div>
-              <div className='mt-2'>
-                <label className='text-sm'>Follow Up:</label>
-                <div className='relative'>
+              <div className='mt-2 block'>
+                <label className='text-sm font-semibold'>Follow Up:</label>
+                <br></br>
                   <DatePicker
                     placeholderText='Select FollowUp Date'
                     selected={formData.followUp}
                     onChange={handleDateSelection}
-                    className='w-full px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200'
+                    className='w-64 h-8 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200'
                   />
                   {confirmDate && (
                     <button className={buttonStyle} onClick={handleConfirmDate}>
                       Confirm Date
                     </button>
                   )}
-                </div>
+                
               </div>
+
+              {isEditModalOpen && (
+              <EditPopup onClose={() => setEditModalOpen(false)} onUpdateAddress={onUpdateAddress} addressData={addressData} companyID={companyID}/>
+              )}
 
               <div className='mt-4'>
                 <button className="bg-blue-700 hover:bg-blue-900 rounded-lg text-white w-full py-1 px-2 text-center font-medium text-xl cursor-pointer"

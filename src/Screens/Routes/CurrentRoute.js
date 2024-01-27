@@ -468,7 +468,7 @@ const handleClearUp = () =>{
     <DragDropContext onDragEnd={handleAddressReorder}>
       <Droppable droppableId="combinedAddresses">
         {(provided) => (
-          <div {...provided.droppableProps} ref={provided.innerRef}>
+          <div className="" {...provided.droppableProps} ref={provided.innerRef}>
             <div>
 
               <div className="flex items-center mt-4">
@@ -490,7 +490,7 @@ const handleClearUp = () =>{
 
               <button
                 onClick={handleLassoClick}
-                className={`text-white ${
+                className={`text-white mt-2 ${
                   isLassoActive
                     ? "bg-red-500 hover:bg-red-600 focus:ring-4 focus:ring-red-300"
                     : "bg-blue-700 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300"
@@ -519,7 +519,7 @@ const handleClearUp = () =>{
 
               {/* Start Location Input */}
               <div>
-                <label htmlFor="startLocation" className="block ml-1 text-sm font-medium text-gray-700">
+                <label htmlFor="startLocation" className="block ml-1 mt-2 text-sm font-medium text-gray-700">
                   Start Location
                 </label>
                 <PlacesAutocomplete
@@ -589,7 +589,7 @@ const handleClearUp = () =>{
           </div>
               {/* End Location Input */}
               <div>
-                <label htmlFor="endLocation" className="mt-1 ml-1 block text-sm font-medium text-gray-700">
+                <label htmlFor="endLocation" className="mt-2 ml-1 block text-sm font-medium text-gray-700">
                   End Location
                 </label>
                 <PlacesAutocomplete   
@@ -647,13 +647,13 @@ const handleClearUp = () =>{
                 onMouseDown={handleOptimizeDown}
                 onMouseUp={handleOptimizeUp}
                 onMouseLeave={handleOptimizeLeave}
-                className="text-white bg-blue-700 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
+                className="text-white mt-2 bg-blue-700 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
               >
                 Optimize
               </button>
               <button
                 onClick={handleSave}
-                className="text-white bg-blue-700 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
+                className="text-white mt-2 bg-blue-700 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
               >
                 Save
               </button>
@@ -661,7 +661,7 @@ const handleClearUp = () =>{
                 onMouseDown={handleClearDown}
                 onMouseUp={handleClearUp}
                 onMouseLeave={handleClearUp}
-                className="text-white bg-blue-700 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
+                className="text-white mt-2 bg-blue-700 hover:bg-blue-900 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
               >
                 Clear
               </button>

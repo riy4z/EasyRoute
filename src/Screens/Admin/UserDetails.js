@@ -127,7 +127,7 @@ function UserDetails({ UserDetails, closePopup }) {
   'absolute mt-10 left-2 border-2 border-blue-700 px-20 py-2 rounded-lg text-blue-700 text-xl shadow-sm text-center hover:bg-blue-700 hover:text-white'
     return (
       <div>
-        <div className="fixed top-0 right-0 bg-white text-black w-[300px] h-full p-0 z-0 transition-opacity ease-out duration-700">
+        <div className="fixed top-0 right-0 bg-white text-black w-[300px] h-full p-0 z-0 transition-opacity ease-out duration-700 text-2xl leading-loose">
           <div style={{ backgroundColor: '#282c34', padding: 4 }}>
             <h3 style={{ color: 'white', marginLeft: 7 }}>
               User Details

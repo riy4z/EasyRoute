@@ -22,7 +22,7 @@ function Sidebar(props) {
   const [{apiData}] = useFetch('');
   const [userLocations, setUserLocations] = useState([]);
 
-  const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick} = props
+  const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick, setParentLocation} = props
 
   const handleOptionClick = (option, addresses) => {
     setSelectedOption(option);
@@ -84,10 +84,10 @@ function Sidebar(props) {
     }
   };
 
-  const optionStyle = "p-3 cursor-pointer hover:bg-gray-50 hover:bg-opacity-5 hover:rounded-lg"
+  const optionStyle = "p-[1.3rem] cursor-pointer hover:bg-gray-50 hover:bg-opacity-5 hover:rounded-lg text-2xl"
 
 
-  const selectedOptionStyle = "p-3 cursor-pointer bg-gray-100 bg-opacity-25 rounded-lg"
+  const selectedOptionStyle = "p-[1.3rem] cursor-pointer bg-gray-100 bg-opacity-25 rounded-lg text-2xl"
 
 
   const isAdmin = apiData?.RoleHierarchy;
@@ -109,11 +109,18 @@ function Sidebar(props) {
     fetchData();
   }, []);
 
+  const handleDropdownChange=(value)=>{
+     setSelectedLocation(value)
+     setParentLocation(value)
+     
+    //  props.setSelectedLocation(value)
+  }
+
   // Constant to determine whether to display the Admin option
   const shouldDisplayAdmin = isAdmin;
   return (
     <div
-      className="fixed w-[275px] h-full z-40 p-2 bg-customColor text-blue-200 leading-loose text-2xl"
+      className="fixed w-[275px] h-full z-40 p-2 bg-customColor text-blue-200 leading-loose "
 
     >
       <h2 className="text-white text-5xl font-bold leading-loose">EasyRoute</h2>
@@ -121,7 +128,7 @@ function Sidebar(props) {
       <select
       className="text-white bg-customColor  rounded-lg text-xl px-12 p-3 text-center inline-flex border border-gray-100 border-opacity-25 mb-2 focus:outline-none"
       id="locationDropdown"
-      onChange={(e) => setSelectedLocation(e.target.value)}
+      onChange={(e) => handleDropdownChange(e.target.value)}
       value={selectedLocation}
     >
       <option value="" disabled className="text-gray-500 px-5 hover:bg-gray-100 p-3 text-xl bg-gray-700  inline-flex text-left">Select Location</option>
@@ -191,10 +198,11 @@ function Sidebar(props) {
         <i className="fas fa-user" style={{ marginRight: 25 }} />
         Profile
       </p>
-
-      <ExtendedScreen isExpanded={isExpanded} onToggleExpand={handleToggleExpand}>
+<div>
+      <ExtendedScreen isExpanded={isExpanded} onToggleExpand={handleToggleExpand} >
         {renderContent()}
       </ExtendedScreen>
+      </div>
     </div>
   );
 }

@@ -89,7 +89,7 @@ function Admin() {
       </button>
   
       
-      <div className="mt-4 ml-11">
+      <div className="mt-4 ml-11 text-2xl leading-loose">
         <div
           className="text-4x1 font-medium text-black text-semibold text-left cursor-pointor "
           onClick={toggleRole}

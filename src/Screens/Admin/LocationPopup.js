@@ -112,7 +112,7 @@ function LocationPopup({ closePopup }) {
     <div>
       <Toaster position="top-center" reverseOrder={false}></Toaster>
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
-        <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto relative">
+        <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto relative text-2xl leading-loose">
           <div className="absolute top-4 right-4 cursor-pointer">
             <button onClick={closePopup} className="text-gray-500 hover:text-gray-700">
               <RxCrossCircled />
@@ -120,12 +120,14 @@ function LocationPopup({ closePopup }) {
           </div>
           <h2 className="text-3xl font-bold text-center mb-4">Locations</h2>
           <hr className="my-4" />
+          <div className='overflow-y-auto h-72'>
           <ul>
             {locations.map((location, index) => (
               <li key={index}>{location.Location}</li>
             ))}
           </ul>
-          <div>
+          </div>
+          <div className='mt-2'>
             {showInput && (
               <form onSubmit={handleSubmit}>
                 <input

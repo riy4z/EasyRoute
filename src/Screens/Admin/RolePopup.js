@@ -89,7 +89,7 @@ function RolePopup(props) {
     <div>
       <Toaster position="top-center" reverseOrder={false}></Toaster>
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
-        <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto">
+        <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto text-2xl leading-loose">
           <div className="flex justify-end">
             <button onClick={props.closePopup} className="text-gray-500 hover:text-gray-700">
               <RxCrossCircled />

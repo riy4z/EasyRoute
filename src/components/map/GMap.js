@@ -419,7 +419,7 @@ let lastCoordinateInEntireArray = null;
 
     return (
         isLoaded ? (
-            <div className='map-container' style={{ position: 'relative', display: "block" }}>
+            <div className=" w-[275px] h-full leading-loose ">
                 <GoogleMap
                     zoom={12}
                     center={initialCenter}
@@ -587,13 +587,12 @@ let lastCoordinateInEntireArray = null;
 
                 </GoogleMap>
                 {clickedMarkers && (
-          <div>
             <AccountDetails
+              selectedLocation={props.selectedLocation}
               addressData={clickedMarkers[0]} // Pass the selected marker's data to AccountDetails
               isExpanded={true} // Set isExpanded to true to render the AccountDetails component
               onToggleExpand={() => setClickedMarkers(null)} // Close the AccountDetails component when needed
             />
-            </div>
           )}
             </div>
             

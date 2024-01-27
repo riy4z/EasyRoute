@@ -15,6 +15,7 @@ const App = () => {
   const [customRouteClick, setCustomRouteClick] = useState(false);
   const [clearClick, setClearClick] = useState(false);
   const [savedPolylines,setSavedPolylines]=useState([]);
+  const [selectedLocation,setSelectedLocation]=useState("");
 
 
   const handleSetAddresses = (newAddresses) => {
@@ -54,12 +55,13 @@ const handleClearClick = (value) => {
   setClearClick(value);
 };
 
+
   return (
     <div>
       <Sidebar setAddresses={handleSetAddresses} setLassoActivate={handleLassoActivate} onSelectedAddresses={handleSelectedAddresses} polylines={polylines} handlePolylinesUpdate={handlePolylinesSaved} onUpdateStartLocation={setStartLocation}
-        onUpdateEndLocation={setEndLocation} lassoComplete={lassoComplete} onOptimizeClick={handleOptimizeClick} onCustomRouteClick={handleCustomRouteClick} onClearClick={handleClearClick}/>
+        onUpdateEndLocation={setEndLocation} lassoComplete={lassoComplete} onOptimizeClick={handleOptimizeClick} onCustomRouteClick={handleCustomRouteClick} onClearClick={handleClearClick} setParentLocation={setSelectedLocation}/>
       <GMap addresses={addresses} LassoActive={lassoactivate} selectAddress={selectAddress} onPolylinesUpdate={handlePolylinesUpdate} startLocation={startLocation} // Pass the start location to GMap
-        endLocation={endLocation} onLassoComplete={handleLassoComplete} optimizeClick={optimizeClick} customRouteClick={customRouteClick} savedPolylines={savedPolylines} clearClick={clearClick} />
+        endLocation={endLocation} onLassoComplete={handleLassoComplete} optimizeClick={optimizeClick} customRouteClick={customRouteClick} savedPolylines={savedPolylines} clearClick={clearClick} selectedLocation={selectedLocation} />
     </div>
   );
 };
