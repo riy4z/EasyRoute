@@ -3,12 +3,11 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import App from './App';
-import LoginPage from './authentication/Screens/LoginPage';
-
+// import LoginPage from './authentication/Screens/LoginPage';
+import LoginPasswordPage from './authentication/Screens/LoginPasswordPage';
 import reportWebVitals from './reportWebVitals';
-import Password from './authentication/Screens/Password';
-import Recovery from './authentication/Screens/Recovery';
-import Reset from './authentication/Screens/Reset';
+import RecoveryPage from './authentication/Screens/RecoveryPage';
+import ResetPage from './authentication/Screens/ResetPage';
 import Register from './authentication/Screens/Register';
 import "./index.css";
 import { AuthorizeUser, ProtectRoute } from './authentication/middleware/auth';
@@ -17,12 +16,11 @@ import { AuthorizeUser, ProtectRoute } from './authentication/middleware/auth';
 const Root = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<LoginPage />} />
-      <Route path="/password" element={<div><ProtectRoute><Password/></ProtectRoute></div>}/>
+      <Route path="/" element={<LoginPasswordPage/>}/>
+      <Route path="/recoverypage" element={<RecoveryPage/>}/>
       <Route path="/register/:params" element={<Register/>}/>
-      <Route path="/recovery" element={<Recovery/>}/>
-      <Route path="/reset" element={<Reset/>}/>
-      <Route path="/app" element={<div><AuthorizeUser><App /></AuthorizeUser></div>} />
+      <Route path="/resetpage" element={<ResetPage/>}/>
+      <Route path="/app" element={<AuthorizeUser><App/></AuthorizeUser>} />
     </Routes>
   </BrowserRouter>
 );
