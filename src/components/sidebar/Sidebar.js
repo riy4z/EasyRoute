@@ -22,8 +22,13 @@ function Sidebar(props) {
   const [{apiData}] = useFetch('');
   const [userLocations, setUserLocations] = useState([]);
 
-  const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick, setParentLocation} = props
+  // const userlocation = fetchUserLocations();
+  // console.log(userlocation)
+  const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick} = props
+  const[isAdmin,setIsAdmin]=useState(2);
 
+
+  console.log(selectedLocation);
   const handleOptionClick = (option, addresses) => {
     setSelectedOption(option);
     setIsExpanded(true); // Expand the ExtendedScreen on option click
@@ -48,11 +53,11 @@ function Sidebar(props) {
 
  
 
-
   const renderContent = () => {
     switch (selectedOption) {
       case 'Admin':
-        return <Admin />;
+        return <Admin 
+        isCorpAdmin={isAdmin} />;
       case 'Account':
         return <Account setAddresses={props.setAddresses} selectedLocation={selectedLocation} />;
       case 'Route':
@@ -90,7 +95,7 @@ function Sidebar(props) {
   const selectedOptionStyle = "p-[1.3rem] cursor-pointer bg-gray-100 bg-opacity-25 rounded-lg text-2xl"
 
 
-  const isAdmin = apiData?.RoleHierarchy;
+  // const isAdmin = apiData?.RoleHierarchy;
  
 
   useEffect(() => {
@@ -109,12 +114,18 @@ function Sidebar(props) {
     fetchData();
   }, []);
 
-  const handleDropdownChange=(value)=>{
-     setSelectedLocation(value)
-     setParentLocation(value)
-     
-    //  props.setSelectedLocation(value)
-  }
+
+  useEffect(() => {
+    try { 
+
+    const admin = userLocations.find((loc) => loc.LocationID === selectedLocation);
+    setIsAdmin(admin.RoleHierarchy)
+    console.log(isAdmin)
+    }
+    catch(error)
+    {console.log("Location not selected")}
+  },[selectedLocation]);
+
 
   // Constant to determine whether to display the Admin option
   const shouldDisplayAdmin = isAdmin;

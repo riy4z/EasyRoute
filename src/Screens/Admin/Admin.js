@@ -7,13 +7,14 @@ import getRoleHierarchy from '../../components/fetch/getRoleHierarchy';
 import getCompanyID from '../../components/fetch/getCompany';
 import { getUsersByCompany } from '../../components/fetch/getUsersByCompany'; 
 
-function Admin() {
+function Admin(props) {
   const [isInvitePopupOpen, setInvitePopupOpen] = useState(false);
   const [isLocationPopupOpen, setLocationPopupOpen] = useState(false);
   const [isRolePopupOpen, setRolePopupOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const companyId = getCompanyID();
-  const isCorpAdmin = getRoleHierarchy();
+  // const isCorpAdmin = getRoleHierarchy();
+  const isCorpAdmin=props.isCorpAdmin;
   const showAddButtons = isCorpAdmin;
   const [selectedUserName, setSelectedUserName] = useState(null);
   const [showLocalAdmin, setShowLocalAdmin] = useState(false);
@@ -21,7 +22,7 @@ function Admin() {
   const [isRoleOpen, setRoleOpen] = useState(false);
   const [isLocalAdminOpen, setLocalAdminOpen] = useState(false);
   const [isUsersOpen, setUsersOpen] = useState(false);
-
+  
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -64,7 +65,7 @@ function Admin() {
     setRoleOpen(!isRoleOpen);
   };
   
-
+console.log(users)
   return (
     <div>
       <h1 className="text-5xl font-medium text-customColor1 text-left">Admin</h1>
@@ -114,7 +115,7 @@ function Admin() {
           {users
             .filter(user => user.RoleHierarchy === 1)
             .map(user => (
-              <div key={user._id} onClick={() => handleUserNameClick(user.firstName)}>
+              <div key={user._id} onClick={() => handleUserNameClick(user)}>
                 <p style={{ cursor: 'pointer' }}>{`${user.firstName} `}</p>
               </div>
             ))}
@@ -136,7 +137,7 @@ function Admin() {
             users
               .filter(user => user.RoleHierarchy === 2)
               .map(user => (
-                <div key={user._id} onClick={() => handleUserNameClick(user.firstName)}>
+                <div key={user._id} onClick={() => handleUserNameClick(user)}>
                   <p style={{ cursor: 'pointer' }}>{`${user.firstName} `}</p>
                 </div>
               ))
@@ -154,18 +155,8 @@ function Admin() {
       {isInvitePopupOpen && <InvitePopup closePopup={closeInvitePopup} />}
   
       {selectedUserName && (
-        <UserDetails userName={selectedUserName} 
-        UserDetails={{
-          _id:"65643d525b99a474bd4713ba",
-          username:"riy4z",
-          password:"$2b$10$6vm1h3mR6OIUXIySUI2Y6OPvKApzcGPy6wBQ5mtEIdyNI4Dt0GdTe",
-          email:"shehnazrasheetha2@gmail.com",
-          address:"haha",
-          firstName:"Riyaz",
-          lastName:"Ahamed",
-          mobile:"hardcoded data for testing",
-          CompanyID:"65644b1071ffc1cf2bcee6cf",
-          RoleHierarchy:0}}  
+        <UserDetails  
+        UserDetails={selectedUserName}  
         closePopup={() => setSelectedUserName(null)} />
       )}
     </div>
