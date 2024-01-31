@@ -4,12 +4,14 @@ import toast, {Toaster} from 'react-hot-toast';
 import { verifyPassword } from '../helper/helper';
 import avatar from '../assets/avatar.png';
 import styles from '../../styles/ProfileStyle.module.css';
+import useFetch from '../hooks/fetch.hook';
 
 
 const LoginPasswordPage = () => {
   const [username, setUsernameLocal] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const [{isLoading, apiData, serverError}]= useFetch(`/user/${username}`)
 
   const handleLogin = async () => {
     try {
@@ -18,14 +20,13 @@ const LoginPasswordPage = () => {
       if (response.data) {
         let {token} = response.data
         localStorage.setItem('token', token)
-        navigate('/app'); // Replace '/home' with the actual route path for HomeTabs
+        navigate('/app'); 
       } else {
-        // You might want to use a different approach to display errors on the web
         toast.error('Login failed. Username or password is incorrect');
       }
     } catch (error) {
       console.error('Error during login:', error);
-      // Displaying errors using alert, replace with your preferred error handling
+
       toast.error('Login failed');
     }
   };

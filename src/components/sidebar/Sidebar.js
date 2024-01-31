@@ -24,7 +24,7 @@ function Sidebar(props) {
 
   // const userlocation = fetchUserLocations();
   // console.log(userlocation)
-  const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick} = props
+  const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick, setParentLocation} = props
   const[isAdmin,setIsAdmin]=useState(2);
 
 
@@ -95,7 +95,11 @@ function Sidebar(props) {
   const selectedOptionStyle = "p-[1.3rem] cursor-pointer bg-gray-100 bg-opacity-25 rounded-lg text-2xl"
 
 
-  // const isAdmin = apiData?.RoleHierarchy;
+  const handleDropdownChange=(value)=>{
+    setSelectedLocation(value)
+    setParentLocation(value)
+    
+ }
  
 
   useEffect(() => {
