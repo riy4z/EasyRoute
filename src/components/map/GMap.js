@@ -417,6 +417,8 @@ let lastCoordinateInEntireArray = null;
         zIndex: 99999
     }
 
+    const customMarkerIcon = "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+
     return (
         isLoaded ? (
             <div className=" w-[275px] h-full leading-loose ">
@@ -509,7 +511,7 @@ let lastCoordinateInEntireArray = null;
             // Case when polyline is an array of coordinates
             coordinates = polyline.map((coord) => {
                 // Assuming that Ig is an array and you want to map its elements
-                const igArray = coord.latLngs.Ig[0].Ig;
+                const igArray = coord.latLngs.Fg[0].Fg;
 
                 // Map the elements of igArray to create coordinates
                 const mappedCoordinates = igArray.map((igCoord) => ({
@@ -542,12 +544,12 @@ let lastCoordinateInEntireArray = null;
         // Route From Saved Routes
         else if (
             polyline.latLngs &&
-            polyline.latLngs.Ig &&
-            Array.isArray(polyline.latLngs.Ig) &&
-            polyline.latLngs.Ig[0] &&
-            Array.isArray(polyline.latLngs.Ig[0].Ig)
+            polyline.latLngs.Fg &&
+            Array.isArray(polyline.latLngs.Fg) &&
+            polyline.latLngs.Fg[0] &&
+            Array.isArray(polyline.latLngs.Fg[0].Fg)
         ) {
-            coordinates = polyline.latLngs.Ig[0].Ig.map((coord) => ({
+            coordinates = polyline.latLngs.Fg[0].Fg.map((coord) => ({
                 lat: coord.lat,
                 lng: coord.lng,
             }));
@@ -569,7 +571,10 @@ let lastCoordinateInEntireArray = null;
             <React.Fragment key={index}>
                 <Polyline path={coordinates} options={options} />
                 {/* Marker for firstmost coordinate */}
-                <Marker position={firstCoordinate} label={(index + 1).toString()} />
+                <Marker position={firstCoordinate}  icon={{
+                                url: customMarkerIcon,
+                                scaledSize: new window.google.maps.Size(32, 32), // Adjust the size as needed
+                            }} label={(index + 1).toString()} />
             </React.Fragment>
         );
     })}
@@ -579,6 +584,10 @@ let lastCoordinateInEntireArray = null;
     <Marker
         position={lastCoordinateInEntireArray}
         label={`${polylines.length + 1}`}
+        icon={{
+            url: customMarkerIcon,
+            scaledSize: new window.google.maps.Size(32, 32), // Adjust the size as needed
+        }}
     />
 )}
 

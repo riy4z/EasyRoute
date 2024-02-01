@@ -1,9 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import RoutePopup from './RoutePopup';
 import NullAddress1 from '../../assets/images/NullAddress1.jpg';
-import fetchLocations from '../../components/fetch/fetchLocations';
-import fetchUserLocations from '../../components/fetch/fetchUserLocations';
 import getUserID from "../../components/fetch/getUser";
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import axios from "axios";
@@ -72,12 +70,12 @@ const [optimizeDownOccurred, setOptimizeDownOccurred] = useState(false);
   
   if (polylines.length > 0 && savedRouteClick) {
    
-    const firstItemLat = polylines[0].latLngs.Ig[0].Ig[0].lat;
-    const firstItemLng = polylines[0].latLngs.Ig[0].Ig[0].lng;
+    const firstItemLat = polylines[0].latLngs.Fg[0].Fg[0].lat;
+    const firstItemLng = polylines[0].latLngs.Fg[0].Fg[0].lng;
     setFirstLatLng({ lat: firstItemLat, lng: firstItemLng || {} });
 
     
-    const lastItem = polylines[polylines.length - 1].latLngs.Ig[0].Ig;
+    const lastItem = polylines[polylines.length - 1].latLngs.Fg[0].Fg;
     if (Array.isArray(lastItem) && lastItem.length > 0) {
       const lastItemIndex = lastItem.length - 1;
       const lastItemLat = lastItem[lastItemIndex].lat;
