@@ -1,31 +1,26 @@
 import React, { useEffect, useState } from "react";
 import fetchUserRoute from "../../components/fetch/fetchUserRoute";
-import { getRouteId } from "../../components/fetch/fetchRoute";
+import { getRoute } from "../../components/fetch/fetchRoute";
 import api from "../../config/api";
 
 function SavedRoutes(props) {
   const [userRoutes, setUserRoutes] = useState([]);
-  const {handlePolylinesUpdate,onSavedRouteClick}=props;
+  const {handlePolylinesUpdate,onSavedRouteClick, selectedLocation}=props;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userRoutesData = await fetchUserRoute();
-
-        // Fetch detailed information for each route
-        const detailedRoutes = await Promise.all(
-          userRoutesData.map((route) => getRouteId(route.RouteID))
-        );
-
-        setUserRoutes(detailedRoutes);
+        const routes = await getRoute(selectedLocation); // Fetch all routes for selected location
+  
+        setUserRoutes(routes.route);
       } catch (error) {
         // Handle errors
         console.error('Error:', error);
       }
     };
-
+  
     fetchData();
-  }, []);
+  }, [selectedLocation]);
   
   const handleonclick = (route) => {
   
@@ -37,7 +32,7 @@ function SavedRoutes(props) {
   
   const handleShowAll = () => {
     if (document.getElementById("showAllCheckbox").checked) {
-      const updatedAllRoutes = userRoutes.map(route => route.route.Route);
+      const updatedAllRoutes = userRoutes.map(route => route.Route);
       // Update the polylines state using the prop function
       handlePolylinesUpdate(updatedAllRoutes);
     } else {
@@ -67,7 +62,7 @@ function SavedRoutes(props) {
   
       if (response.status === 200) {
         // Route successfully deleted, update the state or refetch the data
-        setUserRoutes((prevRoutes) => prevRoutes.filter((route) => route.route._id !== routeId));
+        setUserRoutes((prevRoutes) => prevRoutes.filter((route) => route._id !== routeId));
       } else {
         // Handle the case where the deletion was not successful
         console.error('Failed to delete route:', response.statusText);
@@ -94,10 +89,10 @@ function SavedRoutes(props) {
       }
   
       const updatedRoute = response.data;
-  
-      setUserRoutes((prevRoutes) =>
-        prevRoutes.map((route) =>
-          route.route._id === routeId ? { ...route, route: updatedRoute.route } : route
+
+      setUserRoutes(prevRoutes =>
+        prevRoutes.map(route =>
+          route._id === routeId ? { ...route, RouteName: RouteName } : route
         )
       );
   
@@ -107,7 +102,7 @@ function SavedRoutes(props) {
     }
   };
   
-
+console.log(userRoutes  )
   return (
     <div className="text-2xl leading-loose">
       <div>
@@ -123,20 +118,20 @@ function SavedRoutes(props) {
       </div>
       <ul>
         {userRoutes.map((route) => (
-          <li key={route.route._id} className='border overflow-y-auto px-2'> 
+          <li key={route._id} className='border overflow-y-auto px-2'> 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: "pointer" }}>
-              <span onClick={()=>handleonclick(route.route)}>{route.route.RouteName}</span>
+              <span onClick={()=>handleonclick(route)}>{route.RouteName}</span>
               <div>
                 <button
                   className="fa-solid fa-pencil  px-4"
                   onClick={() => {
-                    const newRouteName = prompt('Enter new route name:', route.route.RouteName);
+                    const newRouteName = prompt('Enter new route name:', route.RouteName);
                     if (newRouteName !== null) {
-                      handleUpdateRoute(route.route._id, newRouteName);
+                      handleUpdateRoute(route._id, newRouteName);
                     }
                   }}
                 ></button>
-                  <button className="fa-solid fa-xmark" onClick={() => handleDeleteRoute(route.route._id)}></button>
+                  <button className="fa-solid fa-xmark" onClick={() => handleDeleteRoute(route._id)}></button>
               </div>
             </div>
 

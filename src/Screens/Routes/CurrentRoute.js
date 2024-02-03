@@ -67,23 +67,26 @@ const [optimizeDownOccurred, setOptimizeDownOccurred] = useState(false);
   
   //UseEffect to extract lat , lng from first and last item
   useEffect(() => {
+    try {
+      if (polylines.length > 0 && savedRouteClick) {
+        const firstItemLat = polylines[0].latLngs.Fg[0].Fg[0].lat;
+        const firstItemLng = polylines[0].latLngs.Fg[0].Fg[0].lng;
+        setFirstLatLng({ lat: firstItemLat, lng: firstItemLng || {} });
   
-  if (polylines.length > 0 && savedRouteClick) {
-   
-    const firstItemLat = polylines[0].latLngs.Fg[0].Fg[0].lat;
-    const firstItemLng = polylines[0].latLngs.Fg[0].Fg[0].lng;
-    setFirstLatLng({ lat: firstItemLat, lng: firstItemLng || {} });
-
-    
-    const lastItem = polylines[polylines.length - 1].latLngs.Fg[0].Fg;
-    if (Array.isArray(lastItem) && lastItem.length > 0) {
-      const lastItemIndex = lastItem.length - 1;
-      const lastItemLat = lastItem[lastItemIndex].lat;
-      const lastItemLng = lastItem[lastItemIndex].lng;
-      setLastLatLng({ lat: lastItemLat, lng: lastItemLng || {} });
+        const lastItem = polylines[polylines.length - 1].latLngs.Fg[0].Fg;
+        if (Array.isArray(lastItem) && lastItem.length > 0) {
+          const lastItemIndex = lastItem.length - 1;
+          const lastItemLat = lastItem[lastItemIndex].lat;
+          const lastItemLng = lastItem[lastItemIndex].lng;
+          setLastLatLng({ lat: lastItemLat, lng: lastItemLng || {} });
+        }
+      }
+    } catch (error) {
+      // If there's an error, display an alert
+      alert('An error occurred: ' + error.message);
     }
-  }
-}, [polylines, savedRouteClick]);
+  }, [polylines, savedRouteClick]);
+  
 
 //Reverse Geocoding
 useEffect(() => {

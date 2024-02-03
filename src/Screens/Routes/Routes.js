@@ -72,6 +72,7 @@ useEffect(() => {
         <SavedRoutes 
         handlePolylinesUpdate={handlePolylinesUpdate}
         onSavedRouteClick={handleSavedRouteClick}
+        selectedLocation={selectedLocation}
         />
       )}
     </div>
