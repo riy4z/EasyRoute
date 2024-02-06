@@ -73,7 +73,7 @@ const EditPopup = ({ onClose, selectedLocation, addressData, companyID, onUpdate
   
           api.patch(`/update-address-data/${addressData._id}`, updatedAddressData)
             .then(response => {
-              // console.log('Address updated successfully:', updatedAddressData);
+              console.log('Address updated successfully:', updatedAddressData);
               // Perform additional actions as needed after successful update
               onUpdateAddress(updatedAddressData);
               onClose()

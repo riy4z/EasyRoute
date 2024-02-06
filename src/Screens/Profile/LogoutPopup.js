@@ -27,7 +27,7 @@ function LogoutPopup(props) {
           </button>
         </div>
         <div className="flex justify-between">
-          <button onClick={userLogout} className="w-2/5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm">
+          <button onClick={userLogout} className="w-2/5 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm">
             Yes
           </button>
           <button onClick={props.closePopup} className="w-2/5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm">

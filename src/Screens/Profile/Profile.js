@@ -123,11 +123,8 @@ export default function Profile() {
              {!isEditing && ( // Display "Edit" button when not editing
               <div  className="max-w-[280px] text-xl py-5 leading-loose overlow-hidden">
                 <label>
-                  <strong>First Name:</strong>
-                <p >{apiData?.firstName || ''}</p></label>
-                <label>
-                  <strong>Last Name:</strong>
-                <p>{apiData?.lastName || ''}</p></label>
+                  <strong>Name:</strong>
+                <p >{apiData?.firstName || ''} {apiData?.lastName || ''}</p></label>
                 <label>
                   <strong>Email:</strong>
                 <p >{apiData?.email || ''}</p></label>

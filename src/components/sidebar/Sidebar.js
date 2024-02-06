@@ -135,13 +135,14 @@ function Sidebar(props) {
   const shouldDisplayAdmin = isAdmin;
   return (
     <div
-      className="fixed w-[275px] h-full z-40 p-2 bg-customColor text-blue-200 leading-loose "
+      className="fixed md:w-[275px] sm:w-[90px] h-full z-40 p-2 bg-customColor text-blue-200 leading-loose "
 
     >
-      <h2 className="text-white text-5xl font-bold leading-loose">EasyRoute</h2>
+      <h2 className="hidden md:inline-block text-white text-5xl font-bold leading-loose">EasyRoute</h2>
+      <h2 className='block md:hidden text-white text-4xl ml-3 font-bold leading-loose'>EZ</h2>
 
       <select
-      className="text-white bg-customColor  rounded-lg text-xl px-12 p-3 text-center inline-flex border border-gray-100 border-opacity-25 mb-2 focus:outline-none"
+      className="hidden md:text-white md:bg-customColor md:rounded-lg md:text-xl md:px-12 md:p-3 md:text-center md:inline-flex md:border md;border-gray-100 md:border-opacity-25 md:mb-2 focus:outline-none"
       id="locationDropdown"
       onChange={(e) => handleDropdownChange(e.target.value)}
       value={selectedLocation}
@@ -167,51 +168,51 @@ function Sidebar(props) {
           className={selectedOption === 'Admin' ? selectedOptionStyle : optionStyle}
           onClick={() => handleOptionClick('Admin')}
         >
-          <i className="fas fa-solid fa-user-tie" style={{ marginRight: 25 }} />
-          Admin
+          <i className="fas fa-solid fa-user-tie"  />
+          <span className="md:ml-6 hidden md:inline-block">Admin</span>
         </p>
       )}
       <p
         className={selectedOption === 'Account' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Account')}
       >
-        <i className="fas fa-user-circle" style={{ marginRight: 25 }} />
-        Account
+        <i className="fas fa-user-circle"  />
+        <span className="md:ml-6 hidden md:inline-block">Account</span>
       </p>
       <p
         className={selectedOption === 'Route' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Route')}
       >
-        <i className="fas fa-map-marked-alt" style={{ marginRight: 25 }} />
-        Route
+        <i className="fas fa-map-marked-alt"  />
+        <span className="md:ml-6 hidden md:inline-block">Route</span>
       </p>
       <p
         className={selectedOption === 'FollowUp' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('FollowUp')}
       >
-        <i className="fas fa-star" style={{ marginRight: 25 }} />
-        Follow Up
+        <i className="fas fa-star"  />
+        <span className="md:ml-6 hidden md:inline-block">Follow Up</span>
       </p>
       <p
         className={selectedOption === 'Settings' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Settings')}
       >
-        <i className="fas fa-cog" style={{ marginRight: 25 }} />
-        Settings
+        <i className="fas fa-cog"  />
+        <span className="md:ml-6 hidden md:inline-block">Settings</span>
       </p>
       <p
         className={selectedOption === 'HelpSupport' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('HelpSupport')}
       >
-        <i className="fas fa-question-circle" style={{ marginRight: 25 }} />
-        Help & Support
+        <i className="fas fa-question-circle"  />
+        <span className="md:ml-6 hidden md:inline-block">Help & Support</span>
       </p>
       <p
         className={selectedOption === 'Profile' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Profile')}
       >
-        <i className="fas fa-user" style={{ marginRight: 25 }} />
-        Profile
+        <i className="fas fa-user"  />
+        <span className="md:ml-6 hidden md:inline-block">Profile</span>
       </p>
 <div>
       <ExtendedScreen isExpanded={isExpanded} onToggleExpand={handleToggleExpand} >

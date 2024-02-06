@@ -300,16 +300,14 @@ updateSavedAddress = (updatedAddress) => {
           onClick={() => this.handleListItemClick(address)}
           onMouseEnter={() => this.handleListItemHover(index)}
           onMouseLeave={() => this.handleListItemLeave(index)}
+          className="cursor-pointer border-b border-gray-200 hover:bg-gray-100 p-1"
           style={{
-            backgroundColor: address.backgroundColor,
-            cursor: 'pointer',
-            borderBottom: '1px solid #ccc',
             display: address.isHidden ? 'none' : 'block' // Hiding elements with isHidden set to true
           }}
         >
-          <p style={{ fontSize: "14px" }}>
-            <strong>{address['First Name']} {address['Last Name']}</strong><br></br>         
-            {address['Street Address']}, {address['City']}, {address['State']}, {address['ZIP Code']}
+          <p className="text-sm font-bold">
+            {address['First Name']} {address['Last Name']}</p>        
+           <p className="text-sm font-normal leading-tight text-gray-700 my-1">   {address['Street Address']}, {address['City']}, {address['State']}, {address['ZIP Code']}
           </p> 
         </li>
       ));
