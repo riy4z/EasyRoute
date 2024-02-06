@@ -35,9 +35,8 @@ useEffect(() => {
         ? await axios.get(`/api/user/${username}`)
         : await axios.get(`/api/${query}`);
 
-        if (window.location.pathname === '/app') {
-          sessionStorage.setItem(storageKey, JSON.stringify(data));
-        }
+      
+      sessionStorage.setItem(storageKey, JSON.stringify(data));
 
       setData((prev) => ({ ...prev, apiData: data, status, isLoading: false }));
     } catch (error) {
