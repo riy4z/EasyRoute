@@ -12,6 +12,7 @@ import FollowUp from "../../Screens/Followup/FollowUp";
 import fetchUserLocations from '../fetch/fetchUserLocations';
 import fetchLocations from '../fetch/fetchLocations';
 import getUserID from '../fetch/getUser';
+import api from '../../config/api';
 
 
 function Sidebar(props) {
@@ -20,10 +21,10 @@ function Sidebar(props) {
   const [selectedLocation, setSelectedLocation] = useState('')
   const [Locations, setLocations] = useState([]);
   const [{apiData}] = useFetch('');
+  const [followUpData, setFollowUpData] = useState([]);
+  const [hasFollowUpForToday, setHasFollowUpForToday] = useState(false);
   const [userLocations, setUserLocations] = useState([]);
 
-  // const userlocation = fetchUserLocations();
-  // console.log(userlocation)
   const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick, setParentLocation} = props
   const[isAdmin,setIsAdmin]=useState(2);
 
@@ -45,6 +46,77 @@ function Sidebar(props) {
       setSelectedOption(null); 
     }
   }, [isExpanded]);
+
+//!---Location Dropdown
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userId = getUserID();
+        const userLocationsData = await fetchUserLocations(userId);
+        setUserLocations(userLocationsData);
+        const allLocations = await fetchLocations();
+        setLocations(allLocations);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+ 
+    fetchData();
+  }, []);
+ 
+ 
+  useEffect(() => {
+    try { 
+ 
+    const admin = userLocations.find((loc) => loc.LocationID === selectedLocation);
+    setIsAdmin(admin.RoleHierarchy)
+    console.log(isAdmin)
+    }
+    catch(error)
+    {console.log("Location not selected")}
+  },[selectedLocation]);
+
+  //-----!
+  
+  
+  //!------FollowUp Data
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await api.get(`/getFollowUpDataByLocation?locationId=${selectedLocation}`);
+        const sortedFollowUpData = response.data.followUps.sort((a, b) => new Date(a.followUp) - new Date(b.followUp));
+        setFollowUpData(sortedFollowUpData);
+      } catch (error) {
+        setHasFollowUpForToday(false)
+        console.error('Error fetching follow-up data:', error);
+      } 
+    };
+
+    fetchData();
+  }, [selectedLocation]);
+
+  useEffect(() => {
+    console.log(followUpData)
+    // Check if follow-up data matches the current date
+    if (followUpData.length>0){
+
+    const currentDate = new Date().toLocaleDateString();
+    followUpData.forEach((item, index) => {
+      if (new Date(item.followUp).toLocaleDateString() === currentDate) {
+        console.log('Follow-up data matching current date:', followUpData[index]);
+        setHasFollowUpForToday(true);
+      }
+      else{
+        setHasFollowUpForToday(false)
+      }
+    });}
+    else{
+      setHasFollowUpForToday(false)
+    }
+  }, [followUpData, selectedLocation]);
+
+  //-------!
   
   const handleLassoToggle = (isActive) => {
     // Pass isActive to the parent component
@@ -80,7 +152,7 @@ function Sidebar(props) {
         return <Settings />;
         case 'FollowUp': // Add 'FollowUp' option
         return <FollowUp
-        selectedLocation={selectedLocation}
+        followUpData={followUpData}
         />;
       case 'Profile':
         return <Profile />;
@@ -89,10 +161,10 @@ function Sidebar(props) {
     }
   };
 
-  const optionStyle = "p-[1.3rem] cursor-pointer hover:bg-gray-50 hover:bg-opacity-5 hover:rounded-lg text-2xl"
+  const optionStyle = "p-[1.3rem] flex cursor-pointer hover:bg-gray-50 hover:bg-opacity-5 hover:rounded-lg text-2xl"
 
 
-  const selectedOptionStyle = "p-[1.3rem] cursor-pointer bg-gray-100 bg-opacity-25 rounded-lg text-2xl"
+  const selectedOptionStyle = "p-[1.3rem] flex cursor-pointer bg-gray-100 bg-opacity-25 rounded-lg text-2xl"
 
 
   const handleDropdownChange=(value)=>{
@@ -102,33 +174,6 @@ function Sidebar(props) {
  }
  
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userId = getUserID();
-        const userLocationsData = await fetchUserLocations(userId);
-        setUserLocations(userLocationsData);
-        const allLocations = await fetchLocations();
-        setLocations(allLocations);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-
-  useEffect(() => {
-    try { 
-
-    const admin = userLocations.find((loc) => loc.LocationID === selectedLocation);
-    setIsAdmin(admin.RoleHierarchy)
-    console.log(isAdmin)
-    }
-    catch(error)
-    {console.log("Location not selected")}
-  },[selectedLocation]);
 
 
   // Constant to determine whether to display the Admin option
@@ -191,7 +236,7 @@ function Sidebar(props) {
         onClick={() => handleOptionClick('FollowUp')}
       >
         <i className="fas fa-star"  />
-        <span className="md:ml-6 hidden md:inline-block">Follow Up</span>
+        <span className="md:ml-6 hidden md:inline-block">Follow Up</span> {hasFollowUpForToday ? <span className="bg-red-500  justify-center rounded-full h-2 w-2 p-1 ml-1 "></span> : ""}
       </p>
       <p
         className={selectedOption === 'Settings' ? selectedOptionStyle : optionStyle}

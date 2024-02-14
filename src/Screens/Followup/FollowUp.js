@@ -3,7 +3,7 @@ import api from '../../config/api';
 import AccountDetails from '../Accounts/AccountDetails';
 
 const FollowUp = (props) => {
-  const [followUpData, setFollowUpData] = useState([]);
+
   const [addressInfoList, setAddressInfoList] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isAccountDetailsExpanded, setIsAccountDetailsExpanded] = useState(false);
@@ -11,28 +11,15 @@ const FollowUp = (props) => {
   const [listItemClick, setListItemClick] = useState(false);
   const [refresh, setRefresh] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await api.get(`/getFollowUpDataByLocation?locationId=${props.selectedLocation}`);
-        const sortedFollowUpData = response.data.followUps.sort((a, b) => new Date(a.followUp) - new Date(b.followUp));
-        setFollowUpData(sortedFollowUpData);
-      } catch (error) {
-        console.error('Error fetching follow-up data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [refresh, props.selectedLocation]);
+  
 
   useEffect(() => {
-    if (followUpData.length > 0) {
+    if (props.followUpData.length > 0) {
       const fetchAddressInfo = async () => {
         const infoList = await Promise.all(
-          followUpData.map(async (item) => {
+          props.followUpData.map(async (item) => {
             const response = await api.get(`/get-address-data-marker?markerId=${item.addressId}`);
+            setIsLoading(false)
             return response.data;
           })
         );
@@ -41,17 +28,9 @@ const FollowUp = (props) => {
 
       fetchAddressInfo();
     }
-  }, [followUpData]);
+  }, [props.followUpData]);
 
-  useEffect(() => {
-    // Check if follow-up data matches the current date
-    const currentDate = new Date().toLocaleDateString();
-    followUpData.forEach((item, index) => {
-      if (new Date(item.followUp).toLocaleDateString() === currentDate) {
-        console.log('Follow-up data matching current date:', followUpData[index]);
-      }
-    });
-  }, [followUpData]);
+
 
   const handleListItemClick = (address) => {
     setSelectedAddress(address);
@@ -72,7 +51,7 @@ const FollowUp = (props) => {
       <h1 className="text-5xl font-medium text-customColor1 text-left mb-2">Follow Up</h1>
       <div className="container mx-auto mt-8 p-6 bg-white rounded-lg shadow-md max-h-screen overflow-y-auto">
         <ul className="space-y-4">
-          {followUpData.map((item, index) => (
+          {props.followUpData.map((item, index) => (
             <li
               key={item.markerId}
               className="p-4 border border-gray-300 rounded-lg cursor-pointer transition duration-300 ease-in-out transform hover:shadow-md hover:-translate-y-1"
