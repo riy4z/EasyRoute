@@ -61,7 +61,7 @@ const GMap = (props) => {
         if (props.endLocation) {
             MapFunctions.createMarkerFromAddress(props.endLocation, 'endLocation', setMarkers);
         }
-
+        console.log(props.addresses)
         MapFunctions.createPinsFromAddresses(props.addresses, setMarkers);
     }, [props.addresses, props.startLocation, props.endLocation]);
 

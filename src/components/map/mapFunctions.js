@@ -29,9 +29,11 @@ export const createPinsFromAddresses = (addresses, setMarkers) => {
   
   const markers = [];
   
-  const createMarker = (latitude, longitude, markerId) => {
-      markers.push({ position: { lat: latitude, lng: longitude }, markerId });
-  };
+  const createMarker = (latitude, longitude, markerId, isHidden) => {
+    
+        markers.push({ position: { lat: latitude, lng: longitude }, markerId });
+    
+};
 
   const geocoder = new window.google.maps.Geocoder();
 
@@ -46,8 +48,13 @@ export const createPinsFromAddresses = (addresses, setMarkers) => {
   const geocodeAddress = async (addressData) => {
     if (addressData.longitude && addressData.latitude) {
           // If longitude and latitude are already present, use them to create a marker
+          if (!addressData.isHidden) {
           createMarker(addressData.latitude, addressData.longitude, addressData.markerId);
           return;
+          }
+          else{
+            return;
+          }
       }
 
       if (!addressData["Street Address"] || !addressData["City"] || !addressData["ZIP Code"]) {

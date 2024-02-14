@@ -77,12 +77,11 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
   };
 
   const handleDateSelection = (selectedDate) => {
-    const utcDate = addMinutes(selectedDate, selectedDate.getTimezoneOffset());
-  
+    // Simply set the selected date without adjusting for the timezone offset
     setConfirmDate(true);
     setFormData({
       ...formData,
-      followUp: utcDate,
+      followUp: selectedDate, // Set the selected date directly
     });
   };
 
