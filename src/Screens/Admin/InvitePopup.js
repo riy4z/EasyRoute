@@ -5,6 +5,8 @@ import { RxCrossCircled } from 'react-icons/rx';
 import fetchLocations from '../../components/fetch/fetchLocations';
 import fetchRoles from '../../components/fetch/fetchRoles';
 import getRoleHierarchy from '../../components/fetch/getRoleHierarchy';
+import CryptoJS from 'crypto-js';
+import config from '../../config/config';
 
 function InvitePopup(props) {
   const [email, setEmail] = useState('');
@@ -412,12 +414,16 @@ function InvitePopup(props) {
 
     props.closePopup();
   };
+  const encrypt = (text) => {
+    const key = config.secretkey; 
+    const encrypted = CryptoJS.AES.encrypt(text, key);
+    return encrypted.toString();
+  };
   // Function to generate a unique link
-  const generateUniqueLink = (email,location,role,companyid) => {
-    // Implement your logic to generate a unique link based on the email
-    return `http://${window.location.hostname}:3000/register?email=${encodeURIComponent(email)}&location=${encodeURIComponent(location)}&role=${encodeURIComponent(role)}&companyid=${(companyid)}`;
-  };
-
+  const generateUniqueLink = (email, location, role, companyId) => {
+    const encryptedParams = encrypt(`${email}:${location}:${role}:${companyId}`);
+    return `http://${window.location.hostname}:3000/register/${encodeURIComponent(encryptedParams)}`;
+  }
   return (
     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
       <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto relative text-2xl">
