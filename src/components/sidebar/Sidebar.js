@@ -11,7 +11,6 @@ import useFetch from '../../authentication/hooks/fetch.hook';
 import FollowUp from "../../Screens/Followup/FollowUp";
 import fetchUserLocations from '../fetch/fetchUserLocations';
 import fetchLocations from '../fetch/fetchLocations';
-import getUserID from '../fetch/getUser';
 import api from '../../config/api';
 
 
@@ -51,8 +50,7 @@ function Sidebar(props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userId = getUserID();
-        const userLocationsData = await fetchUserLocations(userId);
+        const userLocationsData = await fetchUserLocations();
         setUserLocations(userLocationsData);
         const allLocations = await fetchLocations();
         setLocations(allLocations);

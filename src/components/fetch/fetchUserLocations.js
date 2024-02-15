@@ -3,7 +3,7 @@ import getUserID from "./getUser";
 import api from "../../config/api";
 
 const fetchUserLocations = async () => {
-  const userid = getUserID();
+  const userid =  getUserID();
   try {
     const response = await api.get(`/getUserLocations`, {
       params: {

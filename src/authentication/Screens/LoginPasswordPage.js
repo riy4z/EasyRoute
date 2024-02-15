@@ -4,14 +4,15 @@ import toast, {Toaster} from 'react-hot-toast';
 import { verifyPassword } from '../helper/helper';
 import avatar from '../assets/avatar.png';
 import styles from '../../styles/ProfileStyle.module.css';
-import useFetch from '../hooks/fetch.hook';
+import { useAuthStore } from '../store/store';
 
 
 const LoginPasswordPage = () => {
   const [username, setUsernameLocal] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const [{isLoading, apiData, serverError}]= useFetch(`/user/${username}`)
+  const setUsername = useAuthStore((state) => state.setUsername);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
     try {
@@ -20,6 +21,7 @@ const LoginPasswordPage = () => {
       if (response.data) {
         let {token} = response.data
         localStorage.setItem('token', token)
+        setUsername(username);
         navigate('/app'); 
       } else {
         toast.error('Login failed. Username or password is incorrect');
@@ -29,6 +31,10 @@ const LoginPasswordPage = () => {
 
       toast.error('Login failed');
     }
+  };
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -56,13 +62,18 @@ const LoginPasswordPage = () => {
       />
 
       <input
-        className={styles.textbox}
-        type="password"
+        className={`${styles.textbox}`}
+        type={showPassword ? 'text' : 'password'}
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-
+      <i
+                onClick={handleTogglePassword}
+                className={`fixed mt-28 right-8 text-gray-300 cursor-pointer ${
+                  showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'
+                }`}
+              ></i>
 
 
       <button className={styles.btn} onClick={handleLogin}>Login</button>
