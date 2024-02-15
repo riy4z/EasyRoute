@@ -197,6 +197,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
     const checkInData = {
       addressId: addressData._id,
       meetingNotes: meetingNotes,
+      locationID: selectedLocation,
       userID: userID, 
       companyID: companyID
     };
@@ -307,6 +308,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
                     placeholderText='Select FollowUp Date'
                     selected={formData.followUp}
                     onChange={handleDateSelection}
+                    minDate={new Date()} 
                     className='w-64 h-8 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200'
                   />
                   {confirmDate && (

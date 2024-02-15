@@ -147,7 +147,7 @@ function Sidebar(props) {
       case 'HelpSupport':
         return <HelpSupport />;
       case 'Settings':
-        return <Settings />;
+        return <Settings selectedLocation={selectedLocation} />;
         case 'FollowUp': // Add 'FollowUp' option
         return <FollowUp
         followUpData={followUpData}
