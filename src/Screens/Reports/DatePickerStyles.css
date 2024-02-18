@@ -1,20 +1,16 @@
 /* DatePickerStyles.css */
 
 .settings-container {
-    max-width: 500px;
+
     margin: 0 auto;
+    margin-top: 20px;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #f9f9f9;
   }
   
-  .settings-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  
+
   .settings-options {
     margin-bottom: 20px;
   }
@@ -29,15 +25,6 @@
     font-weight: bold;
   }
   
-  .date-picker-input {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #fff;
-    box-sizing: border-box;
-  }
   
   .react-datepicker-wrapper {
     width: 100%;

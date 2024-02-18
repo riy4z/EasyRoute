@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import getCompanyID from '../../components/fetch/getCompany';
 import { RxCrossCircled } from 'react-icons/rx';
+import getUserID from '../../components/fetch/getUser';
 import fetchLocations from '../../components/fetch/fetchLocations';
+import {addUserLocation} from '../../components/fetch/getUserLocationsByUserId'
 import toast, { Toaster } from 'react-hot-toast';
 import api from '../../config/api';
 
@@ -75,6 +77,9 @@ function LocationPopup({ closePopup }) {
       });
   
       const result = response.data;
+      console.log(result.location._id)
+
+      const userId = await getUserID();
   
       if (result.message) {
         // If the role is added successfully, update the roles state
@@ -85,6 +90,7 @@ function LocationPopup({ closePopup }) {
         setNewState('');
         setNewZipCode('');
         setShowInput(false);
+        const response = await addUserLocation(userId, result.location._id);
         // Show a success toast notification
         toast.success('Location added successfully');
       } else {
@@ -169,7 +175,7 @@ function LocationPopup({ closePopup }) {
                   <button
                     type="button"
                     onClick={handleAddLocation}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+                    className="bg-blue-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
                   >
                     Add Location
                   </button>
@@ -185,7 +191,7 @@ function LocationPopup({ closePopup }) {
             {!showInput && (
               <button
                 onClick={handleAddLocationClick}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+                className="bg-blue-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
               >
                 Add Location
               </button>

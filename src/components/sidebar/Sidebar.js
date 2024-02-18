@@ -3,7 +3,7 @@ import ExtendedScreen from './ExtendedScreen';
 import Account from '../../Screens/Accounts/Account'; 
 import Routes from '../../Screens/Routes/Routes';
 import HelpSupport from '../../Screens/HelpSupport/HelpSupport';
-import Settings from '../../Screens/Settings/Settings';
+import Reports from '../../Screens/Reports/Reports';
 import '@fortawesome/fontawesome-free/css/all.css';
 import Profile from '../../Screens/Profile/Profile';
 import Admin from '../../Screens/Admin/Admin';
@@ -146,8 +146,8 @@ function Sidebar(props) {
         lassoComplete = {lassoComplete}/>;
       case 'HelpSupport':
         return <HelpSupport />;
-      case 'Settings':
-        return <Settings selectedLocation={selectedLocation} />;
+      case 'Reports':
+        return <Reports selectedLocation={selectedLocation} />;
         case 'FollowUp': // Add 'FollowUp' option
         return <FollowUp
         followUpData={followUpData}
@@ -211,7 +211,7 @@ function Sidebar(props) {
           className={selectedOption === 'Admin' ? selectedOptionStyle : optionStyle}
           onClick={() => handleOptionClick('Admin')}
         >
-          <i className="fas fa-solid fa-user-tie"  />
+          <i className="fas fa-solid fa-user-tie mt-1"  />
           <span className="md:ml-6 hidden md:inline-block">Admin</span>
         </p>
       )}
@@ -219,43 +219,43 @@ function Sidebar(props) {
         className={selectedOption === 'Account' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Account')}
       >
-        <i className="fas fa-user-circle"  />
+        <i className="fas fa-user-circle mt-1"  />
         <span className="md:ml-6 hidden md:inline-block">Account</span>
       </p>
       <p
         className={selectedOption === 'Route' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Route')}
       >
-        <i className="fas fa-map-marked-alt"  />
+        <i className="fas fa-map-marked-alt mt-1"  />
         <span className="md:ml-6 hidden md:inline-block">Route</span>
       </p>
       <p
         className={selectedOption === 'FollowUp' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('FollowUp')}
       >
-        <i className="fas fa-star"  />
+        <i className="fa-regular fa-calendar mt-1"  />
         <span className="md:ml-6 hidden md:inline-block">Follow Up</span> {hasFollowUpForToday ? <span className="bg-red-500  justify-center rounded-full h-2 w-2 p-1 ml-1 "></span> : ""}
       </p>
       <p
-        className={selectedOption === 'Settings' ? selectedOptionStyle : optionStyle}
-        onClick={() => handleOptionClick('Settings')}
+        className={selectedOption === 'Reports' ? selectedOptionStyle : optionStyle}
+        onClick={() => handleOptionClick('Reports')}
       >
-        <i className="fas fa-cog"  />
-        <span className="md:ml-6 hidden md:inline-block">Settings</span>
-      </p>
-      <p
-        className={selectedOption === 'HelpSupport' ? selectedOptionStyle : optionStyle}
-        onClick={() => handleOptionClick('HelpSupport')}
-      >
-        <i className="fas fa-question-circle"  />
-        <span className="md:ml-6 hidden md:inline-block">Help & Support</span>
+        <i className="fas fa-chart-simple mt-1"  />
+        <span className="md:ml-6 hidden md:inline-block">Reports</span>
       </p>
       <p
         className={selectedOption === 'Profile' ? selectedOptionStyle : optionStyle}
         onClick={() => handleOptionClick('Profile')}
       >
-        <i className="fas fa-user"  />
+        <i className="fas fa-user mt-1"  />
         <span className="md:ml-6 hidden md:inline-block">Profile</span>
+      </p>
+      <p
+        className={selectedOption === 'HelpSupport' ? selectedOptionStyle : optionStyle}
+        onClick={() => handleOptionClick('HelpSupport')}
+      >
+        <i className="fas fa-question-circle mt-1"  />
+        <span className="md:ml-6 hidden md:inline-block">Help & Support</span>
       </p>
 <div>
       <ExtendedScreen isExpanded={isExpanded} onToggleExpand={handleToggleExpand} >
