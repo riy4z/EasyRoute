@@ -5,6 +5,8 @@ import { RxCrossCircled } from 'react-icons/rx';
 import fetchLocations from '../../components/fetch/fetchLocations';
 import fetchRoles from '../../components/fetch/fetchRoles';
 import getRoleHierarchy from '../../components/fetch/getRoleHierarchy';
+import RolePopup from './RolePopup';
+import LocationPopup from './LocationPopup';
 import CryptoJS from 'crypto-js';
 import config from '../../config/config';
 
@@ -14,6 +16,8 @@ function InvitePopup(props) {
   const [location, setLocation] = useState('');
   const [locationsFromServer, setLocationsFromServer] = useState([]);
   const [rolesFromServer, setRolesFromServer] = useState([]);
+  const [showRolePopup, setShowRolePopup] = useState(false);
+  const [showLocationPopup, setShowLocationPopup] = useState(false);
 
   useEffect(() => {
     // Fetch locations from the server when the component mounts
@@ -31,6 +35,7 @@ function InvitePopup(props) {
 
     fetchData();
   }, []);
+  
 
   
   const handleEmailChange = (event) => {
@@ -427,8 +432,9 @@ function InvitePopup(props) {
 
   
   return (
-    <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
-      <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto relative text-2xl">
+    <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full  backdrop-blur-sm">
+      <div className='flex items-center justify-center w-full h-full'>
+      <div className="bg-white p-8 text-lg rounded-lg shadow-lg z-50 max-w-md w-full relative z-100">
         <div className="absolute top-4 right-4 cursor-pointer">
           <button onClick={props.closePopup} className="text-gray-500 hover:text-gray-700">
             <RxCrossCircled />
@@ -450,7 +456,13 @@ function InvitePopup(props) {
 <label className="block mb-2 text-gray-700 text-sm">Role:</label>
 <select
   value={role}
-  onChange={handleRoleChange}
+  onChange={(event) => {
+    handleRoleChange(event); // Update the role state
+    if (event.target.value === 'add_new_user') {
+      setShowRolePopup(true); // Open RolePopup if "Add new user" is selected
+      setRole('')
+    }
+  }}
   className="w-full p-2 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
   required
 >
@@ -460,9 +472,17 @@ function InvitePopup(props) {
     (getRoleHierarchy() === 1 && rol.RoleHierarchy === 2) ? ( 
       <option key={rol.id} value={rol.RoleHierarchy}>
         {rol.Role}
+          
       </option>
     ) : null
   ))}
+    <option 
+    value="add_new_user"
+    onClick={() => setShowRolePopup(true)}
+    className="flex items-center p-3   text-blue-500 border-t border-gray-200 rounded-b-lg bg-gray-50  hover:bg-gray-100   hover:underline"
+  >
+    Add new Role
+  </option>
 </select>
 
 
@@ -471,7 +491,13 @@ function InvitePopup(props) {
       <label className="block mb-2 text-gray-700 text-sm">Location:</label>
       <select
         value={location}
-        onChange={handleLocationChange}
+        onChange={(event) => {
+          handleLocationChange(event); // Update the role state
+          if (event.target.value === 'add_new_location') {
+            setShowLocationPopup(true); // Open RolePopup if "Add new user" is selected
+            setLocation('')
+          }
+        }}
         className="w-full p-2 border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
         required
       >
@@ -481,16 +507,26 @@ function InvitePopup(props) {
               {loc.Location}
             </option>
           ))}
+              <option 
+    value="add_new_location"
+    onClick={() => setShowRolePopup(true)}
+    className="flex items-center p-3 overflow-y-auto  text-blue-500 border-t border-gray-200 rounded-b-lg bg-gray-50  hover:bg-gray-100   hover:underline"
+  >
+    Add new Location
+  </option>
       </select>
-
       <div className="flex justify-end">
           <button
             onClick={handleInviteClick}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
-          >
+            >
             Invite
           </button>
         </div>
+      {showRolePopup && <RolePopup closePopup={() => setShowRolePopup(false)} />}
+      {showLocationPopup && <LocationPopup closePopup={() => setShowLocationPopup(false)} />}
+      
+      </div>
       </div>
     </div>
   );

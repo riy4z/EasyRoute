@@ -117,25 +117,28 @@ function LocationPopup({ closePopup }) {
   return (
     <div>
       <Toaster position="top-center" reverseOrder={false}></Toaster>
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
-        <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto relative text-2xl leading-loose">
-          <div className="absolute top-4 right-4 cursor-pointer">
-            <button onClick={closePopup} className="text-gray-500 hover:text-gray-700">
-              <RxCrossCircled />
-            </button>
-          </div>
-          <h2 className="text-3xl font-bold text-center mb-4">Locations</h2>
-          <hr className="my-4" />
-          <div className='overflow-y-auto h-72'>
-          <ul>
-            {locations.map((location, index) => (
-              <li key={index}>{location.Location}</li>
-            ))}
-          </ul>
-          </div>
-          <div className='mt-2'>
-            {showInput && (
-              <form onSubmit={handleSubmit}>
+      {/* Apply backdrop blur effect to the background */}
+      <div className="fixed top-0 left-0 w-full h-full ">
+        {/* Content container */}
+        <div className="flex justify-center items-center w-full h-full">
+          <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md relative w-7/12 leading-loose">
+            <div className="absolute top-4 right-4 cursor-pointer">
+              <button onClick={closePopup} className="text-gray-500 hover:text-gray-700">
+                <RxCrossCircled />
+              </button>
+            </div>
+            <h2 className="text-3xl font-bold text-center mb-4">Locations</h2>
+            <hr className="my-4" />
+            <div className='overflow-y-auto scrollbar-w-2 scrollbar-track-gray-lighter scrollbar-thumb-rounded scrollbar-thumb-gray scrolling-touch h-72'>
+              <ul>
+                {locations.map((location, index) => (
+                  <li key={index}>{location.Location}</li>
+                ))}
+              </ul>
+            </div>
+            <div className='mt-2'>
+              {showInput && (
+                <form onSubmit={handleSubmit}>
                 <input
                   type="text"
                   value={newLocation}
@@ -173,25 +176,25 @@ function LocationPopup({ closePopup }) {
                 />
                 <div className="flex justify-between">
                   <button
-                    type="button"
+                    type="text"
                     onClick={handleAddLocation}
-                    className="bg-blue-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+                    className=" inline-block bg-blue-700  hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md  text-sm"
                   >
                     Add Location
                   </button>
                   <button
                     onClick={handleCloseClick}
-                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm ml-2"
+                    className="bg-gray-500 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md  text-sm ml-2"
                   >
                     Close
                   </button>
                 </div>
-              </form>
+                </form>
             )}
             {!showInput && (
               <button
                 onClick={handleAddLocationClick}
-                className="bg-blue-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+                className="bg-blue-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md  text-sm"
               >
                 Add Location
               </button>
@@ -200,7 +203,8 @@ function LocationPopup({ closePopup }) {
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 export default LocationPopup;

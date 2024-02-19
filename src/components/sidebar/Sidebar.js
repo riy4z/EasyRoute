@@ -24,7 +24,7 @@ function Sidebar(props) {
   const [hasFollowUpForToday, setHasFollowUpForToday] = useState(false);
   const [userLocations, setUserLocations] = useState([]);
 
-  const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick, setParentLocation} = props
+  const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick, setParentLocation, navigateToCoordinates} = props
   const[isAdmin,setIsAdmin]=useState(2);
 
 
@@ -129,7 +129,7 @@ function Sidebar(props) {
         return <Admin 
         isCorpAdmin={isAdmin} />;
       case 'Account':
-        return <Account setAddresses={props.setAddresses} selectedLocation={selectedLocation} />;
+        return <Account setAddresses={props.setAddresses} selectedLocation={selectedLocation} navigateToCoordinates={navigateToCoordinates}/>;
       case 'Route':
         return <Routes 
         setAddresses={props.setAddresses} 

@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import api from "../../config/api"
 
 export const sendAddressDataToBackend = async (addressData) => {
+console.log(addressData)
   try {
      await api.post('/store-address-data', addressData, {
       headers: { 'Content-Type': 'application/json' },
@@ -26,73 +27,82 @@ export const createPinsFromAddresses = (addresses, setMarkers) => {
   if (!addresses || addresses.length === 0) {
     return;
   }
-  
+
   const markers = [];
-  
+  const addressDataArray = []; // New array to store address data
+
   const createMarker = (latitude, longitude, markerId, isHidden) => {
-    
-        markers.push({ position: { lat: latitude, lng: longitude }, markerId });
-    
-};
+    markers.push({ position: { lat: latitude, lng: longitude }, markerId });
+  };
 
   const geocoder = new window.google.maps.Geocoder();
 
   const logGeocodingError = (status, address) => {
-      if (status === 'ZERO_RESULTS') {
-          console.error('No results found for the address:', address);
-      } else {
-        console.error('Geocode was not successful for the following reason: ' + status);
-      }
+    if (status === 'ZERO_RESULTS') {
+      console.error('No results found for the address:', address);
+    } else {
+      console.error('Geocode was not successful for the following reason: ' + status);
+    }
   };
 
   const geocodeAddress = async (addressData) => {
     if (addressData.longitude && addressData.latitude) {
-          // If longitude and latitude are already present, use them to create a marker
-          if (!addressData.isHidden) {
-          createMarker(addressData.latitude, addressData.longitude, addressData.markerId);
-          return;
+      // If longitude and latitude are already present, use them to create a marker
+      if (!addressData.isHidden) {
+        createMarker(addressData.latitude, addressData.longitude, addressData.markerId);
+        return;
+      } else {
+        return;
+      }
+    }
+
+    if (!addressData["Street Address"] || !addressData["City"] || !addressData["ZIP Code"]) {
+      console.error('Invalid address data:', addressData);
+      return;
+    }
+
+    const fullAddress = `${addressData["Street Address"]}, ${addressData["City"]}, ${addressData["ZIP Code"]}`;
+
+    try {
+      await new Promise((resolve) =>
+        geocoder.geocode({ address: fullAddress }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            const location = results[0].geometry.location;
+            const longitude = location.lng();
+            const latitude = location.lat();
+
+            const markerId = uuidv4(); // Generate a unique ID
+
+            createMarker(latitude, longitude, markerId);
+            // Instead of sending data immediately, push it to the array
+            addressDataArray.push({ ...addressData, longitude, latitude, markerId });
+          } else {
+            logGeocodingError(status, fullAddress);
           }
-          else{
-            return;
-          }
-      }
-
-      if (!addressData["Street Address"] || !addressData["City"] || !addressData["ZIP Code"]) {
-          console.error('Invalid address data:', addressData);
-          return;
-      }
-
-      const fullAddress = `${addressData["Street Address"]}, ${addressData["City"]}, ${addressData["ZIP Code"]}`;
-
-      try {
-          await new Promise((resolve) =>
-              geocoder.geocode({ address: fullAddress }, (results, status) => {
-                  if (status === 'OK' && results[0]) {
-                      const location = results[0].geometry.location;
-                      const longitude = location.lng();
-                      const latitude = location.lat();
-
-                      const markerId = uuidv4(); // Generate a unique ID
-                      
-                      createMarker(latitude, longitude, markerId);
-                      sendAddressDataToBackend({ ...addressData, longitude, latitude, markerId });
-                  } else {
-                      logGeocodingError(status, fullAddress);
-                  }
-                  resolve();
-              })
-          );
-      } catch (error) {
-          console.error('Geocoding error:', error);
-      }
+          resolve();
+        })
+      );
+    } catch (error) {
+      console.error('Geocoding error:', error);
+    }
   };
 
   const geocodePromises = addresses.map((addressData) => geocodeAddress(addressData));
 
   Promise.all(geocodePromises).then(() => {
-      setMarkers(markers);
+    // Now, instead of sending data one by one, send the entire array
+    sendAddressDataToBackend(addressDataArray);
+    setMarkers(markers);
   });
 };
+
+
+// Function to send all address data to the backend
+const sendAllAddressDataToBackend = (addressDataArray) => {
+  // You can implement your backend sending logic here
+  console.log('Sending all address data to the backend:', addressDataArray);
+};
+
   
 // In mapFunctions.js
 export const createRoutesBetweenMarkers = async (markers, setPolylines) => {
