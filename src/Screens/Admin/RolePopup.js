@@ -62,6 +62,7 @@ function RolePopup(props) {
         setRoles([...roles, result.role]);
         setNewRole('');
         setShowInput(false);
+        props.setRolesFromServer([...roles, result.role])
         // Show a success toast notification
         toast.success('Role added successfully');
       } else {
@@ -82,6 +83,7 @@ function RolePopup(props) {
     }
 
     alert(`Roles submitted: ${roles.map((role) => role.Role).join(', ')}`);
+    
     props.closePopup();
   };
 

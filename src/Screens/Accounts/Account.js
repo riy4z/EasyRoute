@@ -236,7 +236,7 @@ function Account(props) {
 
             {savedAddress.length == 0 && (
               <div className="flex text-gray-400 text-sm p-1 h-full justify-center items-center mx-4 my-6">
-              <p>ⓘ No Accounts Found for the selected Location, try importing accounts using the Import Accounts / Add Accounts option</p>
+              <p>ⓘ No Accounts Found for the selected Location, try importing accounts using the Import Accounts / Add Accounts option.</p>
               </div>
             )}
       {isAccountDetailsExpanded && (

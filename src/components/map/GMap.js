@@ -64,12 +64,17 @@ const GMap = (props) => {
         if (props.startLocation) {
             MapFunctions.createMarkerFromAddress(props.startLocation, 'startLocation', setMarkers);
         }
-
+    
         if (props.endLocation) {
             MapFunctions.createMarkerFromAddress(props.endLocation, 'endLocation', setMarkers);
         }
-        console.log(props.addresses)
-        MapFunctions.createPinsFromAddresses(props.addresses, setMarkers);
+    
+        // Check if props.addresses is empty
+        if (Array.isArray(props.addresses) && props.addresses.length === 0) {
+            setMarkers([]); // Set markers to an empty array
+        } else {
+            MapFunctions.createPinsFromAddresses(props.addresses, setMarkers);
+        }
     }, [props.addresses, props.startLocation, props.endLocation]);
 
     const containerStyle = {

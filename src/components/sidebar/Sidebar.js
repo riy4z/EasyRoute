@@ -104,6 +104,7 @@ function Sidebar(props) {
       if (new Date(item.followUp).toLocaleDateString() === currentDate) {
         console.log('Follow-up data matching current date:', followUpData[index]);
         setHasFollowUpForToday(true);
+        alert("You have a Follow-up today")
       }
       else{
         setHasFollowUpForToday(false)
@@ -112,7 +113,7 @@ function Sidebar(props) {
     else{
       setHasFollowUpForToday(false)
     }
-  }, [followUpData, selectedLocation]);
+  }, [followUpData]);
 
   //-------!
   
@@ -168,7 +169,8 @@ function Sidebar(props) {
   const handleDropdownChange=(value)=>{
     setSelectedLocation(value)
     setParentLocation(value)
-    
+    setIsExpanded(false)
+    props.setAddresses([])
  }
  
 

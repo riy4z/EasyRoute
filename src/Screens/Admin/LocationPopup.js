@@ -7,7 +7,7 @@ import {addUserLocation} from '../../components/fetch/getUserLocationsByUserId'
 import toast, { Toaster } from 'react-hot-toast';
 import api from '../../config/api';
 
-function LocationPopup({ closePopup }) {
+function LocationPopup({ closePopup, setLocationsFromServer }) {
   const [locations, setLocations] = useState([]);
   const [showInput, setShowInput] = useState(false);
   const [newLocation, setNewLocation] = useState('');
@@ -77,20 +77,21 @@ function LocationPopup({ closePopup }) {
       });
   
       const result = response.data;
-      console.log(result.location._id)
+      console.log(result.location)
 
       const userId = await getUserID();
-  
-      if (result.message) {
+      const role = 0;
+      if (result) {
         // If the role is added successfully, update the roles state
         setLocations([...locations, result.location]);
+        setLocationsFromServer([...locations, result.location])
         setNewLocation('');
         setNewStreetAddress('');
         setNewCity('');
         setNewState('');
         setNewZipCode('');
         setShowInput(false);
-        const response = await addUserLocation(userId, result.location._id);
+        const response = await addUserLocation(userId, result.location._id, role);
         // Show a success toast notification
         toast.success('Location added successfully');
       } else {
@@ -110,7 +111,7 @@ function LocationPopup({ closePopup }) {
       return;
     }
 
-    alert(`Locations submitted: ${locations.map((location) => location.Location).join(', ')}`);
+     {locations.map((location) => location.Location).join(', ')}
     closePopup();
   };
 

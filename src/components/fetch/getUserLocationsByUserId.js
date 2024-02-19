@@ -42,13 +42,13 @@ export async function deleteUserLocation  (userId, locationId)  {
   }
 };
 
-export async function addUserLocation  (userId, locationId)  {
+export async function addUserLocation  (userId, locationId, role)  {
   try {
     // Make an API call to add the location to the user
-    const response = await api.post(`/addUserLocation`, { userId, locationId });
+    const response = await api.post(`/addUserLocation`, { userId, locationId, role });
 
     // Check if the addition was successful
-    if (response.status === 200) {
+    if (response.status === 201) {
       console.log('Location added successfully');
     } else {
       console.error('Failed to add location');

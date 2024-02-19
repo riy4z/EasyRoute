@@ -523,8 +523,8 @@ function InvitePopup(props) {
             Invite
           </button>
         </div>
-      {showRolePopup && <RolePopup closePopup={() => setShowRolePopup(false)} />}
-      {showLocationPopup && <LocationPopup closePopup={() => setShowLocationPopup(false)} />}
+      {showRolePopup && <RolePopup closePopup={() => setShowRolePopup(false)} setRolesFromServer={setRolesFromServer}/>}
+      {showLocationPopup && <LocationPopup closePopup={() => setShowLocationPopup(false)} setLocationsFromServer={setLocationsFromServer}/>}
       
       </div>
       </div>
