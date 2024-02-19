@@ -3,14 +3,12 @@ import InvitePopup from './InvitePopup';
 import LocationPopup from './LocationPopup';
 import RolePopup from './RolePopup';
 import UserDetails from './UserDetails';
-import getRoleHierarchy from '../../components/fetch/getRoleHierarchy';
+
 import getCompanyID from '../../components/fetch/getCompany';
 import { getUsersByCompany } from '../../components/fetch/getUsersByCompany'; 
 
 function Admin(props) {
   const [isInvitePopupOpen, setInvitePopupOpen] = useState(false);
-  const [isLocationPopupOpen, setLocationPopupOpen] = useState(false);
-  const [isRolePopupOpen, setRolePopupOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const companyId = getCompanyID();
   // const isCorpAdmin = getRoleHierarchy();
@@ -41,11 +39,7 @@ function Admin(props) {
   const openInvitePopup = () => setInvitePopupOpen(true);
   const closeInvitePopup = () => setInvitePopupOpen(false);
 
-  const openLocationPopup = () => setLocationPopupOpen(true);
-  const closeLocationPopup = () => setLocationPopupOpen(false);
 
-  const openRolePopup = () => setRolePopupOpen(true);
-  const closeRolePopup = () => setRolePopupOpen(false);
 
   const handleUserNameClick = (userName) => {
     setSelectedUserName(userName);
@@ -70,19 +64,6 @@ console.log(users)
     <div>
       <h1 className="text-5xl font-medium text-customColor1 text-left">Admin</h1>
   
-      {showAddButtons === 0 && (
-        <>
-          <button className="mt-6 bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-16" onClick={openLocationPopup}>
-            <i className="fas fa-info-circle" style={{ marginRight: 10 }}></i>
-            Location
-          </button>
-  
-          <button className="mt-4 bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-20" onClick={openRolePopup}>
-            <i className="fas fa-solid fa-users" style={{ marginRight: 10 }}></i>
-            Role
-          </button>
-        </>
-      )}
   
       <button className="mt-4 bg-blue-700 hover:bg-blue-900 rounded-lg text-white py-1.5 px-6 font-medium cursor-pointer text-xl ml-11" onClick={openInvitePopup}>
         <i className="fas fa-user-plus" style={{ marginRight: 10 }}></i>
@@ -150,8 +131,6 @@ console.log(users)
 
       </div>
   
-      {isLocationPopupOpen && <LocationPopup closePopup={closeLocationPopup} />}
-      {isRolePopupOpen && <RolePopup closePopup={closeRolePopup} />}
       {isInvitePopupOpen && <InvitePopup closePopup={closeInvitePopup} />}
   
       {selectedUserName && (

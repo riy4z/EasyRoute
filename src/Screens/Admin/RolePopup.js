@@ -62,6 +62,7 @@ function RolePopup(props) {
         setRoles([...roles, result.role]);
         setNewRole('');
         setShowInput(false);
+        props.setRolesFromServer([...roles, result.role])
         // Show a success toast notification
         toast.success('Role added successfully');
       } else {
@@ -82,6 +83,7 @@ function RolePopup(props) {
     }
 
     alert(`Roles submitted: ${roles.map((role) => role.Role).join(', ')}`);
+    
     props.closePopup();
   };
 
@@ -89,7 +91,8 @@ function RolePopup(props) {
     <div>
       <Toaster position="top-center" reverseOrder={false}></Toaster>
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
-        <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto text-2xl leading-loose">
+        <div className="flex w-full h-full justify-center items-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto w-full leading-loose">
           <div className="flex justify-end">
             <button onClick={props.closePopup} className="text-gray-500 hover:text-gray-700">
               <RxCrossCircled />
@@ -142,6 +145,7 @@ function RolePopup(props) {
             )}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

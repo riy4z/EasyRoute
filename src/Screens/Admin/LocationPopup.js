@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import getCompanyID from '../../components/fetch/getCompany';
 import { RxCrossCircled } from 'react-icons/rx';
+import getUserID from '../../components/fetch/getUser';
 import fetchLocations from '../../components/fetch/fetchLocations';
+import {addUserLocation} from '../../components/fetch/getUserLocationsByUserId'
 import toast, { Toaster } from 'react-hot-toast';
 import api from '../../config/api';
 
-function LocationPopup({ closePopup }) {
+function LocationPopup({ closePopup, setLocationsFromServer }) {
   const [locations, setLocations] = useState([]);
   const [showInput, setShowInput] = useState(false);
   const [newLocation, setNewLocation] = useState('');
@@ -75,16 +77,21 @@ function LocationPopup({ closePopup }) {
       });
   
       const result = response.data;
-  
-      if (result.message) {
+      console.log(result.location)
+
+      const userId = await getUserID();
+      const role = 0;
+      if (result) {
         // If the role is added successfully, update the roles state
         setLocations([...locations, result.location]);
+        setLocationsFromServer([...locations, result.location])
         setNewLocation('');
         setNewStreetAddress('');
         setNewCity('');
         setNewState('');
         setNewZipCode('');
         setShowInput(false);
+        const response = await addUserLocation(userId, result.location._id, role);
         // Show a success toast notification
         toast.success('Location added successfully');
       } else {
@@ -104,32 +111,35 @@ function LocationPopup({ closePopup }) {
       return;
     }
 
-    alert(`Locations submitted: ${locations.map((location) => location.Location).join(', ')}`);
+     {locations.map((location) => location.Location).join(', ')}
     closePopup();
   };
 
   return (
     <div>
       <Toaster position="top-center" reverseOrder={false}></Toaster>
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-md">
-        <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md mx-auto relative text-2xl leading-loose">
-          <div className="absolute top-4 right-4 cursor-pointer">
-            <button onClick={closePopup} className="text-gray-500 hover:text-gray-700">
-              <RxCrossCircled />
-            </button>
-          </div>
-          <h2 className="text-3xl font-bold text-center mb-4">Locations</h2>
-          <hr className="my-4" />
-          <div className='overflow-y-auto h-72'>
-          <ul>
-            {locations.map((location, index) => (
-              <li key={index}>{location.Location}</li>
-            ))}
-          </ul>
-          </div>
-          <div className='mt-2'>
-            {showInput && (
-              <form onSubmit={handleSubmit}>
+      {/* Apply backdrop blur effect to the background */}
+      <div className="fixed top-0 left-0 w-full h-full ">
+        {/* Content container */}
+        <div className="flex justify-center items-center w-full h-full">
+          <div className="bg-white p-8 rounded-lg shadow-lg z-50 max-w-md relative w-7/12 leading-loose">
+            <div className="absolute top-4 right-4 cursor-pointer">
+              <button onClick={closePopup} className="text-gray-500 hover:text-gray-700">
+                <RxCrossCircled />
+              </button>
+            </div>
+            <h2 className="text-3xl font-bold text-center mb-4">Locations</h2>
+            <hr className="my-4" />
+            <div className='overflow-y-auto scrollbar-w-2 scrollbar-track-gray-lighter scrollbar-thumb-rounded scrollbar-thumb-gray scrolling-touch h-72'>
+              <ul>
+                {locations.map((location, index) => (
+                  <li key={index}>{location.Location}</li>
+                ))}
+              </ul>
+            </div>
+            <div className='mt-2'>
+              {showInput && (
+                <form onSubmit={handleSubmit}>
                 <input
                   type="text"
                   value={newLocation}
@@ -167,25 +177,25 @@ function LocationPopup({ closePopup }) {
                 />
                 <div className="flex justify-between">
                   <button
-                    type="button"
+                    type="text"
                     onClick={handleAddLocation}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+                    className=" inline-block bg-blue-700  hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md  text-sm"
                   >
                     Add Location
                   </button>
                   <button
                     onClick={handleCloseClick}
-                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm ml-2"
+                    className="bg-gray-500 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md  text-sm ml-2"
                   >
                     Close
                   </button>
                 </div>
-              </form>
+                </form>
             )}
             {!showInput && (
               <button
                 onClick={handleAddLocationClick}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+                className="bg-blue-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md  text-sm"
               >
                 Add Location
               </button>
@@ -194,7 +204,8 @@ function LocationPopup({ closePopup }) {
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 export default LocationPopup;

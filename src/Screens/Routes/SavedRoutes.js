@@ -104,8 +104,8 @@ function SavedRoutes(props) {
   
 console.log(userRoutes  )
   return (
-    <div className="text-2xl leading-loose">
-      <div>
+    <div className=" p-1  leading-loose">
+      <div className="ml-1">
       <input
   id="showAllCheckbox"
   type="checkbox"
@@ -114,11 +114,12 @@ console.log(userRoutes  )
     handleShowAll();
   }}
 />
-<span htmlFor="showAllCheckbox" className="text-xl"> Show all the saved routes</span>
+<span htmlFor="showAllCheckbox" className="ml-1 text-sm font-medium"> Show all saved routes</span>
       </div>
+      <div className="mt-2">
       <ul>
         {userRoutes.map((route) => (
-          <li key={route._id} className='border overflow-y-auto px-2'> 
+          <li key={route._id} className='border-b border-gray-200  overflow-y-auto p-1 text-lg font-normal hover:bg-gray-100 block'> 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: "pointer" }}>
               <span onClick={()=>handleonclick(route)}>{route.RouteName}</span>
               <div>
@@ -138,6 +139,7 @@ console.log(userRoutes  )
           </li>
         ))}
       </ul>
+      </div>
     </div>
   );
 }

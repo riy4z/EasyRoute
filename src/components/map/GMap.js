@@ -15,6 +15,7 @@ const GMap = (props) => {
     const drawingManagerRef = useRef();
     const [selectedMarkers, setSelectedMarkers] = useState([]);
     const [clickedMarkers, setClickedMarkers] = useState(null);
+    const [accountMarker, setAccountMarker] = useState(null);
     const [polygons, setPolygons] = useState([]);
     const [markers, setMarkers] = useState([]);
     const [initialCenter, setInitialCenter] = useState(null);
@@ -51,18 +52,29 @@ const GMap = (props) => {
                 });
             }
         );
+       
     }, []);
+
+    useEffect(()=>{
+        if (props.ZoomToCoordinates){navigateToCoordinates(props.ZoomToCoordinates[0],props.ZoomToCoordinates[1])
+            setAccountMarker(props.ZoomToCoordinates)}
+    },[props.ZoomToCoordinates])
 
     useEffect(() => {
         if (props.startLocation) {
             MapFunctions.createMarkerFromAddress(props.startLocation, 'startLocation', setMarkers);
         }
-
+    
         if (props.endLocation) {
             MapFunctions.createMarkerFromAddress(props.endLocation, 'endLocation', setMarkers);
         }
-
-        MapFunctions.createPinsFromAddresses(props.addresses, setMarkers);
+    
+        // Check if props.addresses is empty
+        if (Array.isArray(props.addresses) && props.addresses.length === 0) {
+            setMarkers([]); // Set markers to an empty array
+        } else {
+            MapFunctions.createPinsFromAddresses(props.addresses, setMarkers);
+        }
     }, [props.addresses, props.startLocation, props.endLocation]);
 
     const containerStyle = {
@@ -202,6 +214,13 @@ const GMap = (props) => {
         }
     };
     
+    const navigateToCoordinates = (latitude, longitude) => {
+        if (mapRef.current) {
+            mapRef.current.panTo({ lat: latitude, lng: longitude });
+            mapRef.current.setZoom(15); // You can adjust the zoom level as needed
+        }
+    };
+
     
 
     const onEditPolygon = (index) => {
@@ -493,6 +512,21 @@ let lastCoordinateInEntireArray = null;
                     {markers.map((marker, index) => (
                         <Marker key={marker.markerId} position={marker.position} name={`Marker ${index}`} onClick={() => handleMarkerClick(marker.markerId)} />
                     ))}
+{accountMarker &&(
+    <Marker
+    position={{
+        lat: accountMarker[0],
+        lng: accountMarker[1]
+    }}
+    icon={{
+        url: 'https://d1tnxy3bik2ajc.cloudfront.net/img/ic_default_h@2x.png',
+        scaledSize: new window.google.maps.Size(35, 35) // Adjust the size as needed
+    }}
+/>
+)}
+
+
+
 
 
 {/*Dont Touch - Polylines Rendering Logic - Time Spent 19h*/}

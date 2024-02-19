@@ -32,12 +32,12 @@ export async function registerUser(credentials ) {
     try {
         const { data: { msg, error }, status } = await api.post(`/register`, credentials );
         
-        let { username, email, location } = credentials;
+        let { username, email, location, role } = credentials;
 
         if (status === 201) {
             await api.post('/registerMail', { username, userEmail: email });
             const userID = await api.get(`/user/${username}`)
-            await api.post('/addUserLocation', {userId:userID.data._id, locationId:location})
+            await api.post('/addUserLocation', {userId:userID.data._id, locationId:location, role:role})
         }
 
         return { msg, error };
