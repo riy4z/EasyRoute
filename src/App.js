@@ -43,6 +43,7 @@ const App = () => {
 
   const handleLassoComplete = (markersDetails) => {
     // Do something with the markersDetails data (e.g., update state or perform an action)
+    console.log(markersDetails);
     setLassoComplete(markersDetails);
 };
 
