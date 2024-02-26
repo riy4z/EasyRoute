@@ -1,13 +1,16 @@
 // mapFunctions.js
 import { v4 as uuidv4 } from 'uuid';
 import api from "../../config/api"
+import toast, { Toaster } from 'react-hot-toast';
+
 
 export const sendAddressDataToBackend = async (addressData) => {
 console.log(addressData)
   try {
      await api.post('/store-address-data', addressData, {
       headers: { 'Content-Type': 'application/json' },
-    });
+    })
+    toast.success('Accounts imported successfully');
   } catch (error) {
     console.error('Error saving address data:', error);
   }
@@ -29,7 +32,7 @@ export const createPinsFromAddresses = (addresses, setMarkers) => {
   }
 
   const markers = [];
-  const addressDataArray = []; // New array to store address data
+  const addressDataArray = [];
 
   const createMarker = (latitude, longitude, markerId, isHidden) => {
     markers.push({ position: { lat: latitude, lng: longitude }, markerId });
@@ -47,13 +50,19 @@ export const createPinsFromAddresses = (addresses, setMarkers) => {
 
   const geocodeAddress = async (addressData) => {
     if (addressData.longitude && addressData.latitude) {
-      // If longitude and latitude are already present, use them to create a marker
-      if (!addressData.isHidden) {
+      // If longitude and latitude are already present
+      if (!addressData.isHidden && addressData.markerId) {
         createMarker(addressData.latitude, addressData.longitude, addressData.markerId);
-        return;
-      } else {
-        return;
+        addressDataArray.push({ ...addressData });
       }
+
+      if(!addressData.markerId){
+        const markerId = uuidv4();
+        createMarker(addressData.latitude, addressData.longitude, markerId);
+        addressDataArray.push({ ...addressData });
+      }
+      
+      return;
     }
 
     if (!addressData["Street Address"] || !addressData["City"] || !addressData["ZIP Code"]) {
@@ -71,10 +80,9 @@ export const createPinsFromAddresses = (addresses, setMarkers) => {
             const longitude = location.lng();
             const latitude = location.lat();
 
-            const markerId = uuidv4(); // Generate a unique ID
+            const markerId = uuidv4();
 
             createMarker(latitude, longitude, markerId);
-            // Instead of sending data immediately, push it to the array
             addressDataArray.push({ ...addressData, longitude, latitude, markerId });
           } else {
             logGeocodingError(status, fullAddress);
@@ -90,18 +98,21 @@ export const createPinsFromAddresses = (addresses, setMarkers) => {
   const geocodePromises = addresses.map((addressData) => geocodeAddress(addressData));
 
   Promise.all(geocodePromises).then(() => {
-    // Now, instead of sending data one by one, send the entire array
-    sendAddressDataToBackend(addressDataArray);
+    // Check if data is from the CSV (where longitude and latitude were present)
+  
+    // Check if any object in the addressDataArray contains the isHidden field
+    const containsIsHidden = addressDataArray.some(obj => obj.hasOwnProperty('isHidden'));
+  
+    // If none of the objects contain the isHidden field, send the addressDataArray to the backend
+    if (!containsIsHidden) {
+      console.log(addressDataArray);
+      sendAddressDataToBackend(addressDataArray);
+    }
+  
     setMarkers(markers);
   });
 };
 
-
-// Function to send all address data to the backend
-const sendAllAddressDataToBackend = (addressDataArray) => {
-  // You can implement your backend sending logic here
-  console.log('Sending all address data to the backend:', addressDataArray);
-};
 
   
 // In mapFunctions.js

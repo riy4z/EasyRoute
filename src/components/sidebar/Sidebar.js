@@ -17,7 +17,9 @@ import api from '../../config/api';
 function Sidebar(props) {
   const [selectedOption, setSelectedOption] = useState(null); 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDropDownExpanded, setIsDropdownExpanded] = useState(false  );
   const [selectedLocation, setSelectedLocation] = useState('')
+  const [selectedLocationName, setSelectedLocationName] = useState('Select Location')
   const [Locations, setLocations] = useState([]);
   const [{apiData}] = useFetch('');
   const [followUpData, setFollowUpData] = useState([]);
@@ -149,7 +151,7 @@ function Sidebar(props) {
         return <HelpSupport />;
       case 'Reports':
         return <Reports selectedLocation={selectedLocation} />;
-        case 'FollowUp': // Add 'FollowUp' option
+        case 'FollowUp': 
         return <FollowUp
         followUpData={followUpData}
         />;
@@ -166,46 +168,60 @@ function Sidebar(props) {
   const selectedOptionStyle = "p-[1.3rem] flex cursor-pointer bg-gray-100 bg-opacity-25 rounded-lg text-2xl"
 
 
-  const handleDropdownChange=(value)=>{
+  const handleDropdownChange=(value, key)=>{
     setSelectedLocation(value)
     setParentLocation(value)
+    setSelectedLocationName(key)
+    setIsDropdownExpanded(false)
     setIsExpanded(false)
     props.setAddresses([])
  }
  
-
+ const toggleDropdown = () => {
+  setIsDropdownExpanded(!isDropDownExpanded);
+};
 
 
   // Constant to determine whether to display the Admin option
   const shouldDisplayAdmin = isAdmin;
   return (
     <div
-      className="fixed md:w-[275px] sm:w-[90px] h-full z-40 p-2 bg-customColor text-blue-200 leading-loose "
+      className="fixed md:w-[275px] sm:w-[90px] h-full z-40 p-2 bg-gradient-to-b from-customColor to-customColorG text-blue-200 leading-loose "
 
     >
       <h2 className="hidden md:inline-block text-white text-5xl font-bold leading-loose">EasyRoute</h2>
       <h2 className='block md:hidden text-white text-4xl ml-3 font-bold leading-loose'>EZ</h2>
 
-      <select
-      className="hidden md:text-white md:bg-customColor md:rounded-lg md:text-xl md:px-12 md:p-3 md:text-center md:inline-flex md:border md;border-gray-100 md:border-opacity-25 md:mb-2 focus:outline-none"
-      id="locationDropdown"
-      onChange={(e) => handleDropdownChange(e.target.value)}
-      value={selectedLocation}
-    >
-      <option value="" disabled className="text-gray-500 px-5 hover:bg-gray-100 p-3 text-xl bg-gray-700  inline-flex text-left">Select Location</option>
-      {userLocations.map((userLocation) => {
-        const location = Locations.find((loc) => loc._id === userLocation.LocationID);
-        return (
-          <option
-            key={userLocation._id}
-            value={userLocation.LocationID}
-            className="text-white block  hover:bg-gray-100 text-left text-xl bg-gray-700  inline-flex items-center "
-          >
-            {location ? location.Location : ""}
-          </option>
-        );
-      })}
-    </select>
+      <div className="relative">
+        <div
+          className="text-white hover:bg-gray-500  bg-customColor border-[1.5px] border-gray-500 border-opacity-75 text-center rounded-lg text-xl px-2 py-2 mb-2 cursor-pointer"
+          onClick={toggleDropdown}
+        >
+          <svg class="inline-block mr-1 mb-1 w-[1.4rem] h-[1.4rem] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+    <path fill-rule="evenodd" d="M12 2a8 8 0 0 1 6.6 12.6l-.1.1-.6.7-5.1 6.2a1 1 0 0 1-1.6 0L6 15.3l-.3-.4-.2-.2v-.2A8 8 0 0 1 11.8 2Zm3 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" clip-rule="evenodd"/>
+  </svg>
+  
+          {selectedLocationName}
+
+        </div>
+
+        {isDropDownExpanded && (
+          <ul className="absolute top-full left-0 z-10 bg-gray-700 w-full rounded-lg overflow-hidden">
+            {userLocations.map((userLocation) => {
+              const location = Locations.find((loc) => loc._id === userLocation.LocationID);
+              return (
+                <li
+                  key={userLocation._id}
+                  className="text-white hover:bg-gray-600 text-left text-xl px-5 py-1 cursor-pointer"
+                  onClick={() => handleDropdownChange(userLocation.LocationID, location.Location)}
+                >
+                  {location ? location.Location : ""}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
 
 
       {(shouldDisplayAdmin === 0 || shouldDisplayAdmin === 1) && (

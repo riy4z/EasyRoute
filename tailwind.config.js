@@ -9,6 +9,7 @@ module.exports = {
     extend: {
       colors: {
         customColor: '#282c34',
+        customColorG: '#1A2536',
         customColor1: '#394359', // Example color, replace with your desired color code
       },
     },

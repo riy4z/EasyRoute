@@ -4,6 +4,7 @@ import Popup from "./Popup";
 import AccountDetails from "./AccountDetails";
 import getCompanyID from "../../components/fetch/getCompany";
 import getUserID from "../../components/fetch/getUser";
+import ImportPopup from "./importPopup";
 import toast, { Toaster } from 'react-hot-toast';
 import api from "../../config/api";
 import { FaSearch } from 'react-icons/fa';
@@ -19,6 +20,7 @@ function Account(props) {
   const [searchTerm, setSearchTerm] = useState('');
   const [refresh, setRefresh] = useState(true);
   const [isAccountDetailsExpanded, setIsAccountDetailsExpanded] = useState(false);
+  const [importPopup, setImportPopup] = useState(false);
 
 
 
@@ -70,6 +72,15 @@ function Account(props) {
     }
   };
 
+  const openImport = () =>{
+    if (props.selectedLocation) {
+      setImportPopup(true)
+    } else {
+      alert("Please select a location before importing accounts.");
+    }
+
+  }
+
   const handleFileSelect = () => {
     if (props.selectedLocation) {
       fileInputRef.current.click();
@@ -108,7 +119,6 @@ function Account(props) {
         .then((response) => {
           if (response.data.success) {
             console.log('CSV file processed successfully');
-            toast.success('Accounts imported successfully');
           } else {
             console.error('Error processing CSV file:', response.data.error);
             toast.error('Error processing CSV file');
@@ -118,17 +128,12 @@ function Account(props) {
           console.error('Error sending CSV data to the server:', error);
           toast.error('Error sending CSV data to the server');
         });
-  
+        closePopup();
+
       // Update the state with all data
       props.setAddresses(newData);
     });
   };
-  
-
-
-  
-
-
 
   const openPopup = () => {
     if (!props.selectedLocation) {
@@ -142,8 +147,10 @@ function Account(props) {
 
   const closePopup = () => {
     setIsPopupOpen(false);
+    setImportPopup(false);
     setIsOverlayVisible(false);
   };
+  
 
   const handleListItemHover = (index) => {
     const updatedSavedAddresses = [...savedAddress];
@@ -183,15 +190,11 @@ function Account(props) {
       <Toaster position="top-center" reverseOrder={false}></Toaster>
       <h1 className="text-5xl font-medium text-customColor1 text-left ">Accounts</h1>
       <div>
-        <button className="cursor-pointer mt-4 bg-blue-700 hover:bg-blue-900 rounded-lg px-14 py-1.5 text-white font-medium text-xl" onClick={handleFileSelect}>Import Accounts</button>
-        <input
-          type="file"
-          accept=".csv"
-          onChange={handleFileChange}
-          ref={fileInputRef}
-          style={{ display: "none" }}
-        />
+        <button className="cursor-pointer mt-4 bg-blue-700 hover:bg-blue-900 rounded-lg px-14 py-1.5 text-white font-medium text-xl" onClick={openImport}>Import Accounts</button>
+        
       </div>
+
+      
 
       <div className="relative block mt-4 ">
             <div className="flex items-center h-max">
@@ -239,6 +242,16 @@ function Account(props) {
               <p>ⓘ No Accounts Found for the selected Location, try importing accounts using the Import Accounts / Add Accounts option.</p>
               </div>
             )}
+
+            {/* Import Popup Render*/}
+            {importPopup &&(
+<ImportPopup onClose={closePopup}
+handleFileSelect={handleFileSelect}
+handleFileChange={handleFileChange}
+fileInputRef={fileInputRef}/>
+      )}
+
+      {/*Account Details Render*/}
       {isAccountDetailsExpanded && (
         <AccountDetails
           addressData={selectedAddress}
