@@ -13,6 +13,7 @@ export default function Profile() {
   const [isEditing, setEditing] = useState(false);
   const [isEmailChanging, setEmailChanging] = useState(false);
   const [isPasswordChanging, setPasswordChanging] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
   
 
   const openPopup = () => {
@@ -66,7 +67,7 @@ export default function Profile() {
   
   const update="absolute mt-28 left-3 border-2 border-indigo-500 px-24 py-2 rounded-lg text-indigo-500 text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white"
   const inputStyle = "relative left-3 border-2  py-3 rounded-xl px-[26px] shadow-sm text-lg mt-4 focus:outline-none";
-  const buttonStyle1="border-2 border-red-600 mt-28 ml-3 px-[58px] py-2 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
+  const buttonStyle1="border-2 border-red-600 mt-4 ml-3 px-[58px] py-2 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
   const buttonStyle2="border-2 border-red-600 mt-28 ml-3 px-[100px] py-2 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
   const EditStyle="border-2 border-blue-700 mt-28 ml-3 px-[112px] py-2 rounded-lg text-blue-700 text-xl text-center hover:bg-blue-700 hover:text-white"
   const EmailEditStyle="border-2 border-blue-700 mt-2 ml-3 px-16 py-2 rounded-lg text-blue-700 text-xl text-center hover:bg-blue-700 hover:text-white"
@@ -99,6 +100,8 @@ export default function Profile() {
 
 
   const handleEmailUpdate = (newEmail) => {
+    setNewEmail(newEmail)
+    console.log(newEmail)
     // Update the email in the state or perform any necessary actions
   };
   
@@ -107,11 +110,11 @@ export default function Profile() {
     <div>
       <Toaster position="top-center" reverseOrder={false}></Toaster>
 
-      <div style={{ top: 43, position: 'absolute' }}>
-        <div>
+      <div className="overflow-x-auto">
+        <div >
           <div>
             <h4 class="text-5xl font-medium text-customColor1 text-left ">Profile</h4>
-            {/* <span className="py-4 text-xl w-2/3 text-center text-gray-500">You can update the details.</span> */}
+            <span className="py-4 text-xl w-2/3 text-center text-gray-500">You can update the details.</span>
           </div>
 
           <form onSubmit={formik.handleSubmit}>
@@ -160,28 +163,36 @@ export default function Profile() {
              </form>
              {!isEditing && !isEmailChanging && !isPasswordChanging && ( 
               <div  className="max-w-[280px] text-xl py-5 leading-loose overlow-hidden">
-                <label>
-                  <strong>Name:</strong>
-                <p >{apiData?.firstName || ''} {apiData?.lastName || ''}</p></label>
-                <label>
-                  <strong>Email:</strong>
-                <p >{apiData?.email || ''}</p></label>
-                <label>
-                  <strong>Mobile:</strong>
-                <p>{apiData?.mobile || ''}</p></label>
-                <label>
-                  <strong>Address:</strong>
-                <p>{apiData?.address || ''}</p></label>
+                <div className="bg-[#f9f9f9] p-4 rounded border-solid border border-[#ccc] shadow-md mb-4">
+                <p className="text-center text-3xl font-semibold">{apiData?.username}</p>
+                <p className="text-center text-gray-500 text-base">(username)</p>
+               
+                <i className="fas fa-user mr-2 text-base text-gray-500"></i>
+                <p className="text-base font-regular" >{apiData?.firstName || ''} {apiData?.lastName || ''}</p>
+               
+                <i className="fas fa-envelope mr-2 text-base text-gray-500"></i>
+                <p className="break-words text-base font-regular">{newEmail || apiData?.email || ''}</p>
+               
+                <i className="fas fa-phone mr-2 text-base text-gray-500"></i>
+                <p className="text-base font-regular">{apiData?.mobile || ''}</p>
+               
+                <i className="fas fa-map-marker-alt mr-2 text-base text-gray-500"></i>
+                <p clasName="break-words text-base font-regular">{apiData?.address || ''}</p>
+            
+                </div>
 
-              <button className={EditStyle} onClick={onEditClick}>
+              <span className="underline cursor-pointer text-base" onClick={onEditClick}>
                 Edit
-              </button>
-              <button className={EmailEditStyle} onClick={handleChangeEmail}>
-                Change Email
-              </button>
-              <button className={PasswordEditStyle} onClick={handleChangePassword}>
+              </span>
+              <br></br>
+              <span className="underline cursor-pointer text-base" onClick={handleChangeEmail}>
+  Change Email
+</span>
+<br></br>
+
+              <span className="underline cursor-pointer text-base" onClick={handleChangePassword}>
       Change Password
-    </button>
+    </span>
               <div>
             <button class={buttonStyle1} onClick={openPopup}>
           Logout Account
@@ -216,3 +227,5 @@ export default function Profile() {
     
   );
 }
+
+

@@ -17,6 +17,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
     lastCheckIn: '',
     followUp: '',
   });
+  const [lastFollowup, setLastFollowUp] = useState('');
 
   const [isCheckInPopupOpen, setCheckInPopupOpen] = useState(false);
   const [confirmDate, setConfirmDate] = useState(false);
@@ -76,17 +77,9 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
     setCheckInPopupOpen(false);
   };
 
-  const handleDateSelection = (selectedDate) => {
-    // Simply set the selected date without adjusting for the timezone offset
-    setConfirmDate(true);
-    setFormData({
-      ...formData,
-      followUp: selectedDate, // Set the selected date directly
-    });
-  };
-
-  const handleConfirmDate = () => {
-    const confirmed = window.confirm('Are you sure you want to save this follow-up date?');
+  const handleConfirmDate = (selectedDate) => {
+    const date = selectedDate.toLocaleDateString()
+    const confirmed = window.confirm(`Are you sure you want to save this follow-up date on ${date}?`);
     
     if (confirmed) {
       const userID  = getUserID();
@@ -95,7 +88,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
         addressId: addressData.markerId,
         userID: userID,
         companyID: companyID,
-        followUp: formData.followUp,
+        followUp: selectedDate,
         LocationID: selectedLocation
       };
       
@@ -107,6 +100,10 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
         .then((response) => {
           // console.log('Follow-up data saved successfully:', response.data);
           setConfirmDate(false);
+          setFormData({
+            ...formData,
+            followUp: selectedDate
+          });
         })
         .catch((error) => {
           console.error('Error saving follow-up data:', error);
@@ -114,6 +111,10 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
         });
     } else {
       setConfirmDate(false);
+      setFormData({
+        ...formData,
+        followUp: ''
+      });
     }
   };
 
@@ -178,6 +179,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
   
     if (!activeTab || activeTab === 'details' || activeTab === 'history') {
       fetchMeetingNotesAndHistory();
+      fetchFollowUp();
     }
   }, [addressData._id, activeTab]); 
 
@@ -241,6 +243,22 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
       });
       
   };
+
+  const fetchFollowUp = async () => {
+    const response = await api.get(`/getFollowUpDataByAddressId?addressId=${addressData.markerId}`);
+    const followUpdata = response.data;
+  
+    if (followUpdata && followUpdata.followUps && followUpdata.followUps.length > 0) {
+      const followUpDateTime = new Date(followUpdata.followUps[0].followUp).toLocaleDateString()
+  
+      setLastFollowUp(followUpDateTime)
+    }
+    else {
+      setLastFollowUp('')
+    }
+  };
+
+  console.log(addressData.markerId)
  
   
   
@@ -305,17 +323,12 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
                 <label className='text-sm font-semibold'>Follow Up:</label>
                 <br></br>
                   <DatePicker
-                    placeholderText='Select FollowUp Date'
+                    placeholderText={`${lastFollowup || 'Select FollowUp Date'}`}
                     selected={formData.followUp}
-                    onChange={handleDateSelection}
+                    onChange={handleConfirmDate}
                     minDate={new Date()} 
                     className='w-64 h-8 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200'
                   />
-                  {confirmDate && (
-                    <button className={buttonStyle} onClick={handleConfirmDate}>
-                      Confirm Date
-                    </button>
-                  )}
                 
               </div>
 
