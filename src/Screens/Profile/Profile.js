@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { useFormik } from 'formik';
+import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import useFetch from '../../authentication/hooks/fetch.hook';
-import {updateUser, generateOTP} from '../../authentication/helper/helper';
-import { profileValidation } from '../../authentication/helper/validate';
+import {generateOTP} from '../../authentication/helper/helper';
 import LogoutPopup from './LogoutPopup';
 import ChangeEmailPopup from './ChangeEmailPopup';
 import PasswordChangePopup from './PasswordChangePopup';
+import api from '../../config/api';
 
 export default function Profile() {
   const [isPopupOpen, setPopupOpen] = useState(false);
@@ -14,7 +13,37 @@ export default function Profile() {
   const [isEmailChanging, setEmailChanging] = useState(false);
   const [isPasswordChanging, setPasswordChanging] = useState(false);
   const [newEmail, setNewEmail] = useState('');
-  
+  const [{ isLoading, apiData, serverError }] = useFetch('');
+  const [originalData, setOriginalData] = useState({}); // Update the query here
+  const [formData, setFormData] = useState({
+    username:'',
+    firstName: '',
+    lastName: '',
+    email: '',
+    mobile: '',
+    address: '',
+  });
+
+  useEffect(() => {
+    if (apiData) {
+      setFormData({
+        username: apiData?.username || '',
+        firstName: apiData?.firstName || '',
+        lastName: apiData?.lastName || '',
+        email: apiData?.email || '',
+        mobile: apiData?.mobile || '',
+        address: apiData?.address || '',
+      });
+      setOriginalData({
+        username: apiData?.username || '',
+        firstName: apiData?.firstName || '',
+        lastName: apiData?.lastName || '',
+        email: apiData?.email || '',
+        mobile: apiData?.mobile || '',
+        address: apiData?.address || '',
+      });
+    }
+  }, [apiData]);
 
   const openPopup = () => {
     setPopupOpen(true);
@@ -24,30 +53,36 @@ export default function Profile() {
     setPopupOpen(false);
   }
 
-  const [{ isLoading, apiData, serverError }] = useFetch(''); // Update the query here
-
-  const formik = useFormik({
-    initialValues: {
-      firstName: apiData?.firstName || '',
-      lastName: apiData?.lastName || '',
-      email: apiData?.email || '',
-      mobile: apiData?.mobile || '',
-      address: apiData?.address || '',
-    },
-    enableReinitialize: true,
-    validate: profileValidation,
-    validateOnBlur: false,
-    validateOnChange: false,
-    onSubmit: async (values) => {
-      values = await Object.assign(values);
-      let updatePromise = updateUser(values);
-      toast.promise(updatePromise, {
-        loading: 'Updating...!',
-        success: <b>Updated Successfully...!</b>,
-        error: <b>Could not update..!</b>,
+  const handleSubmit = async () => {
+    try {
+      const updatedUser = await api.patch(`/updateUser/${apiData?._id}`, {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        mobile: formData.mobile,
+        address: formData.address
       });
-    },
-  });
+
+      if (updatedUser.status === 200) {
+        sessionStorage.setItem('userData', JSON.stringify(updatedUser.data))
+        toast.success('Email updated successfully.');
+        setEditing(false)
+      } else {
+        alert("Userdata cannot be updated");
+      }
+    } catch (error) {
+      console.error("An error occurred while updating userData:", error);
+      alert("UserData cannot be updated.");
+    }
+  };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   const onEditClick = () => {
     setEditing(true);
   };
@@ -63,9 +98,10 @@ export default function Profile() {
 
   const onCancelClick = () => {
     setEditing(false);
+    setFormData(originalData);
   };
   
-  const update="absolute mt-28 left-3 border-2 border-indigo-500 px-24 py-2 rounded-lg text-indigo-500 text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white"
+  const update="absolute mt-28 ml-2 left-3 border-2 border-indigo-500 px-24 py-2 rounded-lg text-indigo-500 text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white"
   const inputStyle = "relative left-3 border-2  py-3 rounded-xl px-[26px] shadow-sm text-lg mt-4 focus:outline-none";
   const buttonStyle1="border-2 border-red-600 mt-4 ml-3 px-[58px] py-2 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
   const buttonStyle2="border-2 border-red-600 mt-28 ml-3 px-[100px] py-2 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
@@ -101,58 +137,65 @@ export default function Profile() {
 
   const handleEmailUpdate = (newEmail) => {
     setNewEmail(newEmail)
-    console.log(newEmail)
     // Update the email in the state or perform any necessary actions
   };
-  
+
+
 
   return (
     <div>
       <Toaster position="top-center" reverseOrder={false}></Toaster>
 
-      <div className="overflow-x-auto">
+      <div className="">
         <div >
           <div>
             <h4 class="text-5xl font-medium text-customColor1 text-left ">Profile</h4>
-            <span className="py-4 text-xl w-2/3 text-center text-gray-500">You can update the details.</span>
           </div>
 
-          <form onSubmit={formik.handleSubmit}>
+         
          
             {isEditing && ( // Conditionally render inputs when editing 
             <div class="leading-loose">
               <div>
+              <input
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="relative left-3 border-2 py-3 rounded-xl px-[26px] shadow-sm text-lg mt-4 focus:outline-none"
+                    type="text"
+                    placeholder="First Name"
+                  />
                 <input
-                  {...formik.getFieldProps('firstName')}
-                  className={inputStyle} 
-                  type="text"
-                  placeholder="FirstName"
-                />
-                <input
-                  {...formik.getFieldProps('lastName')}
-                  className={inputStyle}
-                  type="text"
-                  placeholder="LastName"
-                />
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="relative left-3 border-2 py-3 rounded-xl px-[26px] shadow-sm text-lg mt-4 focus:outline-none"
+                    type="text"
+                    placeholder="Last Name"
+                  />
               </div>
               
               <div>
-                <input
-                  {...formik.getFieldProps('mobile')}
-                  className={inputStyle}
-                  type="text"
-                  placeholder="Mobile No."
-                />
+              <input
+                    name="mobile"
+                    value={formData.mobile}
+                    onChange={handleChange}
+                    className="relative left-3 border-2 py-3 rounded-xl px-[26px] shadow-sm text-lg mt-4 focus:outline-none"
+                    type="text"
+                    placeholder="Mobile"
+                  />
                 
               </div>
 
               <input
-                {...formik.getFieldProps('address')}
-                className={inputStyle}
-                type="text"
-                placeholder="Address"
-              />
-              <button className={update} type="submit">
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className="relative left-3 border-2 py-3 rounded-xl px-[26px] shadow-sm text-lg mt-4 focus:outline-none"
+                    type="text"
+                    placeholder="Address"
+                  />
+              <button className={update} onClick={handleSubmit}>
                 Update
               </button>
               <button className={buttonStyle2} onClick={onCancelClick}>
@@ -160,24 +203,32 @@ export default function Profile() {
                 </button>
             </div>
             )} 
-             </form>
+            
              {!isEditing && !isEmailChanging && !isPasswordChanging && ( 
-              <div  className="max-w-[280px] text-xl py-5 leading-loose overlow-hidden">
-                <div className="bg-[#f9f9f9] p-4 rounded border-solid border border-[#ccc] shadow-md mb-4">
-                <p className="text-center text-3xl font-semibold">{apiData?.username}</p>
+              <div  className="max-w-[280px] py-5 leading-loose overlow-hidden">
+                <div className="bg-[#f9f9f9] p-4 rounded border-solid border border-[#ccc] shadow-md mb-4">    
+                <p className="text-center text-3xl font-semibold">{formData.username}</p>
                 <p className="text-center text-gray-500 text-base">(username)</p>
                
-                <i className="fas fa-user mr-2 text-base text-gray-500"></i>
-                <p className="text-base font-regular" >{apiData?.firstName || ''} {apiData?.lastName || ''}</p>
-               
-                <i className="fas fa-envelope mr-2 text-base text-gray-500"></i>
-                <p className="break-words text-base font-regular">{newEmail || apiData?.email || ''}</p>
-               
-                <i className="fas fa-phone mr-2 text-base text-gray-500"></i>
-                <p className="text-base font-regular">{apiData?.mobile || ''}</p>
-               
-                <i className="fas fa-map-marker-alt mr-2 text-base text-gray-500"></i>
-                <p clasName="break-words text-base font-regular">{apiData?.address || ''}</p>
+                <div className="flex mt-6">
+        <i className="fas fa-user mr-2 text-base text-gray-500"></i>
+        <p className="text-base font-regular">{formData.firstName || ''} {formData.lastName || ''}</p>
+      </div>
+
+      <div className="flex mt-6">
+        <i className="fas fa-envelope mr-2 text-base text-gray-500"></i>
+        <p className="text-base font-regular">{newEmail || formData.email || ''}</p>
+      </div>
+
+      <div className="flex mt-6">
+        <i className="fas fa-phone mr-2 text-base text-gray-500"></i>
+        <p className="text-base font-regular">{formData.mobile || ''}</p>
+      </div>
+
+      <div className="flex mt-6">
+        <i className="fas fa-map-marker-alt mr-2 text-base text-gray-500"></i>
+        <p className="text-base font-regular">{formData.address || ''}</p>
+      </div>
             
                 </div>
 

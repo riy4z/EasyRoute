@@ -53,7 +53,7 @@ const ChangeEmailPopup = ({ closePopup, apiData, onEmailUpdate }) => {
       if (updatedUser.status === 200) {
         sessionStorage.setItem('userData', JSON.stringify(updatedUser.data))
         toast.success('Email updated successfully.');
-        onEmailUpdate();
+        onEmailUpdate(newEmail);
         closePopup();
       } else {
         alert("Userdata cannot be updated");
@@ -71,14 +71,15 @@ const ChangeEmailPopup = ({ closePopup, apiData, onEmailUpdate }) => {
     closePopup();
   };
 
-  const inputStyle = "relative left-3 border-2 py-3 rounded-xl px-[26px] shadow-sm text-lg mt-4 focus:outline-none";
-  const buttonStyle2 = "border-2 border-red-600 mt-4 ml-3 px-[58px] py-2 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white";
-  const updateemail = "relative mt-12 left-3 border-2 border-indigo-500 px-24 py-2 rounded-lg text-indigo-500 text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white";
-  const updateemailcancel = "relative mt-4 left-3 border-2 border-indigo-500 px-24 py-2 rounded-lg text-indigo-500 text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white";
+  const inputStyle = "relative border-2 py-3 w-full rounded-xl px-4 shadow-sm text-lg mt-4 focus:outline-none";
+  const buttonStyle2 = "relative border-2 border-red-600 mt-4 ml-3 px-[58px] py-2 rounded-lg text-red-600 text-xl left-[18%] text-center hover:bg-red-600 hover:text-white";
+  const updateemail = "relative mt-12 left-3 left-[14%] border-2 border-indigo-500 px-24 py-2 rounded-lg text-indigo-500 text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white";
+  const updateemailcancel = "relative mt-4 left-[15%] border-2 border-indigo-500 px-24 py-2 rounded-lg text-indigo-500 text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white";
 
   return (
     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-opacity-50 backdrop-filter backdrop-blur-md flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md mx-auto">
+        <p className='text-2xl font-bold text-center'>Change Email</p>
         {beforesendotp && (
           <div>
             <input
