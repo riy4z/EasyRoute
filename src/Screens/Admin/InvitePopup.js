@@ -10,6 +10,7 @@ import LocationPopup from './LocationPopup';
 import CryptoJS from 'crypto-js';
 import config from '../../config/config';
 
+
 function InvitePopup(props) {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
