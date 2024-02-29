@@ -132,7 +132,7 @@ function RoutePopup(props) {
                   <div
                     key={address._id}
                     className={`bg-white border-b hover:bg-gray-50 ${
-                      address._id % 2 === 0 ? "" : "bg-gray-50"
+                      address._id % 2 === 0 ? "" : "bg-gray-50", address.isHidden? "hidden" : "block"
                     }`}
                   >
                     <div className="w-1 p-1">
@@ -140,7 +140,7 @@ function RoutePopup(props) {
                         <input
                           id={`checkbox-table-search-${address._id}`}
                           type="checkbox"
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                          className={`w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded`}
                           checked={selectedAddress[address._id] || false}
                           onChange={() => handleCheckboxChange(address._id)}
                         />
@@ -150,7 +150,7 @@ function RoutePopup(props) {
                         >
                           checkbox
                         </label>
-                        <div className="px-3 py-1 text-lg font-small text-gray-900 whitespace-nowrap">
+                        <div className={`px-3 py-1 text-lg font-small text-gray-900 whitespace-nowrap`}>
                           {address["First Name"]} {address["Last Name"]}
                         </div>
                       </div>

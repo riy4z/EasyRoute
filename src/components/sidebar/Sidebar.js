@@ -29,7 +29,7 @@ function Sidebar(props) {
   const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick, setParentLocation, navigateToCoordinates} = props
   const[isAdmin,setIsAdmin]=useState(2);
 
-
+  
   console.log(selectedLocation);
   const handleOptionClick = (option, addresses) => {
     setSelectedOption(option);
@@ -146,7 +146,8 @@ function Sidebar(props) {
         onClearClick={onClearClick}
         selectedLocation={selectedLocation}
         handlePolylinesUpdate={handlePolylinesUpdate}
-        lassoComplete = {lassoComplete}/>;
+        lassoComplete = {lassoComplete}
+        navigateToCoordinates={navigateToCoordinates}/>;
       case 'HelpSupport':
         return <HelpSupport />;
       case 'Reports':

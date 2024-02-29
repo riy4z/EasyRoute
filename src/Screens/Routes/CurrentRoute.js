@@ -9,10 +9,11 @@ import getCompanyID from "../../components/fetch/getCompany";
 import * as MapFunctions from "../../components/map/mapFunctions";
 import config from "../../config/config";
 import api from "../../config/api";
+import AccountDetails from "../Accounts/AccountDetails";
 
 
 const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation, lassoComplete, // New prop
-onOptimizeClick, onCustomRouteClick, onClearClick, savedRouteClick, selectedLocation}) => {
+onOptimizeClick, onCustomRouteClick, onClearClick, savedRouteClick, selectedLocation, navigateToCoordinates}) => {
   const [isLassoActive, setIsLassoActive] = useState(false);
   const [isOptimized,setIsOptimized] = useState(false);
   const [combinedAddresses,setCombinedAddresses] = useState([]);
@@ -24,12 +25,22 @@ onOptimizeClick, onCustomRouteClick, onClearClick, savedRouteClick, selectedLoca
   const [lassoAddresses, setLassoAddresses] = useState([]);
   const [startLocation, setStartLocation] = useState({});
   const [endLocation, setEndLocation] = useState({});
+  const [addressclick, setAddressClick] = useState(false);
+  const [clickedaddress, setClickedAddress] = useState(null)
   const companyid = getCompanyID();
   const userid = getUserID();
   // Add this at the beginning of your component function
 const [optimizeDownOccurred, setOptimizeDownOccurred] = useState(false);
 
-  const DraggableAddress = ({ address, index, polylines }) => {
+
+const handleAddressClick = (address) => {
+  setClickedAddress(address)
+  navigateToCoordinates(address.latitude, address.longitude)
+  setAddressClick(true)
+};
+
+
+  const DraggableAddress = ({ address, index, polylines, onClick }) => {
     const [routeDetails, setRouteDetails] = useState({ distance: "", duration: "" });
   
     useEffect(() => {
@@ -43,6 +54,7 @@ const [optimizeDownOccurred, setOptimizeDownOccurred] = useState(false);
       <Draggable draggableId={address._id ? address._id.toString() : `address-${index}`} index={index}>
         {(provided, snapshot) => (
           <div
+          onClick={() => onClick(address)}
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
@@ -589,7 +601,7 @@ const handleClearUp = () =>{
                  {combinedAddresses && combinedAddresses.length > 0 ? (
                     combinedAddresses.map((address, index) => (
                  <
-                  DraggableAddress key={address._id} address={address} index={index} polylines={polylines} className="bg-blue-500 p-4 rounded-lg shadow-md mb-4"/>
+                  DraggableAddress key={address._id} onClick={handleAddressClick} address={address} index={index} polylines={polylines} className="bg-blue-500 p-4 rounded-lg shadow-md mb-4"/>
                  ))
                ) : (
                 <div>
@@ -649,6 +661,11 @@ const handleClearUp = () =>{
                   )}
                 </PlacesAutocomplete>
               </div>
+
+              {addressclick && (
+                <AccountDetails selectedLocation={selectedLocation} addressData={clickedaddress} isExpanded={true} // Set isExpanded to true to render the AccountDetails component
+                onToggleExpand={() => setAddressClick(false)}></AccountDetails>
+              )}
 
 
               {polylines.length > 0 && (

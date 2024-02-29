@@ -409,6 +409,7 @@ let lastCoordinateInEntireArray = null;
         if(props.clearClick){
             setPolylines([]);
             setSelectedMarkers([]);
+            props.onLassoComplete([])
             setPolygons([]);
         }
     },[props.clearClick,setPolylines,props.selectAddress,props.startLocation,props.endLocation])

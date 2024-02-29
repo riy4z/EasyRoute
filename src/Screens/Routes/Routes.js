@@ -4,7 +4,7 @@ import CurrentRoute from './CurrentRoute';
 import SavedRoutes from './SavedRoutes';
 import * as MapFunctions from '../../components/map/mapFunctions';
 
-function Routes({ setAddresses,handlePolylinesUpdate, setLassoActivate, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick,onSavedRouteClick,selectedLocation}) {
+function Routes({ setAddresses,handlePolylinesUpdate, setLassoActivate, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick,onSavedRouteClick,selectedLocation, navigateToCoordinates}) {
   const [addresses, setAddressess] = useState([]);
   const [savedRouteClick, setSavedRouteClick] = useState(false);
   // const [selectedAddresses, setSelectedAddresses] = useState([]);
@@ -65,6 +65,7 @@ useEffect(() => {
         onCustomRouteClick={onCustomRouteClick}
         handlePolylinesUpdate={handlePolylinesUpdate}
         savedRouteClick={savedRouteClick}
+        navigateToCoordinates={navigateToCoordinates}
         onClearClick={onClearClick}
         selectedLocation={selectedLocation}
          />
