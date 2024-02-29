@@ -62,7 +62,7 @@ const LoginPasswordPage = () => {
       />
 
       <input
-        className={`${styles.textbox}`}
+        className={`${styles.textboxpwd}`}
         type={showPassword ? 'text' : 'password'}
         placeholder="Password"
         value={password}
@@ -70,7 +70,7 @@ const LoginPasswordPage = () => {
       />
       <i
                 onClick={handleTogglePassword}
-                className={`fixed mt-28 right-8 text-gray-300 cursor-pointer ${
+                className={`fixed mt-28 right-[19%] text-gray-300 cursor-pointer ${
                   showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'
                 }`}
               ></i>

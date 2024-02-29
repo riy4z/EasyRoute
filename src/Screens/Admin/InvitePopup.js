@@ -46,6 +46,7 @@ function InvitePopup(props) {
   const handleRoleChange = (event) => {
     setRole(event.target.value);
   };
+
   
   const handleLocationChange = (event) => {
     setLocation(event.target.value);

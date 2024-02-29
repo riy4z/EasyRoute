@@ -8,9 +8,9 @@ function RoutePopup(props) {
   const [listAddress, setListAddress] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectAll, setSelectAll] = useState(false);
   const [hasAccounts, setHasAccounts] = useState(true);
-
+  const [showPopup, setShowPopup] = useState(false);
+ 
   useEffect(() => {
     if (props.addresses) {
       setListAddress(props.addresses);
@@ -40,30 +40,39 @@ function RoutePopup(props) {
   }, [props.selectedAddresses]);
 
   const handleCheckboxChange = (_id) => {
-    if (lassoAddresses.some(lassoAddress => lassoAddress._id === _id)) {
-      // If the address is in lassoAddresses, show an alert
-      alert("The Account is already added to the route");
-    } else {
-      // Otherwise, proceed with handling the checkbox change
+    const isAddressSelected = selectedAddress[_id] || false;
+  
+    if (isAddressSelected) {
+      // If the address is already selected, uncheck it
       setSelectedAddress((prevSelected) => {
         const updatedSelected = { ...prevSelected };
-        updatedSelected[_id] = !prevSelected[_id] || false;
+        updatedSelected[_id] = false;
         return updatedSelected;
       });
+    } else {
+      const landsAddresses = [
+        ...lassoAddresses,
+        ...Object.keys(selectedAddress).filter((id) => selectedAddress[id]),
+      ];
+  
+      if (landsAddresses.length >= 20) {
+        // If the limit is exceeded, show a popup
+        setShowPopup(true);
+      } else if (lassoAddresses.some((lassoAddress) => lassoAddress._id === _id)) {
+        // If the address is in lassoAddresses, show an alert
+        alert("The Account is already added to the route");
+      } else {
+        // Otherwise, proceed with handling the checkbox change
+        setSelectedAddress((prevSelected) => {
+          const updatedSelected = { ...prevSelected };
+          updatedSelected[_id] = true;
+          return updatedSelected;
+        });
+      }
     }
   };
-
-  const handleSelectAllChange = () => {
-    setSelectAll(!selectAll);
-    setSelectedAddress(() => {
-      const updatedSelected = {};
-      listAddress.forEach((address) => {
-        updatedSelected[address._id] = !selectAll;
-      });
-      return updatedSelected;
-    });
-  };
-
+  
+  
   const handleDoneClick = () => {
     const selectedAddresses = listAddress.filter(
       (address) =>
@@ -117,19 +126,6 @@ function RoutePopup(props) {
 
         {hasAccounts ? (
           <div>
-            <div className="mb-4">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded"
-                  checked={selectAll}
-                  onChange={handleSelectAllChange}
-                />
-                <span className="ml-2 text-xl font-small text-gray-900">
-                  Select All
-                </span>
-              </label>
-            </div>
             <div className="overflow-x-auto shadow-md sm:rounded-lg">
               <div className="overflow-y-scroll max-h-80">
                 {filteredAddresses.map((address) => (
@@ -175,6 +171,15 @@ function RoutePopup(props) {
             Import accounts for the selected location.
           </div>
         )}
+        {showPopup && (
+    <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full flex items-center justify-center">
+    <div className="bg-white p-7 rounded-lg shadow-lg max-w-md mx-auto">
+        <button className='relative fa-solid fa-circle-xmark ml-[97%] text-2xl bottom-5' onClick={() => setShowPopup(false)}></button>
+        <p className='text-xl text-red-700 font-bold'>Waypoints limit exceeded</p> 
+        <p className='text-gray-500'>Only 20 allowed per route</p>
+    </div>
+    </div>
+)}
       </div>
     </div>
   );

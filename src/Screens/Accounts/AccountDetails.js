@@ -211,7 +211,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
 
         const historyResponse = await api.get(`/getMeetingNotesAndHistory?addressId=${addressData._id}`);
         const updatedHistoryData = historyResponse.data;
-        const  companyID  = getCompanyID();
+        const companyID  = getCompanyID();
         const filteredHistoryData = updatedHistoryData.filter(historyItem => historyItem.companyID === companyID);
         setHistoryData(filteredHistoryData);
 
@@ -219,8 +219,23 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
   
         setCheckInPopupOpen(false);
 
-        
-        
+        const followupdata = await api.get(`/getFollowUpDataByAddressId?addressId=${addressData.markerId}`)
+        const followupdatas = followupdata.data
+        console.log(followupdatas)
+
+        if (followupdatas && followupdatas.followUps && followupdatas.followUps.length > 0){
+          api.delete(`/deleteFollowUp/${addressData.markerId}`)
+          .then(response => {
+            // Handle success, update UI or show success message
+            alert("Checked in successfully")
+          }).catch(error => {
+            // Handle error
+            console.error('Error checking in:', error);
+            alert('Failed to check in.');
+          });
+        }
+
+                
         if (listItemClick) {
           api.delete(`/deleteFollowUp/${addressData.markerId}`)
           .then(response => {

@@ -28,7 +28,7 @@ export async function getUser({username}){
 }
 
 
-export async function registerUser(credentials ) {
+export async function registerUser(credentials) {
     try {
         const { data: { msg, error }, status } = await api.post(`/register`, credentials );
         

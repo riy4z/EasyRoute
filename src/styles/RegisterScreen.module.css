@@ -18,13 +18,12 @@
 }
 
 .textbox{
-    @apply border-2 px-5 py-4 rounded-xl w-3/4 shadow-sm text-lg ;
+    @apply border-2 px-5 py-4 rounded-xl w-3/4 shadow-sm text-lg w-full ;
     @apply focus:outline-none;
     
 }
-
 .textboxpwd{
-    @apply border-2 pl-5 pt-4 pb-4 pr-8 rounded-xl w-3/4 shadow-sm text-lg ;
+    @apply border-2 pl-5 pt-4 pb-4 pr-8 rounded-xl w-3/4 shadow-sm text-lg w-full ;
     @apply focus:outline-none;
     
 }

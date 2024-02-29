@@ -4,7 +4,8 @@ import * as MapFunctions from './mapFunctions';
 import AccountDetails from '../../Screens/Accounts/AccountDetails';
 import config from '../../config/config';
 import api from '../../config/api';
-import deleteIcon from '../../assets/images/remove.png'
+import deleteIcon from '../../assets/images/remove.png';
+import customMarkerIcon from '../../assets/images/map3.png'
 
 const libraries = ['places', 'drawing'];
 
@@ -20,6 +21,7 @@ const GMap = (props) => {
     const [markers, setMarkers] = useState([]);
     const [initialCenter, setInitialCenter] = useState(null);
     const [polylines, setPolylines] = useState([]);
+    const [showPopup, setShowPopup] = useState(false);
 
     
     const { isLoaded } = useJsApiLoader({
@@ -89,7 +91,8 @@ const GMap = (props) => {
     const onOverlayComplete = async($overlayEvent) => {
         
         drawingManagerRef.current.setDrawingMode(null);
-    
+
+ 
         let newShape;
         switch ($overlayEvent.type) {
             case window.google.maps.drawing.OverlayType.POLYGON:
@@ -161,18 +164,35 @@ const GMap = (props) => {
                 alert('Account already added to route');
                 return; // Do not update state or call onLassoComplete
             }
-        
+          
+            if (props.selectAddress.length >= 20){
+                setShowPopup(true)
+                setPolygons([...polygons])
+                return
+            }
+
             // Update selectedMarkers state only with non-duplicate markers
             const updatedSelectedMarkers = [...selectedMarkers, ...filteredNewMarkersDetails];
-            setSelectedMarkers(updatedSelectedMarkers);
-        
-            // Update props.onLassoComplete with data from all shapes
-            props.onLassoComplete(updatedSelectedMarkers);
+            const limitaddresses = [...updatedSelectedMarkers, ...props.selectAddress];
+            if (updatedSelectedMarkers.length > 20) {
+                // Display popup if waypoints limit exceeded
+                setShowPopup(true);
+                setPolygons([...polygons])
+            } else if (limitaddresses.length > 20){
+                setShowPopup(true);
+                setPolygons([...polygons])
+            } else {
+                // Update selectedMarkers state
+                setSelectedMarkers(updatedSelectedMarkers);
+            
+                // Update props.onLassoComplete with data from all shapes
+                props.onLassoComplete(updatedSelectedMarkers);
+            }
+
         }
     
     };
 
-    console.log(selectedMarkers)
 
     const onDeleteDrawing = () => {
         // Check if the activePolygonIndex is valid
@@ -216,7 +236,7 @@ const GMap = (props) => {
     
     const navigateToCoordinates = (latitude, longitude) => {
         if (mapRef.current) {
-            mapRef.current.panTo({ lat: latitude, lng: longitude });
+            mapRef.current.panTo({ lat: latitude , lng: longitude });
             mapRef.current.setZoom(15); // You can adjust the zoom level as needed
         }
     };
@@ -282,12 +302,35 @@ const GMap = (props) => {
                 alert('Account already added to route');
                 return; // Do not update state or call onLassoComplete
             }
+
+            const combinedAddresses = [...updatedSelectedMarkers, ...props.selectAddress]
     
-            // Update selectedMarkers state with the combined set of markers
-            setSelectedMarkers(updatedSelectedMarkers);
-    
-            // Update props.onLassoComplete with data from all shapes
-            props.onLassoComplete(updatedSelectedMarkers);
+            if (updatedSelectedMarkers.length < selectedMarkers.length) {
+                // If markers were removed, allow editing
+                // Update selectedMarkers state
+                setSelectedMarkers(updatedSelectedMarkers);
+                
+                // Update props.onLassoComplete with data from all shapes
+                props.onLassoComplete(updatedSelectedMarkers);
+            } else if (updatedSelectedMarkers.length > selectedMarkers.length && props.selectAddress.length >= 20 ) {
+                // Display popup if waypoints limit exceeded after adding new markers
+                setShowPopup(true);
+                setPolygons([...polygons]);
+            } else if (updatedSelectedMarkers.length > 20){
+                setShowPopup(true);
+                setPolygons([...polygons]);
+            } else if (combinedAddresses.length > 20) {
+                setShowPopup(true);
+                setPolygons([...polygons]);
+            } else {
+                // Update selectedMarkers state
+                setSelectedMarkers(updatedSelectedMarkers);
+                
+                // Update props.onLassoComplete with data from all shapes
+                props.onLassoComplete(updatedSelectedMarkers);
+            }
+        
+        
         }
     };
     
@@ -436,7 +479,7 @@ let lastCoordinateInEntireArray = null;
         zIndex: 99999
     }
 
-    const customMarkerIcon = "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+
 
     return (
         isLoaded ? (
@@ -525,7 +568,15 @@ let lastCoordinateInEntireArray = null;
 />
 )}
 
-
+{showPopup && (
+    <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full flex items-center justify-center">
+    <div className="bg-white p-7 rounded-lg shadow-lg max-w-md mx-auto">
+        <button className='relative fa-solid fa-circle-xmark ml-[97%] text-2xl bottom-5' onClick={() => setShowPopup(false)}></button>
+        <p className='text-xl text-red-700 font-bold'>Waypoints limit exceeded</p> 
+        <p className='text-gray-500'>Only 20 allowed per route</p>
+    </div>
+    </div>
+)}
 
 
 
@@ -607,8 +658,11 @@ let lastCoordinateInEntireArray = null;
                 {/* Marker for firstmost coordinate */}
                 <Marker position={firstCoordinate}  icon={{
                                 url: customMarkerIcon,
-                                scaledSize: new window.google.maps.Size(32, 32), // Adjust the size as needed
-                            }} label={(index + 1).toString()} />
+                                scaledSize: new window.google.maps.Size(35, 35), // Adjust the size as needed
+                            }} label={{
+                                text: (index + 1).toString(),
+                                className: 'bg-white rounded-full text-sm mb-2.5 p-1 flex items-center justify-center w-5 h-5',
+                              }} />
             </React.Fragment>
         );
     })}
@@ -617,10 +671,10 @@ let lastCoordinateInEntireArray = null;
 {lastCoordinateInEntireArray && (
     <Marker
         position={lastCoordinateInEntireArray}
-        label={`${polylines.length + 1}`}
+        label={{text: `${polylines.length + 1}`, className:'bg-white rounded-full text-sm mb-2.5 p-1 flex items-center justify-center w-5 h-5'}}
         icon={{
             url: customMarkerIcon,
-            scaledSize: new window.google.maps.Size(32, 32), // Adjust the size as needed
+            scaledSize: new window.google.maps.Size(35, 35), // Adjust the size as needed
         }}
     />
 )}

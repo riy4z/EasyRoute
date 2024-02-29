@@ -205,27 +205,27 @@ export default function Profile() {
             )} 
             
              {!isEditing && !isEmailChanging && !isPasswordChanging && ( 
-              <div  className="max-w-[280px] py-5 leading-loose overlow-hidden">
+              <div  className="max-w-[280px] py-5 leading-loose overlow-y-auto">
                 <div className="bg-[#f9f9f9] p-4 rounded border-solid border border-[#ccc] shadow-md mb-4">    
                 <p className="text-center text-3xl font-semibold">{formData.username}</p>
                 <p className="text-center text-gray-500 text-base">(username)</p>
                
-                <div className="flex mt-6">
+                <div className="flex mt-6 break-all">
         <i className="fas fa-user mr-2 text-base text-gray-500"></i>
         <p className="text-base font-regular">{formData.firstName || ''} {formData.lastName || ''}</p>
       </div>
 
-      <div className="flex mt-6">
+      <div className="flex mt-6 break-all">
         <i className="fas fa-envelope mr-2 text-base text-gray-500"></i>
         <p className="text-base font-regular">{newEmail || formData.email || ''}</p>
       </div>
 
-      <div className="flex mt-6">
+      <div className="flex mt-6 break-all">
         <i className="fas fa-phone mr-2 text-base text-gray-500"></i>
         <p className="text-base font-regular">{formData.mobile || ''}</p>
       </div>
 
-      <div className="flex mt-6">
+      <div className="flex mt-6 break-all">
         <i className="fas fa-map-marker-alt mr-2 text-base text-gray-500"></i>
         <p className="text-base font-regular">{formData.address || ''}</p>
       </div>

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { generateOTPbyEmail, verifyOTPbyEmail } from '../../authentication/helper/helper';
 import api from '../../config/api';
+import { registerUser } from '../../authentication/helper/helper';
 
 const ChangeEmailPopup = ({ closePopup, apiData, onEmailUpdate }) => {
   const [newEmail, setNewEmail] = useState(apiData?.email);
@@ -13,18 +14,37 @@ const ChangeEmailPopup = ({ closePopup, apiData, onEmailUpdate }) => {
 
   const handleSendOTP = async () => {
     try {
+      if (!newEmail) {
+            toast.error('Please enter a valid email address.');
+            return;
+          }
       const otpsend = await generateOTPbyEmail(newEmail);
-      if (otpsend) {
+      const isEmailValid = await checkEmailExistence();
+      if (isEmailValid && otpsend) {
         setOTP('');
         setBeforeSendOTP(false);
         setOTPSent(true);
       } else {
-        alert("OTP can't be sent!");
+        toast.error("OTP can't be sent!");
       }
     } catch (error) {
       console.error("An error occurred while sending OTP:", error);
-      alert("OTP cannot be sent!");
+      toast.error("OTP cannot be sent!");
     }
+  };
+
+  const checkEmailExistence = async () => {
+    const { error: emailError } = await registerUser({
+      email: newEmail,
+      password: '',
+    });
+  
+    if (emailError && emailError.includes('email')) {
+      toast.error('Email already exists. Please use a different email.');
+      return false;
+    }
+  
+    return true;
   };
 
   const handleVerifyOTP = async () => {

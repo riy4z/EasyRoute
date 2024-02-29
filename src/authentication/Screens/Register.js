@@ -1,66 +1,88 @@
 import React, { useState, useEffect } from 'react';
-import { useFormik } from 'formik';
-import styles from '../../styles/ProfileStyle.module.css';
+import styles from "../../styles/RegisterScreen.module.css";
 import toast, { Toaster } from 'react-hot-toast';
 import avatar from '../assets/avatar.png';
 import { Link, useNavigate } from 'react-router-dom';
-import convertToBase64 from '../helper/convert';
 import { registerValidation } from '../helper/validate';
 import { registerUser, generateOTPbyEmail, verifyOTPbyEmail} from '../helper/helper';
 import { getCompanyById } from '../../components/fetch/getCompanyById';
 import { getRolesFromHierarchy } from '../../components/fetch/getRolesFromHierarchy';
+import { getRolesbyHierarchyandCompany } from '../../components/fetch/getRolesByHierarchyandCompany';
 import CryptoJS from 'crypto-js';
 import config from '../../config/config';
 
 export default function Register() {
   const navigate = useNavigate();
-  const [file, setFile] = useState();
   const [showPassword, setShowPassword] = useState(false);
   const [isVerificationVisible, setVerificationVisible] = useState(false);
   const [isRegisterVisible, setRegisterVisible] = useState(false);
   const [enteredOTP, setEnteredOTP] = useState('');
   const [isEmailVerified, setIsEmailVerified] = useState(false);
-  const [roles, setRoles] = useState([]);
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [role, setRole] = useState('')
+  const [companyID, setCompanyID] = useState('')
+  const [location, setLocation] = useState('')
+  const [companyname, setCompanyName] = useState('')
+  const [rolename, setRoleName] = useState('')
 
-  const formik = useFormik({
-    initialValues: {
-      email: '',
-      username: '',
-      password: '',
-      role: '',
-      companyId: '',
-      location: '',
-      companyName: '',
-      roleName:'',
-    },
-    validate: registerValidation,
-    validateOnBlur: false,
-    validateOnChange: false,
-    onSubmit: async (values) => {
-      values = await Object.assign(values, { profile: file || '',});    
-      let registerPromise = registerUser(values);
-      toast.promise(
-        registerPromise.then((response) => {
-            if (response.error) {
-                return Promise.reject(response.error);
-            } else {
-                navigate('/', { state: { message: 'Registered Successfully...!' } });
-                return response;
-            }
-        }),
-        {
-            loading: 'Creating....',
-            success: <b>Registered Successfully...!</b>,
-            error: (error) => <b>{error}</b>,
-        }
-    );
-}
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
   
-  })
+    // Validate input fields
+    const validationErrors = await registerValidation({
+      username: username,
+      password: password,
+      email: email,
+    });
+  
+    if (Object.keys(validationErrors).length > 0) {
+      // Display validation errors
+      toast.error('Please fix the following errors:');
+      Object.values(validationErrors).forEach((error) => toast.error(error));
+      return;
+    }
+  
+    // Proceed with registration
+    const values = {
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      username: username,
+      password: password,
+      role: role,
+      companyId: companyID,
+      location: location,
+      companyName: companyname,
+      roleName: rolename,
+    };
+  
+    let registerPromise = registerUser(values);
+    toast.promise(
+      registerPromise.then((response) => {
+        if (response.error) {
+          return Promise.reject(response.error);
+        } else {
+          navigate('/', { state: { message: 'Registered Successfully...!' } });
+          return response;
+        }
+      }),
+      {
+        loading: 'Creating....',
+        success: <b>Registered Successfully...!</b>,
+        error: (error) => <b>{error}</b>,
+      }
+    );
+  };
+  
 
   const checkEmailExistence = async () => {
     const { error: emailError } = await registerUser({
-      email: formik.values.email,
+      email: email,
       password: '',
     });
   
@@ -73,7 +95,7 @@ export default function Register() {
   };
   
   const handleVerifyEmail = async () => {
-    if (!formik.values.email) {
+    if (!email) {
       toast.error('Please enter a valid email address.');
       return;
     }
@@ -93,19 +115,13 @@ const decrypt = (encryptedText) => {
 };
   
 
-
-  const onUpload = async (e) => {
-    const base64 = await convertToBase64(e.target.files[0]);
-    setFile(base64);
-  };
-
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
 
   useEffect(() => {
     if (isVerificationVisible) {
-      generateOTPbyEmail(formik.values.email).then((OTP) => {
+      generateOTPbyEmail(email).then((OTP) => {
         if (OTP) {
           toast.success('OTP has been sent to your email');
         } else {
@@ -113,34 +129,24 @@ const decrypt = (encryptedText) => {
         }
       });
     }
-  }, [formik.values.email, isVerificationVisible]);
+  }, [email, isVerificationVisible]);
 
 
   useEffect(() => {
     const urlParams = window.location.pathname.split('/').filter(Boolean);
     const encryptedParams = urlParams[1];
   const decryptedParams = decrypt(decodeURIComponent(encryptedParams));
+ 
 
   const [emailFromUrl, locationFromUrl, roleFromUrl, companyIdFromUrl] = decryptedParams.split(':');
 
-  
-    // console.log('Email from URL:', emailFromUrl);
-    // console.log('Location from URL:', locationFromUrl);
-    // console.log('Role from URL:', roleFromUrl);
-    // console.log('Company ID from URL:', companyIdFromUrl);
     getCompanyById(companyIdFromUrl)
       .then((company) => {
         if (company) {
-
-    formik.setValues({
-      email: emailFromUrl || '',
-      username: '',
-      password: '',
-      role: roleFromUrl || '', 
-      companyId: companyIdFromUrl || '',
-      location: locationFromUrl || '' ,
-      companyName: company.CompanyName,
-    });
+    setEmail(emailFromUrl || '')
+    setCompanyID(companyIdFromUrl || '')
+    setLocation(locationFromUrl || '')
+    setCompanyName(company.CompanyName)
   } else {
     console.error('Company not found for companyId:', companyIdFromUrl);
   }
@@ -148,25 +154,23 @@ const decrypt = (encryptedText) => {
 .catch((error) => {
   console.error('Error fetching company details:', error);
 });
-getRolesFromHierarchy(roleFromUrl)
-.then((fetchedRoles) => {
-  if (fetchedRoles && fetchedRoles.length > 0) {
-    setRoles(fetchedRoles);
-    const firstRole = fetchedRoles[0];
-    formik.setFieldValue('roleName', firstRole.Role);
+
+getRolesbyHierarchyandCompany(roleFromUrl,companyIdFromUrl).then((role)=>{
+  if (role) {
+    setRoleName(role[0].Role)
+    setRole(role[0].RoleHierarchy)
+  } else {
+    console.error('Role not found for rolehierarchy and companyID:', roleFromUrl);
   }
-})
-.catch((error) => {
-  console.error('Error fetching roles:', error);
+}).catch((error) => {
+  console.error('Error fetching role details:', error);
 });
-   
-    formik.setFieldTouched('email');
-    formik.setFieldError('email', 'Email locked from URL parameter.');
+
   
   }, []);
 
   function resendOTP(){
-    let sendPromise = generateOTPbyEmail(formik.values.email);
+    let sendPromise = generateOTPbyEmail(email);
 
     toast.promise(sendPromise, {
     loading: 'Sending...',
@@ -179,7 +183,8 @@ getRolesFromHierarchy(roleFromUrl)
   })
   }
 
- const verifyemailbutton = "border border-indigo-500  w-full py-2 rounded-lg text-black text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white"
+ const verifyemailbutton = "border border-indigo-500 mt-4 ml-[40%] px-2 py-2 rounded-lg text-black text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white"
+ const registerbutton = "relative right-44 border border-indigo-500 mt-4 px-2 py-2 rounded-lg text-black text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white"
 
   return (
     <div className="container mx-auto">
@@ -187,53 +192,104 @@ getRolesFromHierarchy(roleFromUrl)
 
       <div className="flex justify-center items-center h-screen">
       
-        <div className={styles.glass} style={{ width: '45%', paddingTop: '3em' }}>
+        <div className={`${styles.glass}`} style={{ width: '45%', paddingTop: '3em' }}>
         <div className="title flex flex-col items-center">
                 <h4 className='text-5xl font-bold'>Register</h4>
                 <span className='py-4 text-xl w-2/3 text-center text-gray-500'>
-                    Happy to join you as <b>{formik.values.roleName}</b> at <b>{formik.values.companyName}</b>!
+                    Happy to join you as <b>{rolename}</b> at <b>{companyname}</b>!
                 </span>
 
               </div>
-          <form className="py-1" onSubmit={formik.handleSubmit}>
-            <div className="profile flex justify-center py-4">
-              <label htmlFor="profile">
-                <img src={file || avatar} className={styles.profile_img} alt="avatar" />
-              </label>
-              <input onChange={onUpload} type="file" id="profile" name="profile" />
-            </div>
+        
 
-            <div className="textbox flex flex-col items-center gap-6">
-              <input {...formik.getFieldProps('username')} className={styles.textbox} type="text" placeholder="Username*" />
-              <input {...formik.getFieldProps('password')} className={styles.textbox} type={showPassword? 'text' : 'password'} placeholder="Password*" />
-              <input {...formik.getFieldProps('email')} className={`${styles.textbox}`} type="email" placeholder="Email*" disabled={isEmailVerified || formik.values.email !== ''}  />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mt-12">
+            
+            <div>
+              <label htmlFor="firstName">First Name*</label>
+              <input
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className={styles.textbox}
+                type="text"
+                placeholder="First Name*"
+              />
+            </div>
+            <div>
+              <label htmlFor="lastName">Last Name*</label>
+              <input
+                id="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className={styles.textbox}
+                type="text"
+                placeholder="Last Name*"
+              />
+              </div>
+
+              <div>
+              <label htmlFor='username'>Username*</label>
+              <input
+                id='username'
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className={styles.textbox}
+                type="text"
+                placeholder="Username*"
+              />
+              </div>
+              <div>
+                <label htmlFor='password'>Password*</label>
+              <input
+                id='password'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={styles.textboxpwd}
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password*"
+              />
               <i
                 onClick={handleTogglePassword}
-                className={`fixed mt-[105px] right-7 text-gray-300 cursor-pointer text-2xl ${
+                className={`fixed right-[4.8%] mt-5 text-gray-300 cursor-pointer text-xl ${
                   showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'
                 }`}
               ></i>
+              </div>
+             
+              <label htmlFor='email'>Email*</label>
+              <input
+                id='email'
+                value={email}
+                className={`${styles.textbox} col-span-2`}
+                type="email"
+                placeholder="Email*"
+                disabled={isEmailVerified || email !== ''}
+              />
               <i
-                className={`fixed mt-[195px] right-8 text-green-500 text-2xl ${
+                className={`absolute right-9 mt-44 text-green-500 text-2xl ${
                   isEmailVerified ? 'fas fa-regular fa-circle-check' : ''
                 }`}
               ></i>
+              <div>
+              
+              </div>
+              
              {/*REGISTER BUTTON*/}
              {isRegisterVisible &&
-                <button className={styles.btn} type="submit">
+                <button className={registerbutton} onClick={handleSubmit}>
                   Register
                 </button>
               }
             </div>
 
-            <div className="text-center py-4">
+            {/* <div className="text-center py-4">
               <span className="text-gray-500">
                 Already Registered? <Link className="text-red-500" to="/">
                   Login Now
                 </Link>
               </span>
-            </div>
-          </form>
+            </div> */}
+        
 
           {/* Verification pop-up */}
           {isVerificationVisible && (
@@ -248,7 +304,7 @@ getRolesFromHierarchy(roleFromUrl)
               <button className="border border-indigo-500 py-2 px-3  rounded-lg text-black text-xl shadow-sm relative text-center mt-[70px] right-[61px] hover:bg-indigo-500 hover:text-white hover:border-none"
               onClick={async () => {
                 try {
-                  const response = await verifyOTPbyEmail({ email: formik.values.email, code: enteredOTP });
+                  const response = await verifyOTPbyEmail({ email: email, code: enteredOTP });
             
                   if (response.status === 201) {
                     // OTP is correct, proceed with registration or any other action
