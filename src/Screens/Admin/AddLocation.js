@@ -1,9 +1,9 @@
-import React, { useState ,useEffect,useCallback } from 'react';
+import React, { useState ,useEffect} from 'react';
 import api from '../../config/api';
 import fetchLocations from '../../components/fetch/fetchLocations';
 import fetchRoles from '../../components/fetch/fetchRoles';
+import fetchUserLocations from '../../components/fetch/fetchUserLocations';
 import getCompanyID from "../../components/fetch/getCompany"
-import { getCompanyById } from '../../components/fetch/getCompanyById';
 import { getUserLocationsByUserId, addUserLocation } from '../../components/fetch/getUserLocationsByUserId';
 
 
@@ -13,10 +13,8 @@ function AddLocation({ onSave, onCancel,UserDetails,updateData }) {
   const [locationsFromServer, setLocationsFromServer] = useState([]);
   const [Location, setLocation] = useState([]);
   const [newLocation, setNewLocation] = useState("");
-  const [showAddLocationDropdown, setShowAddLocationDropdown] = useState(false);
   const [availableLocations, setAvailableLocations] = useState([]);
-  const [Company, setCompany] = useState("");
-  const [LocationId, setLocationId] = useState (null);
+
 
   const [userData, setUserData] = useState({
     location: '',
@@ -36,8 +34,6 @@ function AddLocation({ onSave, onCancel,UserDetails,updateData }) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const company = await getCompanyById(UserDetails.CompanyID);
-      setCompany(company.CompanyName);
       
       try {
         const userLocations = await getUserLocationsByUserId(UserDetails._id);
@@ -76,8 +72,7 @@ function AddLocation({ onSave, onCancel,UserDetails,updateData }) {
   useEffect(() => {
     const fetchDropdown = async () => {
       try {
-        const allLocations = await fetchLocations();
-        const availableLocs = allLocations.filter(loc => !Location.find(selectedLoc => selectedLoc._id === loc._id));
+        const availableLocs = locationsFromServer.filter(loc => !Location.find(selectedLoc => selectedLoc._id === loc._id));
         setAvailableLocations(availableLocs);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -88,14 +83,21 @@ function AddLocation({ onSave, onCancel,UserDetails,updateData }) {
   }, [Location]);
 
   useEffect(() => {
+    // Fetch locations from the server when the component mounts
     const fetchData = async () => {
       try {
+        const userLocationsData = await fetchUserLocations();
         const locations = await fetchLocations();
-        setLocationsFromServer(locations);
+        const matchedLocations = userLocationsData.map(userLocation => {
+          const matchingLocation = locations.find(location => location._id === userLocation.LocationID);
+          return { ...userLocation, ...matchingLocation }; // Merge userLocation and matchingLocation
+        });
+        setLocationsFromServer(matchedLocations);
+    
         const roles = await fetchRoles();
         setRolesFromServer(roles);
       } catch (error) {
-
+        // Handle the error as needed
       }
     };
 
@@ -116,15 +118,15 @@ console.log(locationsFromServer)
   return (
     <div className="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-gray-800 bg-opacity-75 z-50">
       <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-xl font-bold mb-4">Add Location</h2>
+        <h2 className="text-xl font-semibold mb-5 text-center">Add User Location</h2>
         <form onSubmit={handleSubmit}>
-          <div className="ml-2">
-            <label className="text-xl font-bold">Location:</label>
+          <div className="leading-none">
+            <label className="text-lg font-semibold ">Location:</label>
             <div>     
-                  <div>
+                  
 
                      
-  <select className="text-xl"
+  <select className="w-full px-1 text-xl border border-gray-300 rounded-md mt-2 mb-4 focus:outline-none focus:border-blue-500"
     value={newLocation}
     onChange={(e) => {
       const selectedLocationValue = e.target.value;
@@ -141,18 +143,18 @@ console.log(locationsFromServer)
   </select>
 
                     
-                  </div>
+                  
   </div>
           </div>
-
-          <label className="text-xl font-bold">Role:</label>
+<div className='leading-none'>
+          <label className="text-lg font-semibold">Role:</label>
          <select
   value={role}
   onChange={(event) => {
     handleRoleChange(event); 
     
   }}
-  className="w-full p-1 text-xl border border-gray-300 rounded-md mb-3 focus:outline-none focus:border-blue-500"
+  className="w-full px-1 text-xl border border-gray-300 rounded-md mt-2 mb-1 focus:outline-none focus:border-blue-500"
   required
 >
 <option>Select Role</option>
@@ -165,10 +167,10 @@ console.log(locationsFromServer)
   ))}
 
 </select>
-
-          <div className="flex justify-end">
-            <button type="button" onClick={onCancel} className="mr-4 bg-gray-300 hover:bg-gray-600 px-4 rounded-md">Cancel</button>
-            <button type="button" onClick={() => {onAdd(UserDetails._id, newLocation, role)}} className="bg-blue-500 hover:bg-blue-800 px-4 rounded-md">Add</button>
+</div>
+          <div className="flex mt-2 text-lg justify-between items-center font-medium">
+            <div onClick={() => {onAdd(UserDetails._id, newLocation, role)}} className="bg-blue-600 cursor-default py-1 px-6 text-white hover:bg-blue-700 px-4 rounded-md">Add</div>
+            <div onClick={onCancel} className="bg-gray-300 hover:bg-gray-400 px-4 py-1 rounded-md cursor-default">Cancel</div>
             
           </div>
         </form>

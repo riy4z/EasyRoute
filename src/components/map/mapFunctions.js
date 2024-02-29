@@ -1,7 +1,7 @@
 // mapFunctions.js
 import { v4 as uuidv4 } from 'uuid';
 import api from "../../config/api"
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 
 export const sendAddressDataToBackend = async (addressData) => {

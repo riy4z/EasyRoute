@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styles from "../../styles/RegisterScreen.module.css";
 import toast, { Toaster } from 'react-hot-toast';
-import avatar from '../assets/avatar.png';
-import { Link, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 import { registerValidation } from '../helper/validate';
 import { registerUser, generateOTPbyEmail, verifyOTPbyEmail} from '../helper/helper';
 import { getCompanyById } from '../../components/fetch/getCompanyById';
-import { getRolesFromHierarchy } from '../../components/fetch/getRolesFromHierarchy';
 import { getRolesbyHierarchyandCompany } from '../../components/fetch/getRolesByHierarchyandCompany';
 import CryptoJS from 'crypto-js';
 import config from '../../config/config';

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { RxCrossCircled } from 'react-icons/rx';
 import { getCompanyById } from '../../components/fetch/getCompanyById';
-import { getUserLocationsByUserId, deleteUserLocation, addUserLocation } from '../../components/fetch/getUserLocationsByUserId';
+import { getUserLocationsByUserId, deleteUserLocation } from '../../components/fetch/getUserLocationsByUserId';
 import fetchLocations from '../../components/fetch/fetchLocations';
 import api from '../../config/api';
 import UpdatePopup from './Update';
@@ -10,9 +10,6 @@ import AddLocation from './AddLocation';
 function UserDetails({ UserDetails, closePopup }) {
   const [Company, setCompany] = useState("");
   const [Location, setLocation] = useState([]);
-  // const [newLocation, setNewLocation] = useState("");
-  // const [showAddLocationDropdown, setShowAddLocationDropdown] = useState(false);
-  // const [availableLocations, setAvailableLocations] = useState([]);
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
   const [showAddLocation, setShowAddLocation] = useState(false);
   const [updateData, setUpdateData]= useState([]);
@@ -74,46 +71,6 @@ function UserDetails({ UserDetails, closePopup }) {
     fetchUser();
   }, [UserDetails]);
 
-  // useEffect(() => {
-  //   const fetchDropdown = async () => {
-  //     try {
-  //       const allLocations = await fetchLocations();
-  //       const availableLocs = allLocations.filter(loc => !Location.find(selectedLoc => selectedLoc._id === loc._id));
-  //       setAvailableLocations(availableLocs);
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //     }
-  //   };
-
-  //   fetchDropdown();
-  // }, [Location]);
-
-  // const toggleDropdown = useCallback(() => {
-  //   setShowAddLocationDropdown(prevState => !prevState);
-  // }, []);
-
-  // const handleDropdownChangeAndAddLocation = async (selectedLocationValue) => {
-  //   try {
-  //     const selectedLocationOption = availableLocations.find(location => location.Location === selectedLocationValue);
-  
-  //     if (selectedLocationOption) {
-  //       const selectedLocationId = selectedLocationOption._id;
-  //       const confirmed = window.confirm(`Are you sure you want to add "${selectedLocationValue}" as a new location?`);
-  
-  //       if (confirmed) {
-  //         const response = await addUserLocation(UserDetails._id, selectedLocationId);
-  //         console.log('addUserLocation response:', response);
-  
-  //         setLocation(prevLocation => [...prevLocation, { _id: selectedLocationId, Location: selectedLocationValue }]);
-  //         setNewLocation("");
-  //       }
-  //     } else {
-  //       console.error("Error: Selected location not found.");
-  //     }
-  //   } catch (error) {
-  //     console.error('Error handling dropdown change and adding location:', error);
-  //   }
-  // };
  
   const handleDeleteLocation = useCallback(async (locationId) => {
     try {
@@ -131,10 +88,8 @@ function UserDetails({ UserDetails, closePopup }) {
   // const labelStyle = 'mb-2 text-xl';
 
   const deleteButtonClass =
-    'absolute mt-28 left-2 border-2 border-red-500 px-[88px] py-2 rounded-lg text-red-500 text-xl shadow-sm text-center hover:bg-red-500 hover:text-white';
-  const locationButtonClass=
-  'absolute mt-10 left-2 border-2 border-blue-700 px-20 py-2 rounded-lg text-blue-700 text-xl shadow-sm text-center hover:bg-blue-700 hover:text-white'
- 
+    ' text-red-500 text-lg w-full text-center hover:underline';
+  
 console.log(Location)
 
     return (
@@ -156,61 +111,52 @@ console.log(Location)
                     
                   <p 
                     className="text-xl font-bold">
-                    {`${UserDetails.firstName} ${UserDetails.lastName}`} 
+                    {`${UserDetails.firstName||""} ${UserDetails.lastName||""}`}
+                    <span className='text-lg text-gray-500 font-semibold'>{` (${UserDetails.username})`}</span> 
                   </p>
                 
     
-                  <div className=' block'>
-                <label className='text-sm font-semibold'>Email:</label>
+                  <div className=' block border-t leading-none mt-2 py-1'>
+                <label className='text-sm font-semibold leading-loose'>Address:</label>
+                  <p
+                    className='text-sm block'>
+                    {`${UserDetails.address||"(No Address)"}`} 
+                  </p>
+                </div>
+                  
+                <label className='text-sm font-semibold leading-loose'>Email:</label>
                   <p
                     className='text-sm block'>
                     {`${UserDetails.email}`} 
                   </p>
-                </div>
+                
     
                 <div className=' block'>
                 <label className='text-sm font-semibold'>Mobile Number:</label>
                   <p
                      className='text-sm block'>
-                    {`${UserDetails.mobile}`} 
+                    {`${UserDetails.mobile || "(No Mobile Number)"}`} 
                   </p>
                 </div>
     
-                <div className=' block'>
-                  <label className='text-sm font-semibold'>Location: {' '}
-                  </label></div>
+                <div className='flex justify-between items-center py-4 mr-2'>
+    <div className='text-sm font-semibold'>User Location:</div>
+    <div className  ="text-sm text-blue-600 hover:text-blue-500 hover:underline cursor-pointer" onClick={handleAdd}><span>Add</span></div>
+</div>
                  
-                  <div className=" border">
+                  <div className=" border rounded-xl">
   <ul className='overflow-y-auto max-h-24 text-xl'>
     {Location.map(location => (
-      <li className="border-b cursor-pointer hover:underline p-2 text-sm flex justify-between items-center" onClick={()=>{handleUpdate(location)}} key={location._id}>
-        <span>{location.Location} ({location.Role})</span>
-        <i className="fa-solid fa-xmark" onClick={() => handleDeleteLocation(location._id)}></i>
+      <li className="border-b border-gray-200 cursor-pointer  hover:underline p-2 text-sm flex justify-between items-center" >
+        <span onClick={()=>{handleUpdate(location)}} key={location._id}>{location.Location} ({location.Role})</span>
+        <div className='hover:text-red-400'>
+
+        <i className="fa-solid fa-xmark " onClick={() => handleDeleteLocation(location._id)}></i>
+        </div>
       </li>
     ))}
   </ul>
 </div>
-
-                    {/* {showAddLocationDropdown && (
-  <select className="text-xl"
-    value={newLocation}
-    onChange={(e) => {
-      const selectedLocationValue = e.target.value;
-      setNewLocation(selectedLocationValue); // Update the state first
-      handleDropdownChangeAndAddLocation(selectedLocationValue); // Then call the function
-    }}
-  >
-    <option value="">Select a location</option>
-    {availableLocations.map(location => (
-      <option key={location._id} value={location.Location} data-id={location._id}>
-        {location.Location}
-      </option>
-    ))}
-  </select>
-)} */}
-                    
-                 
-              
     
                   <div className=' block'>
                 <label className='text-sm font-semibold'>Company:</label>
@@ -225,8 +171,10 @@ console.log(Location)
               <p>Loading user details...</p>
             )}
           </div>
-          <button className={locationButtonClass} onClick={handleAdd}>Add Location</button>
+          <div className='w-full border-t border-gray-200 hover:font-medium'>
+
           <button className={deleteButtonClass}>Delete User</button>
+          </div>
           
           {showUpdatePopup && (
         <UpdatePopup UserDetails={UserDetails} updateData={updateData} onSave={handleSaveUpdate} onCancel={handleCancelUpdate} />

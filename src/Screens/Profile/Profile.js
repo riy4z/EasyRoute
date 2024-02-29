@@ -102,12 +102,9 @@ export default function Profile() {
   };
   
   const update="absolute mt-28 ml-2 left-3 border-2 border-indigo-500 px-24 py-2 rounded-lg text-indigo-500 text-xl shadow-sm text-center hover:bg-indigo-500 hover:text-white"
-  const inputStyle = "relative left-3 border-2  py-3 rounded-xl px-[26px] shadow-sm text-lg mt-4 focus:outline-none";
   const buttonStyle1="border-2 border-red-600 mt-4 ml-3 px-[58px] py-2 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
   const buttonStyle2="border-2 border-red-600 mt-28 ml-3 px-[100px] py-2 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
-  const EditStyle="border-2 border-blue-700 mt-28 ml-3 px-[112px] py-2 rounded-lg text-blue-700 text-xl text-center hover:bg-blue-700 hover:text-white"
-  const EmailEditStyle="border-2 border-blue-700 mt-2 ml-3 px-16 py-2 rounded-lg text-blue-700 text-xl text-center hover:bg-blue-700 hover:text-white"
-  const PasswordEditStyle="border-2 border-blue-700 mt-2 ml-3 px-12 py-2 rounded-lg text-blue-700 text-xl text-center hover:bg-blue-700 hover:text-white"
+  
 
   
 

@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { RxCrossCircled } from 'react-icons/rx';
 import api from '../../config/api';
-import config from "../../config/config";
-import axios from 'axios';
 import getCompanyID from '../../components/fetch/getCompany';
 import getUserID from '../../components/fetch/getUser';
 import 'react-datepicker/dist/react-datepicker.css';
 import CheckInPopup from './CheckInPopup';
 import DatePicker from 'react-datepicker';
-import { addMinutes } from 'date-fns';
 import EditPopup from './EditPopup';
 
 const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddress, children, listItemClick, refresh, setRefresh, selectedLocation }) => {
@@ -39,13 +36,6 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
     }
   };
   
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
 
   const handleDelete = () => {
     const confirmed = window.confirm('Are you sure you want to delete this information?');
@@ -275,11 +265,6 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
 
   console.log(addressData.markerId)
  
-  
-  
- 
-  const buttonStyle="border-2 border-red-600 mt-6 w-full py-1 rounded-lg text-red-600 text-xl text-center hover:bg-red-600 hover:text-white"
-
 
   return (
     <div className={` ${isExpanded ? 'opacity-100' : 'opacity-0'} fixed top-0 right-0  bg-white text-black w-72 h-screen p-0 z-0 transition-opacity ease-out duration-700 `}>

@@ -53,10 +53,12 @@ function Sidebar(props) {
     const fetchData = async () => {
       try {
         const userLocationsData = await fetchUserLocations();
+        
         setUserLocations(userLocationsData);
         const allLocations = await fetchLocations();
         setLocations(allLocations);
       } catch (error) {
+        fetchData()
         console.error("Error fetching data:", error);
       }
     };
@@ -70,7 +72,6 @@ function Sidebar(props) {
  
     const admin = userLocations.find((loc) => loc.LocationID === selectedLocation);
     setIsAdmin(admin.RoleHierarchy)
-    console.log(isAdmin)
     }
     catch(error)
     {console.log("Location not selected")}
@@ -130,7 +131,8 @@ function Sidebar(props) {
     switch (selectedOption) {
       case 'Admin':
         return <Admin 
-        isCorpAdmin={isAdmin} />;
+        isCorpAdmin={isAdmin} 
+        selectedLocation={selectedLocation}/>;
       case 'Account':
         return <Account setAddresses={props.setAddresses} selectedLocation={selectedLocation} navigateToCoordinates={navigateToCoordinates}/>;
       case 'Route':
@@ -201,11 +203,14 @@ function Sidebar(props) {
           <svg class="inline-block mr-1 mb-1 w-[1.4rem] h-[1.4rem] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
     <path fill-rule="evenodd" d="M12 2a8 8 0 0 1 6.6 12.6l-.1.1-.6.7-5.1 6.2a1 1 0 0 1-1.6 0L6 15.3l-.3-.4-.2-.2v-.2A8 8 0 0 1 11.8 2Zm3 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" clip-rule="evenodd"/>
   </svg>
-  
+  <div className='hidden md:inline'>
           {selectedLocationName}
-
+          </div>
         </div>
-
+{userLocations.length === 0&&(
+  console.log("Error Fetching User Locations, please reload")
+)
+}
         {isDropDownExpanded && (
           <ul className="absolute top-full left-0 z-10 bg-gray-700 w-full rounded-lg overflow-hidden">
             {userLocations.map((userLocation) => {

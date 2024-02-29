@@ -4,6 +4,7 @@ import getCompanyID from "../../components/fetch/getCompany"
 import { RxCrossCircled } from 'react-icons/rx';
 import fetchLocations from '../../components/fetch/fetchLocations';
 import fetchRoles from '../../components/fetch/fetchRoles';
+import fetchUserLocations from '../../components/fetch/fetchUserLocations';
 import getRoleHierarchy from '../../components/fetch/getRoleHierarchy';
 import RolePopup from './RolePopup';
 import LocationPopup from './LocationPopup';
@@ -16,17 +17,25 @@ function InvitePopup(props) {
   const [role, setRole] = useState('');
   const [location, setLocation] = useState('');
   const [locationsFromServer, setLocationsFromServer] = useState([]);
+  const [userLocation, setUserLocations] = useState([])
   const [rolesFromServer, setRolesFromServer] = useState([]);
   const [showRolePopup, setShowRolePopup] = useState(false);
   const [showLocationPopup, setShowLocationPopup] = useState(false);
+
+
 
   useEffect(() => {
     // Fetch locations from the server when the component mounts
     const fetchData = async () => {
       try {
+        const userLocationsData = await fetchUserLocations();
         const locations = await fetchLocations();
-        setLocationsFromServer(locations);
-         // Update the state with locations
+        const matchedLocations = userLocationsData.map(userLocation => {
+          const matchingLocation = locations.find(location => location._id === userLocation.LocationID);
+          return { ...userLocation, ...matchingLocation }; // Merge userLocation and matchingLocation
+        });
+        setLocationsFromServer(matchedLocations);
+    
         const roles = await fetchRoles();
         setRolesFromServer(roles);
       } catch (error) {
@@ -470,14 +479,14 @@ function InvitePopup(props) {
 >
   <option>Select Role</option>
   {rolesFromServer.map((rol) => (
-    (getRoleHierarchy() === 0) || 
-    (getRoleHierarchy() === 1 && rol.RoleHierarchy === 2) ? ( 
-      <option key={rol.id} value={rol.RoleHierarchy}>
-        {rol.Role}
-          
-      </option>
-    ) : null
-  ))}
+  (props.isCorpAdmin === 0 && rol.RoleHierarchy !== 0) || 
+  (props.isCorpAdmin === 1 && rol.RoleHierarchy === 2 && rol.RoleHierarchy !== 0) ? ( 
+    <option key={rol.id} value={rol.RoleHierarchy}>
+      {rol.Role}
+    </option>
+  ) : null
+))}
+  {props.isCorpAdmin===0 &&(
     <option 
     value="add_new_user"
     onClick={() => setShowRolePopup(true)}
@@ -485,6 +494,8 @@ function InvitePopup(props) {
   >
     Add new Role
   </option>
+  )}
+    
 </select>
 
 
@@ -509,18 +520,21 @@ function InvitePopup(props) {
               {loc.Location}
             </option>
           ))}
-              <option 
-    value="add_new_location"
-    onClick={() => setShowRolePopup(true)}
-    className="flex items-center p-3 overflow-y-auto  text-blue-500 border-t border-gray-200 rounded-b-lg bg-gray-50  hover:bg-gray-100   hover:underline"
-  >
-    Add new Location
-  </option>
+          {props.isCorpAdmin===0&&(
+            <option 
+            value="add_new_location"
+            onClick={() => setShowRolePopup(true)}
+            className="flex items-center p-3 overflow-y-auto  text-blue-500 border-t border-gray-200 rounded-b-lg bg-gray-50  hover:bg-gray-100   hover:underline"
+          >
+            Add new Location
+          </option>
+          )}
+              
       </select>
-      <div className="flex justify-end">
+      <div className="flex justify-start">
           <button
             onClick={handleInviteClick}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md transition duration-300 text-sm"
             >
             Invite
           </button>
