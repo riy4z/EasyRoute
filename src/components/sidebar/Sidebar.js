@@ -29,7 +29,7 @@ function Sidebar(props) {
   const { polylines, handlePolylinesUpdate, onUpdateEndLocation, onUpdateStartLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick, setParentLocation, navigateToCoordinates} = props
   const[isAdmin,setIsAdmin]=useState(2);
 
-  
+ 
   console.log(selectedLocation);
   const handleOptionClick = (option, addresses) => {
     setSelectedOption(option);
@@ -58,6 +58,7 @@ function Sidebar(props) {
         const allLocations = await fetchLocations();
         setLocations(allLocations);
       } catch (error) {
+        console.log(apiData)
         fetchData()
         console.error("Error fetching data:", error);
       }

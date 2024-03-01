@@ -23,9 +23,54 @@ function Reports(props) {
     setEndDate(date);
   };
 
+  const ExportCount = async () => {
+    try {
+        // Fetch all user locations
+        const userLocations = await fetchUserLocations();
+
+        // Prepare CSV data for all locations
+        let csvData = `Company,Location,Check-in count\n`;
+
+        // Iterate through each location
+        for (const location of userLocations) {
+            // Fetch the count of check-ins for the current location
+            const countResponse = await api.post('/getCheckinCount', {
+                locationId: location.LocationID,
+                startDate,
+                endDate
+            });
+
+            // Extract the count from the response
+            const checkinCount = countResponse.data.count;
+            const locationid = countResponse.data.locationID;
+            const company = countResponse.data.Company;
+
+            // Append data for the current location to CSV data
+            csvData += `${company},${locationid},${checkinCount}\n`;
+        }
+
+        // Create a Blob object containing the CSV data
+        const blob = new Blob([csvData], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a link element and click it to trigger the download
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `checkin_counts.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        toast.success("Check-in count exported successfully");
+    } catch (error) {
+        console.error('Error exporting check-in count:', error);
+        toast.error('Error exporting check-in count');
+    }
+};
+
+
   const AllLocation = async() =>{
     const selectedLocation = await fetchUserLocations()
-    console.log(selectedLocation)
   }
 
   const exportCheckin = async () => {
@@ -52,7 +97,7 @@ function Reports(props) {
       const responses = await Promise.all(requests);
   
       // Combine all CSV data into one
-      let combinedCSVData = 'Account,User,Street Address, City, State, ZIP Code, Company,Location,Meeting Notes,Checked in\n'; // Add titles
+      let combinedCSVData = 'Company,Location,Account,User,Street Address, City, State, ZIP Code,Meeting Notes,Checked in\n'; // Add titles
   
       responses.forEach(csvData => {
         combinedCSVData += csvData; // Add CSV data for each location
@@ -137,9 +182,10 @@ function Reports(props) {
         <div>
         <div className="mt-6 bg-[#f9f9f9] p-3 w-full rounded border-solid border border-[#ccc]">
 
-  
+  <div className='flex items-center justify-between'>
         <p className='text-gray-400 font-medium'>Check In Report</p>
-
+          <p className='text-blue-500 text-sm  px-2 hover:underline cursor-pointer' onClick={ExportCount}>Count</p>
+          </div>
         <div className="mt-2 flex bg-[#fff] w-full cursor-pointer text-gray-700   py-1 px-2  rounded border-solid border-2 border-gray-100">
 
           <DatePicker
