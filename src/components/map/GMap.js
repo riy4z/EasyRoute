@@ -5,7 +5,7 @@ import AccountDetails from '../../Screens/Accounts/AccountDetails';
 import config from '../../config/config';
 import api from '../../config/api';
 import deleteIcon from '../../assets/images/remove.png';
-import customMarkerIcon from '../../assets/images/map3.png'
+import customMarkerIcon from '../../assets/images/mapmarker.png'
 
 const libraries = ['places', 'drawing'];
 
@@ -659,7 +659,7 @@ let lastCoordinateInEntireArray = null;
                 {/* Marker for firstmost coordinate */}
                 <Marker position={firstCoordinate}  icon={{
                                 url: customMarkerIcon,
-                                scaledSize: new window.google.maps.Size(35, 35), // Adjust the size as needed
+                                scaledSize: new window.google.maps.Size(38,38), // Adjust the size as needed
                             }} label={{
                                 text: (index + 1).toString(),
                                 className: 'bg-white rounded-full text-sm mb-2.5 p-1 flex items-center justify-center w-5 h-5',
@@ -675,7 +675,7 @@ let lastCoordinateInEntireArray = null;
         label={{text: `${polylines.length + 1}`, className:'bg-white rounded-full text-sm mb-2.5 p-1 flex items-center justify-center w-5 h-5'}}
         icon={{
             url: customMarkerIcon,
-            scaledSize: new window.google.maps.Size(35, 35), // Adjust the size as needed
+            scaledSize: new window.google.maps.Size(38,38), // Adjust the size as needed
         }}
     />
 )}

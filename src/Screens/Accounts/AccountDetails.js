@@ -7,6 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import CheckInPopup from './CheckInPopup';
 import DatePicker from 'react-datepicker';
 import EditPopup from './EditPopup';
+import toast, { Toaster } from 'react-hot-toast';
 
 const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddress, children, listItemClick, refresh, setRefresh, selectedLocation }) => {
 
@@ -88,7 +89,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
       api
         .post('/saveFollowUp', dataToSave)
         .then((response) => {
-          // console.log('Follow-up data saved successfully:', response.data);
+          toast.success('Follow-up date saved successfully');
           setConfirmDate(false);
           setFormData({
             ...formData,
@@ -211,7 +212,6 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
 
         const followupdata = await api.get(`/getFollowUpDataByAddressId?addressId=${addressData.markerId}`)
         const followupdatas = followupdata.data
-        console.log(followupdatas)
 
         if (followupdatas && followupdatas.followUps && followupdatas.followUps.length > 0){
           api.delete(`/deleteFollowUp/${addressData.markerId}`)
@@ -268,6 +268,7 @@ const AccountDetails = ({ addressData, isExpanded, onToggleExpand,onUpdateAddres
 
   return (
     <div className={` ${isExpanded ? 'opacity-100' : 'opacity-0'} fixed top-0 right-0  bg-white text-black w-72 h-screen p-0 z-0 transition-opacity ease-out duration-700 `}>
+      <Toaster position='top-center' reverseOrder={false}></Toaster>
       <div className='bg-customColor p-3'>
         <h3 className='text-white text-xl ml-2 flex items-center justify-between'>
           Account Details

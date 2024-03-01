@@ -10,6 +10,7 @@ import * as MapFunctions from "../../components/map/mapFunctions";
 import config from "../../config/config";
 import api from "../../config/api";
 import AccountDetails from "../Accounts/AccountDetails";
+import toast from "react-hot-toast";
 
 
 const CurrentRoute = ({ setLassoActivate, addresses, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation, lassoComplete, // New prop
@@ -61,7 +62,7 @@ const handleAddressClick = (address) => {
             className={`border${snapshot.isDragging ? ' opacity-50' : ''} transition-opacity duration-200 ease-in-out px-0.5 py-1 relative text-sm font-medium rounded-md mt-1`}
           >
             <div className="pl-2">
-            {address["First Name"]} {address["Last Name"]}</div>
+            {`${index + 2}. ${address["First Name"]} ${address["Last Name"]}`}</div>
               <hr className="ml-2 border-t border-gray-200 w-11/12" />
             <div className="text-xs pl-2 text-gray-600 font-normal">
               {index < polylines.length && (
@@ -482,6 +483,8 @@ const handleClearUp = () =>{
           // Handle errors during the request
           console.error('Error during Axios request:', error);
         });
+
+        toast.success(`"${routeName}" Route saved successfully`)
   
     } catch (error) {
       // Handle errors that occur within the try block

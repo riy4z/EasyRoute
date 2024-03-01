@@ -38,6 +38,7 @@ const FollowUp = (props) => {
 
   const handleListItemClick = (address) => {
     setSelectedAddress(address);
+    props.navigateToCoordinates(address.latitude, address.longitude)
     setIsAccountDetailsExpanded(true);
     setListItemClick(true);
   };

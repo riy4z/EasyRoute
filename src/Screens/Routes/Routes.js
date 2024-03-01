@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import CurrentRoute from './CurrentRoute';
 import SavedRoutes from './SavedRoutes';
 import * as MapFunctions from '../../components/map/mapFunctions';
+import { Toaster } from 'react-hot-toast';
 
 function Routes({ setAddresses,handlePolylinesUpdate, setLassoActivate, onSelectedAddresses, polylines, onUpdateStartLocation, onUpdateEndLocation, lassoComplete, onOptimizeClick, onCustomRouteClick, onClearClick,onSavedRouteClick,selectedLocation, navigateToCoordinates}) {
   const [addresses, setAddressess] = useState([]);
@@ -43,6 +44,7 @@ useEffect(() => {
 
   return (
     <div>
+      <Toaster position='top-center' reverseOrder={false}></Toaster>
       <h1 className="text-5xl font-medium text-customColor1 text-left mb-2">Route</h1>
       <ul className="hidden text-sm font-medium text-center text-gray-500 rounded-lg shadow sm:flex dark:divide-gray-700 dark:text-gray-400">
         <li className={`w-full ${activeTab === 'current' ? 'bg-customColor rounded-s-lg text-white' : 'hover:text-gray-700 hover:bg-gray-50 text-customColor'}`}>

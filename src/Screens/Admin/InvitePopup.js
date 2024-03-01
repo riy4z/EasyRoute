@@ -10,6 +10,8 @@ import RolePopup from './RolePopup';
 import LocationPopup from './LocationPopup';
 import CryptoJS from 'crypto-js';
 import config from '../../config/config';
+import { registerUser } from '../../authentication/helper/helper';
+import toast from "react-hot-toast"
 
 
 function InvitePopup(props) {
@@ -60,6 +62,20 @@ function InvitePopup(props) {
   const handleLocationChange = (event) => {
     setLocation(event.target.value);
   };
+
+  const checkEmailExistence = async () => {
+    const { error: emailError } = await registerUser({
+      email: email,
+      password: '',
+    });
+  
+    if (emailError && emailError.includes('email')) {
+      toast.error('Email already exists. Please use a different email.');
+      return false;
+    }
+  
+    return true;
+  };
   
   const handleInviteClick = async () => {
     if (!email || !role || !location) {
@@ -72,6 +88,13 @@ function InvitePopup(props) {
     if (!companyId) {
       // Handle the case where companyId is null or undefined
       console.error('Company ID is not available');
+      return;
+    }
+    
+    const isEmailValid = await checkEmailExistence();
+    if (!isEmailValid) {
+      // Handle the case where companyId is null or undefined
+      console.error('Email already exists');
       return;
     }
     
@@ -416,7 +439,7 @@ function InvitePopup(props) {
                                                   
                                                   
                                                   </div>`, subject: "Invite link for company" });
-                                                  console.log(`Invitation email sent to ${email}`);
+                                                  toast.success(`Invitation email sent to ${email}`);
                                                 } catch (error) {
                                                   console.error('Error sending invitation email:', error);
                                                 }

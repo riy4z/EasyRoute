@@ -94,7 +94,6 @@ function Sidebar(props) {
         console.error('Error fetching follow-up data:', error);
       } 
     };
-
     fetchData();
   }, [selectedLocation]);
 
@@ -157,7 +156,9 @@ function Sidebar(props) {
         return <Reports selectedLocation={selectedLocation} />;
         case 'FollowUp': 
         return <FollowUp
+        selectedLocation={selectedLocation}
         followUpData={followUpData}
+        navigateToCoordinates={navigateToCoordinates}
         />;
       case 'Profile':
         return <Profile />;

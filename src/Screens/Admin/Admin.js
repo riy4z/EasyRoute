@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import InvitePopup from './InvitePopup';
 import UserDetails from './UserDetails';
 import api from '../../config/api';
+import { Toaster } from 'react-hot-toast';
 
 import { getUsersByLocation } from '../../components/fetch/getUsersByLocation'; 
 
@@ -108,6 +109,7 @@ function Admin(props) {
 console.log(users)
   return (
     <div>
+      <Toaster position='top-center' reverseOrder={false}></Toaster>
       <h1 className="text-5xl font-medium text-customColor1 text-left">Admin</h1>
   
   <div className='flex justify-center mt-6 '>
